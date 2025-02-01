@@ -17,13 +17,14 @@ public final class HumanPlayer implements Player {
         return nom;
     }
 
+    // Ici, on renvoie la liste mutable
     @Override
     public List<Card> getCartes() {
-        return List.copyOf(cartes); 
+        return cartes;
     }
 
     @Override
-    public void piocher(Card carte) {
-        cartes.add(carte);
+    public void piocher(Card card) {
+        cartes.add(card);
     }
 }

@@ -1,68 +1,67 @@
 package org.App.view;
 
-import java.util.List;
-
-import org.App.model.Card;
-
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class GameView {
     private final Stage stage;
-    private final Button piocherButton;
-    private final Button passerButton;
     private final Text nomJoueur;
     private final VBox cardsContainer;
 
     public GameView(Stage stage) {
         this.stage = stage;
-        this.piocherButton = new Button("Piocher");
-        this.passerButton = new Button("Passer le tour");
+        stage.setTitle("Skyjo");
+        stage.setWidth(1920);
+        stage.setHeight(1100);
         this.nomJoueur = new Text();
         this.cardsContainer = new VBox(10);
+        // Crée la scène avec le root (si ce n'est pas déjà fait)
+        if (stage.getScene() == null) {
+            stage.setScene(new javafx.scene.Scene(new StackPane(cardsContainer)));
+        }
     }
 
-    public void afficherJeu(String nomJoueurActuel, List<Card> cartesJoueur) {
-        VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #2d2d2d;");
-
-        // Nom du joueur
-        nomJoueur.setText("C'est au tour de : " + nomJoueurActuel);
-        nomJoueur.setFont(new Font(24));
-        nomJoueur.setStyle("-fx-fill: white;");
-
-        // Affichage des cartes du joueur
+    public void showMessageBox(String message) {
+        // Clear the previous content
         cardsContainer.getChildren().clear();
-        for (Card carte : cartesJoueur) {
-            Text cardText = new Text(carte.valeur().toString());
-            cardText.setFont(new Font(18));
-            cardText.setStyle("-fx-fill: white;");
-            cardsContainer.getChildren().add(cardText);
-        }
-
-        // Boutons d'actions
-        HBox buttonsBox = new HBox(10);
-        buttonsBox.setAlignment(Pos.CENTER);
-        buttonsBox.getChildren().addAll(piocherButton, passerButton);
-
-        root.getChildren().addAll(nomJoueur, cardsContainer, buttonsBox);
-
-        stage.setScene(new Scene(root, 600, 400));
+    
+        // Create a Text instance with the message
+        Text messageText = new Text(message);
+    
+        // Add the message to the container
+        cardsContainer.getChildren().add(messageText);
+    
         stage.show();
     }
 
-    public Button getPiocherButton() {
-        return piocherButton;
-    }
-
-    public Button getPasserButton() {
-        return passerButton;
+    public void afficherJeu(String nomJoueurActuel, java.util.List<org.App.model.Card> cartesJoueur, int remainingCards, org.App.model.Card topDiscardCard) {
+        // Clear the previous content
+        cardsContainer.getChildren().clear();
+    
+        // Update the player's name
+        nomJoueur.setText("Joueur actuel: " + nomJoueurActuel);
+    
+        // Create CardView instances for each Card
+        java.util.List<CardView> cardViews = new java.util.ArrayList<>();
+        for (int i = 0; i < cartesJoueur.size(); i++) {
+            cardViews.add(new CardView(cartesJoueur.get(i), i));
+        }
+    
+        // Create BoardView with the CardView instances
+        BoardView boardView = new BoardView(cardViews);
+    
+        // Create PickView with the remaining cards
+        PickView pickView = new PickView(remainingCards);
+    
+        // Create DiscardView with the top discard card
+        DiscardView discardView = new DiscardView(topDiscardCard);
+    
+        // Add the player's name, the board, and the pick view to the container
+        javafx.scene.layout.HBox gameContainer = new javafx.scene.layout.HBox(20, boardView, pickView, discardView);
+        cardsContainer.getChildren().addAll(nomJoueur, gameContainer);
+    
+        stage.show();
     }
 }
