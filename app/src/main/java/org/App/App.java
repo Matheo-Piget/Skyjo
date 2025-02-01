@@ -1,4 +1,4 @@
-package skyjo;
+package org.example;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class SkyjoGame extends Application {
+public class App extends Application {
 
     // Création de la scène principale
     @Override
