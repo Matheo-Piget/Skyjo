@@ -7,6 +7,7 @@ import java.util.List;
 public final class SkyjoGame {
     private final List<Player> players;
     private final List<Card> pick;
+    private int indexActualPlayer = 0;
 
     public SkyjoGame(List<Player> players) {
         this.players = List.copyOf(players);
@@ -31,4 +32,18 @@ public final class SkyjoGame {
     public Card pickCard() {
         return pick.isEmpty() ? null : pick.remove(0);
     }
+
+    public Player getActualPlayer() {
+        return players.get(indexActualPlayer);
+    }
+
+    public void nextPlayer() {
+        indexActualPlayer = (indexActualPlayer + 1) % players.size();
+    }
+
+    public boolean isFinished() {
+        return pick.isEmpty();
+    }
+
+
 }

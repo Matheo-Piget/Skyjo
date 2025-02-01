@@ -12,7 +12,7 @@ public final class App extends Application {
         GameView view = new GameView(primaryStage);
         GameController controller = new GameController(view);
 
-        view.afficherAccueil(controller::startGame);
+        controller.startGame();  // Démarre le jeu et les interactions
     }
 
     public static void main(String[] args) {
