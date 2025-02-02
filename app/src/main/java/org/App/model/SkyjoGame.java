@@ -3,46 +3,37 @@ package org.App.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public final class SkyjoGame {
     private final List<Player> players;
     private final List<Card> pick;
     private final List<Card> discard;
     private int indexActualPlayer = 0;
-
     private final Random random = new Random();
 
-    public SkyjoGame(List<Player> players) {
+    public SkyjoGame(final List<Player> players) {
         this.players = List.copyOf(players);
-        this.pick = creatPick();
+        this.pick = createPick();
         this.discard = new ArrayList<>();
     }
 
-    private List<Card> creatPick() {
-        List<Card> cartes = new ArrayList<>();
-        for (CardValue valeur : CardValue.values()) {
-            switch (valeur) {
-                case ZERO -> {
-                    for (int i = 0; i < 15; i++) {
-                        cartes.add(new Card(valeur, false));
-                    }
-                }
-                case MOINS_DEUX -> {
-                    for (int i = 0; i < 5; i++) {
-                        cartes.add(new Card(valeur, false));
-                    }
-                }
-                default -> {
-                    for (int i = 0; i < 10; i++) {
-                        cartes.add(new Card(valeur, false));
-                    }
-                }
-            }
+    private List<Card> createPick() {
+        List<Card> cards = new ArrayList<>();
+        for (CardValue value : CardValue.values()) {
+            int count = switch (value) {
+                case ZERO -> 15;
+                case MOINS_DEUX -> 5;
+                default -> 10;
+            };
+            cards.addAll(Collections.nCopies(count, new Card(value, false)));
         }
-        Collections.shuffle(cartes);
-        return cartes;
+        Collections.shuffle(cards);
+        return cards;
     }
 
     public List<Player> getPlayers() {
@@ -53,31 +44,13 @@ public final class SkyjoGame {
         return pick.isEmpty() ? null : pick.remove(0);
     }
 
-    public Card discardCard(Card card) {
-        if (!card.faceVisible()) {
-            card = card.retourner();
-        }
-        discard.add(card);
-        return card;
-
-    }
-
     public Card pickDiscard() {
-        if (discard.isEmpty()) {
-            return null;
-        }
-        Card card = discard.remove(discard.size() - 1);
-        card = card.retourner();
-        return card;
+        return discard.isEmpty() ? null : discard.remove(discard.size() - 1).retourner();
     }
 
-    public void addToDiscard(Card card) {
-        if (!card.faceVisible()) {
-            card = card.retourner();  // Retourne la carte si elle est face cachée
-        }
-        discard.add(card);
+    public void addToDiscard(final Card card) {
+        discard.add(card.faceVisible() ? card : card.retourner());
     }
-    
 
     public Player getActualPlayer() {
         return players.get(indexActualPlayer);
@@ -87,40 +60,22 @@ public final class SkyjoGame {
         indexActualPlayer = (indexActualPlayer + 1) % players.size();
     }
 
-    private boolean aPlayerHasReturnEveryCard() {
-        return players.stream()
-            .anyMatch(player -> player.getCartes().stream()
-                .allMatch(Card::faceVisible));
+    private boolean hasPlayerRevealedAllCards() {
+        return players.stream().anyMatch(player -> player.getCartes().stream().allMatch(Card::faceVisible));
     }
 
-    public void revealAllCard(){
-
-        for (Player player : players) {
-            for (int i = 0; i < player.getCartes().size(); i++) {
-                Card card = player.getCartes().get(i);
-                if (!card.faceVisible()) {
-                    player.getCartes().set(i, card.retourner());
-                }
-            }
-        }
-
+    public void revealAllCards() {
+        players.forEach(player -> player.getCartes().replaceAll(card -> card.faceVisible() ? card : card.retourner()));
     }
 
-    public HashMap<Player, Integer> doRanking(){
-
-        HashMap<Player, Integer> ranking = new HashMap<>();
-        for (Player player : players) {
-            int sum = player.getCartes().stream()
-                .mapToInt(card -> card.valeur().getValue())
-                .sum();
-            ranking.put(player, sum);
-        }
+    public Map<Player, Integer> getRanking() {
+        Map<Player, Integer> ranking = new HashMap<>();
+        players.forEach(player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()));
         return ranking;
-
     }
 
     public boolean isFinished() {
-        return aPlayerHasReturnEveryCard();
+        return hasPlayerRevealedAllCards();
     }
 
     public List<Card> getPick() {
@@ -132,45 +87,53 @@ public final class SkyjoGame {
     }
 
     public void startGame() {
-        for (Player player : players) {
-            for (int i = 0; i < 12; i++) {
-                player.piocher(pickCard());
-            }
+        players.forEach(player -> player.getCartes().addAll(pick.subList(0, 12)));
+        pick.subList(0, 12).clear();
+        discard.add(pick.remove(0).retourner());
+    }
+
+    public void exchangeOrRevealCard(final Player player, final Card newCard, final int cardIndex) {
+        if (cardIndex == -1) {
+            addToDiscard(newCard);
+        } else {
+            Card oldCard = player.getCartes().set(cardIndex, newCard);
+            addToDiscard(oldCard);
+            revealCard(player, cardIndex);
         }
-        discard.add(pickCard().retourner());
     }
 
-    public void exchangeCard(Player player, Card newCard, int cardIndex) {
-        Card oldCard = player.getCartes().get(cardIndex);
-        player.getCartes().set(cardIndex, newCard);
-        addToDiscard(oldCard);
-        revealCard(player, cardIndex);
-    }
-
-    public void revealCard(Player player, int cardIndex) {
-        Card card = player.getCartes().get(cardIndex);
-        player.getCartes().set(cardIndex, card.retourner());
+    public void revealCard(final Player player, final int cardIndex) {
+        player.getCartes().set(cardIndex, player.getCartes().get(cardIndex).retourner());
     }
 
     public void revealInitialCards() {
-        int highestTotal = -1;
-        int startingPlayerIndex = 0;
+    int highestTotal = -1;
+    int startingPlayerIndex = 0;
 
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            int total = 0;
-            for (int j = 0; j < 2; j++) {
-                int rand = random.nextInt(player.getCartes().size());
+    for (int i = 0; i < players.size(); i++) {
+        Player player = players.get(i);
+        int total = 0;
+        Set<Integer> revealedIndices = new HashSet<>();
+
+        while (revealedIndices.size() < 2) { // Assurer que deux cartes différentes sont retournées
+            int rand = random.nextInt(player.getCartes().size());
+            if (revealedIndices.add(rand)) { // Ajoute uniquement si l'index n'était pas déjà sélectionné
                 Card card = player.getCartes().get(rand);
                 player.getCartes().set(rand, card.retourner());
                 total += card.valeur().getValue();
             }
-            if (total > highestTotal) {
-                highestTotal = total;
-                startingPlayerIndex = i;
-            }
         }
 
-        indexActualPlayer = startingPlayerIndex;
+        if (total > highestTotal) {
+            highestTotal = total;
+            startingPlayerIndex = i;
+        }
+    }
+    indexActualPlayer = startingPlayerIndex;
+}
+
+
+    public Card getTopDiscard() {
+        return discard.isEmpty() ? null : discard.get(discard.size() - 1);
     }
 }

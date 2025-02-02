@@ -1,10 +1,9 @@
 package org.App.controller;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.App.model.Card;
-import org.App.model.HumanPlayer;
 import org.App.model.Player;
 import org.App.model.SkyjoGame;
 import org.App.view.CardView;
@@ -16,12 +15,9 @@ public final class GameController {
     private final GameView view;
     private Card pickedCard;
 
-    public GameController(GameView view) {
+    public GameController(GameView view, List<Player> players) {
         this.view = view;
-        this.game = new SkyjoGame(List.of(new HumanPlayer("Joueur 1"), new HumanPlayer("Joueur 2"), 
-        new HumanPlayer("Joueur 3"), new HumanPlayer("Joueur 4"), 
-        new HumanPlayer("Joueur 5"), new HumanPlayer("Joueur 6"), 
-        new HumanPlayer("Joueur 7"), new HumanPlayer("Joueur 8")));
+        this.game = new SkyjoGame(players);
         instance = this;
     }
 
@@ -32,9 +28,7 @@ public final class GameController {
     public void startGame() {
         game.startGame();
         game.revealInitialCards();
-        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(),
-                game.getPick().size(),
-                game.getDiscard().isEmpty() ? null : game.getDiscard().get(game.getDiscard().size() - 1));
+        updateView();
     }
 
     public void handlePickClick() {
@@ -48,12 +42,10 @@ public final class GameController {
         if (pickedCard != null) {
             game.addToDiscard(pickedCard);
             pickedCard = null;
-            finDeTour();
+            endTurn();
         } else {
             pickedCard = game.pickDiscard();
-            if (pickedCard != null) {
-                System.out.println(game.getActualPlayer().getName() + " a pioché " + pickedCard.valeur() + " de la défausse");
-            } else {
+            if (pickedCard == null) {
                 view.showMessageBox("La défausse est vide !");
             }
         }
@@ -61,34 +53,26 @@ public final class GameController {
 
     public void handleCardClick(CardView cardView) {
         if (pickedCard != null) {
-            if (cardView.getIndex() == -1) {
-                // Défausser la carte piochée et révéler une carte cachée
-                game.addToDiscard(pickedCard);
-                game.revealCard(game.getActualPlayer(), cardView.getIndex());
-            } else {
-                // Échanger la carte piochée avec la carte cliquée
-                game.exchangeCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
-            }
+            game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             pickedCard = null;
-            finDeTour();
+            endTurn();
         }
     }
     
-    private void finDeTour() {
+    private void endTurn() {
         if (game.isFinished()) {
-            game.revealAllCard();
-            HashMap<Player, Integer> ranking =  game.doRanking();
+            game.revealAllCards();
+            Map<Player, Integer> ranking = game.getRanking();
             view.showRanking(ranking);
         } else {
             game.nextPlayer();
-            // Mise à jour de l'affichage avec tous les boards
-            view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(),
-                    game.getPick().size(),
-                    game.getDiscard().isEmpty() ? null : game.getDiscard().get(game.getDiscard().size() - 1));
+            updateView();
         }
     }
 
-    public GameView getView() {
-        return view;
+    
+
+    private void updateView() {
+        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(), game.getTopDiscard());
     }
 }
