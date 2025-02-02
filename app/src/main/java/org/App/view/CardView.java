@@ -17,7 +17,7 @@ public class CardView extends StackPane {
         this.value = value;
         this.index = index;
 
-        Rectangle cardBackground = new Rectangle(50, 75);
+        Rectangle cardBackground = new Rectangle(40, 65);
         cardBackground.setStroke(Color.BLACK);
 
         Text cardValue = new Text();

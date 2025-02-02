@@ -48,17 +48,23 @@ public class GameView {
         }
 
         VBox centerPlayerContainer = createPlayerBoard(players.get(indexCurrentPlayer), true);
-        HBox sidePlayersContainer = new HBox(40);
-        sidePlayersContainer.setAlignment(Pos.CENTER);
+        HBox topPlayersContainer = new HBox(40);
+        HBox bottomPlayersContainer = new HBox(40);
+        topPlayersContainer.setAlignment(Pos.CENTER);
+        bottomPlayersContainer.setAlignment(Pos.CENTER);
         
-        for (int i = 1; i <= players.size() / 2; i++) {
-            int leftIndex = (indexCurrentPlayer - i + players.size()) % players.size();
-            int rightIndex = (indexCurrentPlayer + i) % players.size();
-            
-            VBox leftPlayer = createPlayerBoard(players.get(leftIndex), false);
-            VBox rightPlayer = createPlayerBoard(players.get(rightIndex), false);
-            
-            sidePlayersContainer.getChildren().addAll(leftPlayer, rightPlayer);
+        List<VBox> sidePlayers = new ArrayList<>();
+        for (int i = 1; i < players.size(); i++) {
+            int playerIndex = (indexCurrentPlayer + i) % players.size();
+            sidePlayers.add(createPlayerBoard(players.get(playerIndex), false));
+        }
+        
+        for (int i = 0; i < sidePlayers.size(); i++) {
+            if (i % 2 == 0) {
+                topPlayersContainer.getChildren().add(sidePlayers.get(i));
+            } else {
+                bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
+            }
         }
         
         PickView pickView = new PickView(remainingCards);
@@ -66,7 +72,7 @@ public class GameView {
         HBox commonPiles = new HBox(40, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
         
-        VBox mainContainer = new VBox(20, sidePlayersContainer, centerPlayerContainer, commonPiles);
+        VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
         
         cardsContainer.getChildren().add(mainContainer);
@@ -83,6 +89,7 @@ public class GameView {
         }
         
         BoardView boardView = new BoardView(cardViews);
+        boardView.setAlignment(Pos.CENTER);
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         
