@@ -17,6 +17,7 @@ public class DiscardView extends StackPane {
 
     public void setTopCard(Card topCard) {
         this.topCard = topCard;
+        System.err.println("DiscardView: topCard set to " + topCard);
         updateView();
     }
 

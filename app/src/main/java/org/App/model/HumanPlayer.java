@@ -17,7 +17,6 @@ public final class HumanPlayer implements Player {
         return nom;
     }
 
-    // Ici, on renvoie la liste mutable
     @Override
     public List<Card> getCartes() {
         return cartes;

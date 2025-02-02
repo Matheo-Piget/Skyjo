@@ -11,7 +11,7 @@ public final class SkyjoGame {
     private final List<Card> discard;
     private int indexActualPlayer = 0;
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public SkyjoGame(List<Player> players) {
         this.players = List.copyOf(players);
@@ -72,10 +72,11 @@ public final class SkyjoGame {
 
     public void addToDiscard(Card card) {
         if (!card.faceVisible()) {
-            card = card.retourner();
-            discard.add(card);
+            card = card.retourner();  // Retourne la carte si elle est face cachée
         }
+        discard.add(card);
     }
+    
 
     public Player getActualPlayer() {
         return players.get(indexActualPlayer);
@@ -103,7 +104,6 @@ public final class SkyjoGame {
                 player.piocher(pickCard());
             }
         }
-        // Add the first card to the discard pile
         discard.add(pickCard().retourner());
     }
 

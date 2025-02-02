@@ -23,7 +23,7 @@ public class CardView extends StackPane {
             Text cardValue = new Text(String.valueOf((int) switch (value.valeur()) {
                 case MOINS_DEUX -> -2;
                 case MOINS_UN -> -1;
-                default -> value.valeur().getValue() -2;
+                default -> value.valeur().getValue();
             }));
             cardValue.setStyle("-fx-font-size: 24px;");
 
