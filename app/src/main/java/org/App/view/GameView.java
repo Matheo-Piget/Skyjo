@@ -1,13 +1,22 @@
 package org.App.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.App.model.Card;
+import org.App.model.Player;
+
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class GameView {
+
     private final Stage stage;
-    private final Text nomJoueur;
     private final VBox cardsContainer;
 
     public GameView(Stage stage) {
@@ -15,53 +24,94 @@ public class GameView {
         stage.setTitle("Skyjo");
         stage.setWidth(1920);
         stage.setHeight(1100);
-        this.nomJoueur = new Text();
-        this.cardsContainer = new VBox(10);
-        // Crée la scène avec le root (si ce n'est pas déjà fait)
+
+        this.cardsContainer = new VBox(20);
+        this.cardsContainer.setAlignment(Pos.CENTER);
+
+        StackPane root = new StackPane(cardsContainer);
+        StackPane.setAlignment(cardsContainer, Pos.CENTER);
+
         if (stage.getScene() == null) {
-            stage.setScene(new javafx.scene.Scene(new StackPane(cardsContainer)));
+            stage.setScene(new Scene(root));
         }
     }
-
-    public void showMessageBox(String message) {
-        // Clear the previous content
+    
+    /**
+     * Affiche le plateau de jeu avec tous les boards des joueurs (côte à côte) 
+     * et les piles communes (pioche et défausse) centrées.
+     * 
+     * @param players Liste de tous les joueurs.
+     * @param currentPlayerName Nom du joueur actif (pour le mettre en avant).
+     * @param remainingCards Nombre de cartes restantes dans la pioche.
+     * @param topDiscardCard Carte visible au sommet de la défausse (peut être null).
+     */
+    public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
         cardsContainer.getChildren().clear();
-    
-        // Create a Text instance with the message
-        Text messageText = new Text(message);
-    
-        // Add the message to the container
-        cardsContainer.getChildren().add(messageText);
-    
+        
+        // Conteneur horizontal pour disposer côte à côte les boards des joueurs
+        HBox playersBoards = new HBox(20);
+        playersBoards.setAlignment(Pos.CENTER);
+
+        // Parcours de tous les joueurs pour créer leur board
+        for (Player player : players) {
+            Text playerNameText = new Text(player.getName());
+            // Mise en avant du joueur actif (par exemple en gras)
+            if (player.getName().equals(currentPlayerName)) {
+                playerNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+            } else {
+                playerNameText.setStyle("-fx-font-size: 16px;");
+            }
+            
+            // Création de la liste de CardView pour le joueur
+            List<CardView> cardViews = new ArrayList<>();
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                cardViews.add(new CardView(player.getCartes().get(i), i));
+            }
+            // Création du board du joueur
+            BoardView boardView = new BoardView(cardViews);
+            
+            // Conteneur vertical pour le nom et le board du joueur
+            VBox playerContainer = new VBox(5, playerNameText, boardView);
+            playerContainer.setAlignment(Pos.CENTER);
+            
+            playersBoards.getChildren().add(playerContainer);
+        }
+        
+        // Création de la vue pour la pioche et la défausse (communes à tous)
+        PickView pickView = new PickView(remainingCards);
+        DiscardView discardView = new DiscardView(topDiscardCard);
+        HBox commonPiles = new HBox(40, pickView, discardView);
+        commonPiles.setAlignment(Pos.CENTER);
+        
+        // Conteneur principal pour l'ensemble de l'affichage
+        VBox mainContainer = new VBox(20, playersBoards, commonPiles);
+        mainContainer.setAlignment(Pos.CENTER);
+        
+        cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
 
-    public void afficherJeu(String nomJoueurActuel, java.util.List<org.App.model.Card> cartesJoueur, int remainingCards, org.App.model.Card topDiscardCard) {
-        // Clear the previous content
+    public void showMessageBox(String message) {
         cardsContainer.getChildren().clear();
-    
-        // Update the player's name
-        nomJoueur.setText("Joueur actuel: " + nomJoueurActuel);
-    
-        // Create CardView instances for each Card
-        java.util.List<CardView> cardViews = new java.util.ArrayList<>();
-        for (int i = 0; i < cartesJoueur.size(); i++) {
-            cardViews.add(new CardView(cartesJoueur.get(i), i));
-        }
-    
-        // Create BoardView with the CardView instances
-        BoardView boardView = new BoardView(cardViews);
-    
-        // Create PickView with the remaining cards
-        PickView pickView = new PickView(remainingCards);
-    
-        // Create DiscardView with the top discard card
-        DiscardView discardView = new DiscardView(topDiscardCard);
-    
-        // Add the player's name, the board, and the pick view to the container
-        javafx.scene.layout.HBox gameContainer = new javafx.scene.layout.HBox(20, boardView, pickView, discardView);
-        cardsContainer.getChildren().addAll(nomJoueur, gameContainer);
-    
+        Text messageText = new Text(message);
+        cardsContainer.getChildren().add(messageText);
+        stage.show();
+    }
+
+    public void showRanking(java.util.HashMap<Player, Integer> ranking) {
+        cardsContainer.getChildren().clear();
+        VBox rankingContainer = new VBox(10);
+        rankingContainer.setAlignment(Pos.CENTER);
+
+        Text rankingTitle = new Text("Classement des joueurs:");
+        rankingContainer.getChildren().add(rankingTitle);
+
+        ranking.forEach((player, score) -> {
+            Text playerScore = new Text(player.getName() + ": " + score);
+            rankingContainer.getChildren().add(playerScore);
+        });
+
+        cardsContainer.getChildren().add(rankingContainer);
         stage.show();
     }
 }

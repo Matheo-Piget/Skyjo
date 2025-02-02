@@ -2,6 +2,7 @@ package org.App.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -86,8 +87,40 @@ public final class SkyjoGame {
         indexActualPlayer = (indexActualPlayer + 1) % players.size();
     }
 
+    private boolean aPlayerHasReturnEveryCard() {
+        return players.stream()
+            .anyMatch(player -> player.getCartes().stream()
+                .allMatch(Card::faceVisible));
+    }
+
+    public void revealAllCard(){
+
+        for (Player player : players) {
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                Card card = player.getCartes().get(i);
+                if (!card.faceVisible()) {
+                    player.getCartes().set(i, card.retourner());
+                }
+            }
+        }
+
+    }
+
+    public HashMap<Player, Integer> doRanking(){
+
+        HashMap<Player, Integer> ranking = new HashMap<>();
+        for (Player player : players) {
+            int sum = player.getCartes().stream()
+                .mapToInt(card -> card.valeur().getValue())
+                .sum();
+            ranking.put(player, sum);
+        }
+        return ranking;
+
+    }
+
     public boolean isFinished() {
-        return pick.isEmpty();
+        return aPlayerHasReturnEveryCard();
     }
 
     public List<Card> getPick() {

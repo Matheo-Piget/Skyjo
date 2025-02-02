@@ -3,6 +3,7 @@ package org.App.view;
 import org.App.controller.GameController;
 import org.App.model.Card;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -13,33 +14,38 @@ public class CardView extends StackPane {
     private final int index;
 
     public CardView(Card value, int index) {
-        if (value.faceVisible()){
-            this.value = value;
-            this.index = index;
-            Rectangle cardBackground = new Rectangle(100, 150);
-            cardBackground.setFill(Color.WHITE);
-            cardBackground.setStroke(Color.BLACK);
+        this.value = value;
+        this.index = index;
 
-            Text cardValue = new Text(String.valueOf((int) switch (value.valeur()) {
+        Rectangle cardBackground = new Rectangle(50, 75);
+        cardBackground.setStroke(Color.BLACK);
+
+        Text cardValue = new Text();
+
+        if (value.faceVisible()) {
+            switch (value.valeur()) {
+                case MOINS_DEUX, MOINS_UN -> cardBackground.setFill(Color.MAGENTA);
+                case ZERO -> cardBackground.setFill(Color.CYAN);
+                case UN, DEUX, TROIS, QUATRE -> cardBackground.setFill(Color.GREENYELLOW);
+                case CINQ, SIX, SEPT, HUIT -> cardBackground.setFill(Color.YELLOW);
+                case NEUF, DIX, ONZE , DOUZE -> cardBackground.setFill(Color.RED);
+                default -> throw new AssertionError();
+            }
+            cardValue.setText(String.valueOf((int) switch (value.valeur()) {
                 case MOINS_DEUX -> -2;
                 case MOINS_UN -> -1;
                 default -> value.valeur().getValue();
             }));
-            cardValue.setStyle("-fx-font-size: 24px;");
-
-            getChildren().addAll(cardBackground, cardValue);
         } else {
-            this.value = value;
-            this.index = index;
-            Rectangle cardBackground = new Rectangle(100, 150);
             cardBackground.setFill(Color.BLACK);
-            cardBackground.setStroke(Color.BLACK);
-
-            Text cardValue = new Text("?");
-            cardValue.setStyle("-fx-font-size: 24px;");
-
-            getChildren().addAll(cardBackground, cardValue);
+            cardValue.setText("?");
+            cardValue.setFill(Color.WHITE); // Assurez-vous que le texte est visible sur fond noir
         }
+
+        cardValue.setStyle("-fx-font-size: 24px;");
+
+        getChildren().addAll(cardBackground, cardValue);
+        StackPane.setAlignment(cardValue, Pos.CENTER); // Aligner le texte après l'ajout
 
         setOnMouseClicked(event -> handleClick());
     }

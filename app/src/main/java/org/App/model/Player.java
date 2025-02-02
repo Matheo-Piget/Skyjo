@@ -11,7 +11,7 @@ public interface Player {
      *
      * @return the name of the player.
      */
-    String getNom();
+    String getName();
 
     /**
      * Gets the list of cards the player has.

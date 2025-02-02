@@ -9,7 +9,7 @@ import javafx.scene.text.Text;
 
 public class PickView extends StackPane {
     public PickView(int remainingCards) {
-        Rectangle cardBackground = new Rectangle(100, 150);
+        Rectangle cardBackground = new Rectangle(50, 75);
         cardBackground.setFill(Color.GRAY);
         cardBackground.setStroke(Color.BLACK);
 
@@ -22,7 +22,6 @@ public class PickView extends StackPane {
     }
 
     private void handleClick() {
-        // Handle pick view click logic
         GameController.getInstance().handlePickClick();
     }
 }

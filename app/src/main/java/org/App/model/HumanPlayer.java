@@ -13,7 +13,7 @@ public final class HumanPlayer implements Player {
     }
 
     @Override
-    public String getNom() {
+    public String getName() {
         return nom;
     }
 
