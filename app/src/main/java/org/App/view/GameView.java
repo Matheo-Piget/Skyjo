@@ -36,59 +36,57 @@ public class GameView {
         }
     }
     
-    /**
-     * Affiche le plateau de jeu avec tous les boards des joueurs (côte à côte) 
-     * et les piles communes (pioche et défausse) centrées.
-     * 
-     * @param players Liste de tous les joueurs.
-     * @param currentPlayerName Nom du joueur actif (pour le mettre en avant).
-     * @param remainingCards Nombre de cartes restantes dans la pioche.
-     * @param topDiscardCard Carte visible au sommet de la défausse (peut être null).
-     */
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
         cardsContainer.getChildren().clear();
         
-        // Conteneur horizontal pour disposer côte à côte les boards des joueurs
-        HBox playersBoards = new HBox(20);
-        playersBoards.setAlignment(Pos.CENTER);
+        int indexCurrentPlayer = 0;
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getName().equals(currentPlayerName)) {
+                indexCurrentPlayer = i;
+                break;
+            }
+        }
 
-        // Parcours de tous les joueurs pour créer leur board
-        for (Player player : players) {
-            Text playerNameText = new Text(player.getName());
-            // Mise en avant du joueur actif (par exemple en gras)
-            if (player.getName().equals(currentPlayerName)) {
-                playerNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
-            } else {
-                playerNameText.setStyle("-fx-font-size: 16px;");
-            }
+        VBox centerPlayerContainer = createPlayerBoard(players.get(indexCurrentPlayer), true);
+        HBox sidePlayersContainer = new HBox(40);
+        sidePlayersContainer.setAlignment(Pos.CENTER);
+        
+        for (int i = 1; i <= players.size() / 2; i++) {
+            int leftIndex = (indexCurrentPlayer - i + players.size()) % players.size();
+            int rightIndex = (indexCurrentPlayer + i) % players.size();
             
-            // Création de la liste de CardView pour le joueur
-            List<CardView> cardViews = new ArrayList<>();
-            for (int i = 0; i < player.getCartes().size(); i++) {
-                cardViews.add(new CardView(player.getCartes().get(i), i));
-            }
-            // Création du board du joueur
-            BoardView boardView = new BoardView(cardViews);
+            VBox leftPlayer = createPlayerBoard(players.get(leftIndex), false);
+            VBox rightPlayer = createPlayerBoard(players.get(rightIndex), false);
             
-            // Conteneur vertical pour le nom et le board du joueur
-            VBox playerContainer = new VBox(5, playerNameText, boardView);
-            playerContainer.setAlignment(Pos.CENTER);
-            
-            playersBoards.getChildren().add(playerContainer);
+            sidePlayersContainer.getChildren().addAll(leftPlayer, rightPlayer);
         }
         
-        // Création de la vue pour la pioche et la défausse (communes à tous)
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
         HBox commonPiles = new HBox(40, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
         
-        // Conteneur principal pour l'ensemble de l'affichage
-        VBox mainContainer = new VBox(20, playersBoards, commonPiles);
+        VBox mainContainer = new VBox(20, sidePlayersContainer, centerPlayerContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
         
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
+    }
+
+    private VBox createPlayerBoard(Player player, boolean isCurrent) {
+        Text playerNameText = new Text(player.getName());
+        playerNameText.setStyle(isCurrent ? "-fx-font-weight: bold; -fx-font-size: 20px;" : "-fx-font-size: 16px;");
+        
+        List<CardView> cardViews = new ArrayList<>();
+        for (int i = 0; i < player.getCartes().size(); i++) {
+            cardViews.add(new CardView(player.getCartes().get(i), i));
+        }
+        
+        BoardView boardView = new BoardView(cardViews);
+        VBox playerContainer = new VBox(5, playerNameText, boardView);
+        playerContainer.setAlignment(Pos.CENTER);
+        
+        return playerContainer;
     }
 
     public void showMessageBox(String message) {

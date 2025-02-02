@@ -18,7 +18,10 @@ public final class GameController {
 
     public GameController(GameView view) {
         this.view = view;
-        this.game = new SkyjoGame(List.of(new HumanPlayer("Joueur 1"), new HumanPlayer("Joueur 2"), new HumanPlayer("Joueur 3"), new HumanPlayer("Joueur 4"), new HumanPlayer("Joueur 5")));
+        this.game = new SkyjoGame(List.of(new HumanPlayer("Joueur 1"), new HumanPlayer("Joueur 2"), 
+        new HumanPlayer("Joueur 3"), new HumanPlayer("Joueur 4"), 
+        new HumanPlayer("Joueur 5"), new HumanPlayer("Joueur 6"), 
+        new HumanPlayer("Joueur 7"), new HumanPlayer("Joueur 8")));
         instance = this;
     }
 
