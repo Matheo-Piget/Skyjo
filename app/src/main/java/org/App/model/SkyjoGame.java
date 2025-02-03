@@ -47,12 +47,20 @@ public final class SkyjoGame {
     }
 
     public Card pickDiscard() {
-        return discard.isEmpty() ? null : discard.remove(discard.size() - 1).retourner();
+        if (discard.isEmpty()) {
+            return null; // Si la défausse est vide
+        } else {
+            Card topCard = discard.remove(discard.size() - 1);
+
+            System.out.println("Joueur " + indexActualPlayer + " a pioché de la défausse un " + topCard.valeur()); 
+            return topCard.retourner(); // On retourne la carte
+        }
     }
 
     public void addToDiscard(final Card card) {
-        discard.add(card.faceVisible() ? card : card.retourner());
-    }
+        System.out.println("Joueur " + indexActualPlayer + " a mit dans la défausse un " + card.valeur());
+        discard.add(card.faceVisible() ? card : card.retourner()); // On ajoute la carte retournée si elle est cachée
+    }    
 
     public Player getActualPlayer() {
         return players.get(indexActualPlayer);
@@ -127,7 +135,7 @@ public final class SkyjoGame {
     public void checkColumns() {
         Player player = players.get(indexActualPlayer);
 
-        int columns = player.getCartes().size()/3; // Supposons une grille de 3x4
+        int columns = player.getCartes().size()/3; 
         int rows = 3;
         List<Card> cartes = player.getCartes();
         boolean columnRemoved = false;
