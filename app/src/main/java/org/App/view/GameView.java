@@ -25,29 +25,37 @@ public class GameView {
 
     private final Stage stage;
     private final VBox cardsContainer;
+    private final Scene scene;
 
     public GameView(Stage stage) {
         this.stage = stage;
         stage.setTitle("Skyjo");
         stage.setFullScreen(true);
-
+    
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
-
+    
         // Create Menu Bar
         MenuBar menuBar = createMenuBar();
-
+    
         StackPane root = new StackPane(cardsContainer);
         StackPane.setAlignment(cardsContainer, Pos.CENTER);
-
+    
         // Add menu bar to the scene
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
         borderPane.setCenter(root);
+    
+        this.scene = new Scene(borderPane); // Créer la scène ici
+    }
+    
+    public Scene getScene() {
+        return scene; // Retourne la scène correctement initialisée
+    }
+    
 
-        if (stage.getScene() == null) {
-            stage.setScene(new Scene(borderPane));
-        }
+    public void show() {
+        stage.show();
     }
 
     // Create a simple MenuBar with options
