@@ -38,7 +38,7 @@ public class GameView {
     
         // Create Menu Bar with Styling
         MenuBar menuBar = createMenuBar();
-        menuBar.setStyle("-fx-background-color: linear-gradient(to right, #4A90E2, #145DA0); -fx-padding: 10px;");
+        menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 10px;");
     
         StackPane root = new StackPane(cardsContainer);
         StackPane.setAlignment(cardsContainer, Pos.CENTER);
@@ -47,7 +47,7 @@ public class GameView {
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
         borderPane.setCenter(root);
-        borderPane.setStyle("-fx-background-color: #1E1E1E;");
+        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
         this.scene = new Scene(borderPane);
     }
@@ -60,11 +60,11 @@ public class GameView {
         stage.show();
     }
 
-    // Create a more stylish MenuBar with enhanced options
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu("Game");
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
+
         startNewGame.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
         exitGame.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
 
@@ -118,13 +118,10 @@ public class GameView {
         
         VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
-        mainContainer.setStyle("-fx-background-color: #2C3E50; -fx-padding: 20px; -fx-border-radius: 10px; -fx-border-color: white;");
-        
-        DropShadow shadow = new DropShadow(10, 5, 5, Color.GRAY);
-        mainContainer.setEffect(shadow);
+        mainContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-padding: 20px; -fx-border-radius: 10px; -fx-border-color: white;");
+        mainContainer.setEffect(new DropShadow(10, 5, 5, Color.GRAY));
     
-        DropShadow shadow2 = new DropShadow(10, 5, 5, Color.GRAY);
-        centerPlayerContainer.setEffect(shadow2);
+        centerPlayerContainer.setEffect(new DropShadow(10, 5, 5, Color.GRAY));
         
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
@@ -132,8 +129,8 @@ public class GameView {
 
     private VBox createPlayerBoard(Player player, boolean isCurrent) {
         Text playerNameText = new Text(player.getName());
-        playerNameText.setFont(Font.font("Arial", isCurrent ? 20 : 16));
-        playerNameText.setFill(isCurrent ? Color.YELLOW : Color.WHITE);
+        playerNameText.setFont(Font.font("Arial", isCurrent ? 22 : 18));
+        playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
     
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
@@ -144,7 +141,7 @@ public class GameView {
         boardView.setAlignment(Pos.CENTER);
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
-        playerContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 10px; -fx-padding: 10px;");
+        playerContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.15); -fx-border-radius: 10px; -fx-padding: 10px;");
     
         return playerContainer;
     }
@@ -155,10 +152,14 @@ public class GameView {
         rankingContainer.setAlignment(Pos.CENTER);
 
         Text rankingTitle = new Text("Classement des joueurs:");
+        rankingTitle.setFont(Font.font("Arial", 24));
+        rankingTitle.setFill(Color.LIGHTGRAY);
         rankingContainer.getChildren().add(rankingTitle);
 
         ranking.forEach((player, score) -> {
             Text playerScore = new Text(player.getName() + ": " + score);
+            playerScore.setFont(Font.font("Arial", 18));
+            playerScore.setFill(Color.WHITE);
             rankingContainer.getChildren().add(playerScore);
         });
 
@@ -166,10 +167,19 @@ public class GameView {
         stage.show();
     }
 
+    public void showEndGame() {
+        cardsContainer.getChildren().clear();
+        Text endGameText = new Text("Fin de la partie !");
+        endGameText.setFont(Font.font("Arial", 36));
+        endGameText.setFill(Color.WHITE);
+        cardsContainer.getChildren().add(endGameText);
+        stage.show();
+    }
+
     public void showMessageBox(String message) {
         cardsContainer.getChildren().clear();
         Text messageText = new Text(message);
-        messageText.setFont(Font.font("Arial", 18));
+        messageText.setFont(Font.font("Arial", 24));
         messageText.setFill(Color.WHITE);
         cardsContainer.getChildren().add(messageText);
         stage.show();
