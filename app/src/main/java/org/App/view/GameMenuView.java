@@ -90,6 +90,7 @@ public class GameMenuView {
     
         // Mise à jour de la scène de la fenêtre
         stage.setScene(gameView.getScene());
+        stage.setFullScreen(true);
     
         // Affichage de la partie (ajout important)
         gameView.showPlaying(players, players.get(0).getName(), 50, null); // Mettre une vraie carte ici
