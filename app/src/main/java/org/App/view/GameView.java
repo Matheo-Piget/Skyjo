@@ -28,8 +28,7 @@ public class GameView {
     public GameView(Stage stage) {
         this.stage = stage;
         stage.setTitle("Skyjo");
-        stage.setWidth(1920);
-        stage.setHeight(1100);
+        stage.setFullScreen(true);
 
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
