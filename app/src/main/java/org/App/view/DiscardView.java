@@ -18,7 +18,7 @@ public class DiscardView extends StackPane {
         DropShadow shadow = new DropShadow(5, 3, 3, Color.GRAY);
         this.setEffect(shadow);
 
-        setOnMouseClicked(event -> handleClick());
+        setOnMouseClicked(event -> handleClick(event));
     }
 
     public void setTopCard(Card topCard) {
@@ -29,13 +29,16 @@ public class DiscardView extends StackPane {
     private void updateView() {
         getChildren().clear();
         if (topCard != null) {
-            CardView cardView = new CardView(topCard, -1); // -1 indicates it's not part of the player's board
+            CardView cardView = new CardView(topCard, -1);
+            cardView.setMouseTransparent(true); // Désactive les interactions pour éviter les clics multiples
             getChildren().add(cardView);
         }
     }
 
-    private void handleClick() {
-        // Handle discard view click logic
+    private void handleClick(javafx.scene.input.MouseEvent event) {
         GameController.getInstance().handleDiscardClick();
+        // Empêche la propagation du clic aux enfants
+
+        event.consume();
     }
 }

@@ -55,6 +55,7 @@ public class CardView extends StackPane {
         cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
         cardBackground.setOnMouseExited(event -> scaleDown(cardBackground));
 
+
         getChildren().addAll(cardBackground, cardValue);
         StackPane.setAlignment(cardValue, javafx.geometry.Pos.CENTER); 
 

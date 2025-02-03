@@ -51,7 +51,6 @@ public final class SkyjoGame {
             return null; // Si la défausse est vide
         } else {
             Card topCard = discard.remove(discard.size() - 1);
-
             System.out.println("Joueur " + indexActualPlayer + " a pioché de la défausse un " + topCard.valeur()); 
             return topCard.retourner(); // On retourne la carte
         }
@@ -98,9 +97,7 @@ public final class SkyjoGame {
     }
 
     public void startGame() {
-
         // clear for new game
-
         if (!pick.isEmpty()) {
             pick.clear();
         }

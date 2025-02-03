@@ -41,20 +41,15 @@ public final class GameController {
         }
     }
 
-
     public void updateView() {
         view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(), game.getTopDiscard());
     }
-    
 
     public void handleDiscardClick() {
         if (pickedCard != null) {
             game.addToDiscard(pickedCard);
             pickedCard = null;
-            if (hasPick){
-
-                
-            }
+            hasPick = false;
             endTurn();
         } else {
             pickedCard = game.pickDiscard();
@@ -68,10 +63,11 @@ public final class GameController {
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             pickedCard = null;
+            hasPick = false;
             endTurn();
         }
     }
-    
+
     private void endTurn() {
         game.checkColumns();
         if (game.isFinished()) {
