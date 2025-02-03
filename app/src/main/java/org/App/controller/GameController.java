@@ -14,6 +14,7 @@ public final class GameController {
     private final SkyjoGame game;
     private final GameView view;
     private Card pickedCard;
+    private boolean hasPick;
 
     public GameController(GameView view, List<Player> players) {
         this.view = view;
@@ -33,15 +34,28 @@ public final class GameController {
 
     public void handlePickClick() {
         pickedCard = game.pickCard();
+
         if (pickedCard != null) {
             System.out.println(game.getActualPlayer().getName() + " a pioché " + pickedCard.valeur());
+            hasPick = true;
         }
     }
+
+
+    public void updateView() {
+        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(), game.getTopDiscard());
+    }
+    
 
     public void handleDiscardClick() {
         if (pickedCard != null) {
             game.addToDiscard(pickedCard);
             pickedCard = null;
+            if (hasPick){
+
+                
+
+            }
             endTurn();
         } else {
             pickedCard = game.pickDiscard();
@@ -60,6 +74,7 @@ public final class GameController {
     }
     
     private void endTurn() {
+        game.checkColumns();
         if (game.isFinished()) {
             game.revealAllCards();
             Map<Player, Integer> ranking = game.getRanking();
@@ -68,11 +83,5 @@ public final class GameController {
             game.nextPlayer();
             updateView();
         }
-    }
-
-    
-
-    private void updateView() {
-        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(), game.getTopDiscard());
     }
 }

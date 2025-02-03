@@ -3,6 +3,7 @@ package org.App.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.App.controller.GameController;
 import org.App.model.Card;
 import org.App.model.Player;
 
@@ -56,8 +57,7 @@ public class GameView {
         MenuItem exitGame = new MenuItem("Exit");
 
         startNewGame.setOnAction(event -> {
-            // Add logic to start a new game
-            System.out.println("Starting new game...");
+            GameController.getInstance().startGame();
         });
 
         exitGame.setOnAction(event -> {

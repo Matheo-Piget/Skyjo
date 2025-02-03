@@ -9,20 +9,23 @@ import javafx.scene.paint.Color;
 public class BoardView extends GridPane {
 
     public BoardView(List<CardView> cardViews) {
-        int cols = 4;
-
-        for (int i = 0; i < cardViews.size(); i++) {
-            int row = i / cols;
-            int col = i % cols;
+        int totalCards = cardViews.size();
+        int rows = Math.min(3, totalCards); // On limite à 3 lignes max
+        int cols = (int) Math.ceil((double) totalCards / rows); // Nombre de colonnes dynamiquement calculé
+    
+        for (int i = 0; i < totalCards; i++) {
+            int row = i % rows;  // Répartition sur les 3 lignes max
+            int col = i / rows;  // Augmente dynamiquement selon le nombre de cartes
             this.add(cardViews.get(i), col, row);
         }
-
-        // Horizontal and vertical gaps between cards
+    
+        // Ajout d'espaces entre les cartes
         this.setHgap(10);
         this.setVgap(10);
-
-        // Applying shadow effect to the whole grid
+    
+        // Application d'un effet d'ombre sur la grille
         DropShadow shadow = new DropShadow(10, 5, 5, Color.GRAY);
         this.setEffect(shadow);
     }
+    
 }

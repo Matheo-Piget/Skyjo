@@ -13,7 +13,7 @@ import javafx.util.Duration;
 
 public class PickView extends StackPane {
     public PickView(int remainingCards) {
-        Rectangle cardBackground = new Rectangle(40, 65);
+        Rectangle cardBackground = new Rectangle(50, 80);
         cardBackground.setFill(Color.GRAY);
         cardBackground.setStroke(Color.BLACK);
         cardBackground.setArcWidth(10); 

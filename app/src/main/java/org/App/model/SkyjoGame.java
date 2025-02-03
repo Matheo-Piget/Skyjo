@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.App.controller.GameController;
+
 public final class SkyjoGame {
     private final List<Player> players;
-    private final List<Card> pick;
+    private List<Card> pick;
     private final List<Card> discard;
     private int indexActualPlayer = 0;
     private final Random random = new Random();
@@ -70,7 +72,8 @@ public final class SkyjoGame {
 
     public Map<Player, Integer> getRanking() {
         Map<Player, Integer> ranking = new HashMap<>();
-        players.forEach(player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()));
+        players.forEach(
+                player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()));
         return ranking;
     }
 
@@ -87,6 +90,21 @@ public final class SkyjoGame {
     }
 
     public void startGame() {
+
+        // clear for new game
+
+        if (!pick.isEmpty()) {
+            pick.clear();
+        }
+        if (!discard.isEmpty()) {
+            discard.clear();
+        }
+        if (!players.isEmpty()) {
+            players.forEach(player -> player.getCartes().clear());
+        }
+
+        pick = createPick();
+
         players.forEach(player -> player.getCartes().addAll(pick.subList(0, 12)));
         pick.subList(0, 12).clear();
         discard.add(pick.remove(0).retourner());
@@ -106,32 +124,81 @@ public final class SkyjoGame {
         player.getCartes().set(cardIndex, player.getCartes().get(cardIndex).retourner());
     }
 
-    public void revealInitialCards() {
-    int highestTotal = -1;
-    int startingPlayerIndex = 0;
+    public void checkColumns() {
+        Player player = players.get(indexActualPlayer);
 
-    for (int i = 0; i < players.size(); i++) {
-        Player player = players.get(i);
-        int total = 0;
-        Set<Integer> revealedIndices = new HashSet<>();
+        int columns = player.getCartes().size()/3; // Supposons une grille de 3x4
+        int rows = 3;
+        List<Card> cartes = player.getCartes();
+        boolean columnRemoved = false;
 
-        while (revealedIndices.size() < 2) { // Assurer que deux cartes différentes sont retournées
-            int rand = random.nextInt(player.getCartes().size());
-            if (revealedIndices.add(rand)) { // Ajoute uniquement si l'index n'était pas déjà sélectionné
-                Card card = player.getCartes().get(rand);
-                player.getCartes().set(rand, card.retourner());
-                total += card.valeur().getValue();
+        for (int col = 0; col < columns; col++) {
+            CardValue firstValue = null;
+            boolean allSame = true;
+            List<Integer> indexes = new ArrayList<>();
+
+            for (int row = 0; row < rows; row++) {
+                int index = row * columns + col;
+                if (index >= cartes.size())
+                    continue;
+
+                Card card = cartes.get(index);
+                if (!card.faceVisible()) {
+                    allSame = false;
+                    break;
+                }
+
+                if (firstValue == null) {
+                    firstValue = card.valeur();
+                } else if (!firstValue.equals(card.valeur())) {
+                    allSame = false;
+                    break;
+                }
+
+                indexes.add(index);
+            }
+
+            if (allSame && firstValue != null) {
+                // Ajouter les cartes à la défausse et supprimer les cartes du plateau
+                for (int i = indexes.size() - 1; i >= 0; i--) {
+                    int index = indexes.get(i);
+                    addToDiscard(cartes.get(index));
+                    cartes.remove(index);
+                }
+                columnRemoved = true;
             }
         }
 
-        if (total > highestTotal) {
-            highestTotal = total;
-            startingPlayerIndex = i;
+        if (columnRemoved) {
+            GameController.getInstance().updateView();
         }
     }
-    indexActualPlayer = startingPlayerIndex;
-}
 
+    public void revealInitialCards() {
+        int highestTotal = -1;
+        int startingPlayerIndex = 0;
+
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            int total = 0;
+            Set<Integer> revealedIndices = new HashSet<>();
+
+            while (revealedIndices.size() < 2) { // Assurer que deux cartes différentes sont retournées
+                int rand = random.nextInt(player.getCartes().size());
+                if (revealedIndices.add(rand)) { // Ajoute uniquement si l'index n'était pas déjà sélectionné
+                    Card card = player.getCartes().get(rand);
+                    player.getCartes().set(rand, card.retourner());
+                    total += card.valeur().getValue();
+                }
+            }
+
+            if (total > highestTotal) {
+                highestTotal = total;
+                startingPlayerIndex = i;
+            }
+        }
+        indexActualPlayer = startingPlayerIndex;
+    }
 
     public Card getTopDiscard() {
         return discard.isEmpty() ? null : discard.get(discard.size() - 1);
