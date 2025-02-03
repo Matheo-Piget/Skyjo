@@ -32,11 +32,15 @@ public final class SkyjoGame {
                 case MOINS_DEUX -> 5;
                 default -> 10;
             };
-            cards.addAll(Collections.nCopies(count, new Card(value, false)));
+            for (int i = 0; i < count; i++) {
+                cards.add(new Card(value, false)); // Crée et ajoute chaque carte
+            }
         }
         Collections.shuffle(cards);
+        System.out.println("Nombre total de cartes générées : " + cards.size()); // DEBUG
         return cards;
     }
+    
 
     public List<Player> getPlayers() {
         return players;
@@ -97,23 +101,28 @@ public final class SkyjoGame {
     }
 
     public void startGame() {
-        // clear for new game
+        if (!pick.isEmpty()) pick.clear();
+        if (!discard.isEmpty()) discard.clear();
+        players.forEach(player -> player.getCartes().clear());
+    
+        pick = createPick(); // Créer une nouvelle pioche
+        players.forEach(player -> {
+            player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur
+            pick.subList(0, 12).clear(); // Retirer ces cartes de la pioche
+        });
+    
+        // Vérifier si la distribution s'est bien passée
+        System.out.println("Cartes restantes dans la pioche après distribution : " + pick.size());
+        players.forEach(player -> System.out.println(player.getName() + " a " + player.getCartes().size() + " cartes"));
+    
+        // Ajoute la première carte de la pioche à la défausse
         if (!pick.isEmpty()) {
-            pick.clear();
+            Card firstCard = pick.remove(0).retourner(); // La retourner face visible
+            discard.add(firstCard);
+            System.out.println("Première carte dans la défausse : " + firstCard.valeur());
         }
-        if (!discard.isEmpty()) {
-            discard.clear();
-        }
-        if (!players.isEmpty()) {
-            players.forEach(player -> player.getCartes().clear());
-        }
-
-        pick = createPick();
-
-        players.forEach(player -> player.getCartes().addAll(pick.subList(0, 12)));
-        players.forEach(player -> pick.subList(0, 12).clear());
-        discard.add(pick.remove(0).retourner());
     }
+    
 
     public void exchangeOrRevealCard(final Player player, final Card newCard, final int cardIndex) {
         if (cardIndex == -1) {

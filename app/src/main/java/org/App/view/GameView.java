@@ -81,6 +81,7 @@ public class GameView {
     }
     
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
+
         cardsContainer.getChildren().clear();
         
 

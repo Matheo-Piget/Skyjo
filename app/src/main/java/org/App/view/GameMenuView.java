@@ -27,6 +27,8 @@ public class GameMenuView {
         this.playerInputs = new VBox(10);
         this.playerInputs.setAlignment(Pos.CENTER);
 
+        stage.setFullScreen(true);
+
         setupMenu();
     }
 
@@ -93,6 +95,8 @@ public class GameMenuView {
         gameView.showPlaying(players, players.get(0).getName(), 50, null); // Mettre une vraie carte ici
     
         gameView.show();
+
+        controller.startGame();
     }
     
     
