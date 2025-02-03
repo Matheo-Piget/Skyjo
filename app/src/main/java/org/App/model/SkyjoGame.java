@@ -114,7 +114,7 @@ public final class SkyjoGame {
         pick = createPick();
 
         players.forEach(player -> player.getCartes().addAll(pick.subList(0, 12)));
-        pick.subList(0, 12).clear();
+        players.forEach(player -> pick.subList(0, 12).clear());
         discard.add(pick.remove(0).retourner());
     }
 

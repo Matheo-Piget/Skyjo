@@ -54,7 +54,6 @@ public final class GameController {
             if (hasPick){
 
                 
-
             }
             endTurn();
         } else {

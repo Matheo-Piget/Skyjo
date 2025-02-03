@@ -18,13 +18,7 @@ public final class App extends Application {
 
         List<Player> players = List.of(
             new HumanPlayer("Joueur 1"),
-            new HumanPlayer("Joueur 2"),
-            new HumanPlayer("Joueur 3"),
-            new HumanPlayer("Joueur 4"),
-            new HumanPlayer("Joueur 5"),
-            new HumanPlayer("Joueur 6"),
-            new HumanPlayer("Joueur 7"),
-            new HumanPlayer("Joueur 8")
+            new HumanPlayer("Joueur 2")
         );
         GameController controller = new GameController(view, players);
 
