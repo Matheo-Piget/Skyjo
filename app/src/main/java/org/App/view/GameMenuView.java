@@ -13,7 +13,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class GameMenuView {
@@ -28,7 +31,7 @@ public class GameMenuView {
         this.playerInputs.setAlignment(Pos.CENTER);
 
         stage.setFullScreen(true);
-
+        
         setupMenu();
     }
 
@@ -36,17 +39,23 @@ public class GameMenuView {
         VBox menuContainer = new VBox(15);
         menuContainer.setPadding(new Insets(20));
         menuContainer.setAlignment(Pos.CENTER);
+        menuContainer.setStyle("-fx-background-color: #2c3e50; -fx-padding: 30px; -fx-border-radius: 10px;");
 
         Label title = new Label("Configuration de la Partie");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        title.setFont(new Font("Arial", 28));
+        title.setTextFill(Color.WHITE);
+        title.setEffect(new DropShadow(3, Color.BLACK));
 
         Label playerCountLabel = new Label("Nombre de joueurs :");
-        TextField playerCountField = new TextField("2");
+        playerCountLabel.setTextFill(Color.WHITE);
 
-        Button generateFieldsButton = new Button("Configurer joueurs");
+        TextField playerCountField = new TextField("2");
+        styleTextField(playerCountField);
+
+        Button generateFieldsButton = createStyledButton("Configurer joueurs");
         generateFieldsButton.setOnAction(e -> generatePlayerFields(playerCountField));
 
-        Button startButton = new Button("Démarrer la partie");
+        Button startButton = createStyledButton("Démarrer la partie");
         startButton.setOnAction(e -> startGame());
 
         menuContainer.getChildren().addAll(title, playerCountLabel, playerCountField, generateFieldsButton, playerInputs, startButton);
@@ -66,13 +75,16 @@ public class GameMenuView {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
-            playerInputs.getChildren().add(new Label("Veuillez entrer un nombre entre 2 et 6."));
+            Label errorLabel = new Label("Veuillez entrer un nombre entre 2 et 6.");
+            errorLabel.setTextFill(Color.RED);
+            playerInputs.getChildren().add(errorLabel);
             return;
         }
         
         for (int i = 1; i <= numPlayers; i++) {
             TextField nameField = new TextField("Joueur " + i);
             nameField.setPromptText("Nom du Joueur " + i);
+            styleTextField(nameField);
             nameFields.add(nameField);
             playerInputs.getChildren().add(nameField);
         }
@@ -88,17 +100,24 @@ public class GameMenuView {
         GameController controller = new GameController(gameView, players);
         controller.startGame();
     
-        // Mise à jour de la scène de la fenêtre
         stage.setScene(gameView.getScene());
         stage.setFullScreen(true);
     
-        // Affichage de la partie (ajout important)
-        gameView.showPlaying(players, players.get(0).getName(), 50, null); // Mettre une vraie carte ici
+        gameView.showPlaying(players, players.get(0).getName(), 50, null); 
     
         gameView.show();
-
         controller.startGame();
     }
-    
-    
+
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;");
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;"));
+        return button;
+    }
+
+    private void styleTextField(TextField textField) {
+        textField.setStyle("-fx-font-size: 14px; -fx-padding: 5px; -fx-border-color: #3498db; -fx-border-radius: 5px;");
+    }
 }
