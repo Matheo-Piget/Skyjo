@@ -41,6 +41,9 @@ public class CardView extends StackPane {
                 case MOINS_UN -> -1;
                 default -> value.valeur().getValue();
             }));
+
+            cardValue.setFont( new javafx.scene.text.Font(24));
+            
         } else {
             cardBackground.setFill(Color.BLACK);
             cardValue.setText("?");
