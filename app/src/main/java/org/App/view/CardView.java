@@ -18,7 +18,7 @@ public class CardView extends StackPane {
         this.value = value;
         this.index = index;
 
-        Rectangle cardBackground = new Rectangle(20, 40);  // Larger card size
+        Rectangle cardBackground = new Rectangle(40, 60);  // Larger card size
         cardBackground.setStroke(Color.BLACK);
         cardBackground.setArcWidth(15); // Rounded corners
         cardBackground.setArcHeight(15); 
