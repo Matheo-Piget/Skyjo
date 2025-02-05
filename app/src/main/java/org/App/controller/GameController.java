@@ -62,17 +62,18 @@ public final class GameController {
     }
 
     public void handleCardClick(CardView cardView) {
-        if (hasDiscard && count_reveal < 2) {
-            game.revealCard(game.getActualPlayer(), cardView.getIndex());
-            updateView();
-            count_reveal++;
-        }
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             pickedCard = null;
             hasPick = false;
             endTurn();
         }
+        if (hasDiscard && count_reveal < 2) {
+            game.revealCard(game.getActualPlayer(), cardView.getIndex());
+            updateView();
+            count_reveal++;
+        }
+        
         if (count_reveal == 2) {
             count_reveal = 0;
             hasDiscard = false;
