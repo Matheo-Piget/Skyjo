@@ -3,7 +3,6 @@ package org.App.view;
 import org.App.controller.GameController;
 import org.App.model.Card;
 
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -49,10 +48,6 @@ public class CardView extends StackPane {
             cardValue.setText("?");
             cardValue.setFill(Color.WHITE); 
         }
-
-        // Adding shadow for depth
-        DropShadow shadow = new DropShadow(15, 5, 5, Color.GRAY);  // Stronger shadow
-        cardBackground.setEffect(shadow);
 
         // Scaling transition for interaction
         cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
