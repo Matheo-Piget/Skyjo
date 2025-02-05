@@ -21,6 +21,5 @@ public class BoardView extends GridPane {
 
         this.setMaxSize(100, 75);
         this.setPrefSize(100, 75);
-        this.setMinSize(100, 75);
     }
 }
