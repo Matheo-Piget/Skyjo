@@ -104,12 +104,12 @@ public class GameView {
             }
         }
 
-        centerPlayerContainer.setMinSize(100, 150);
+        /*centerPlayerContainer.setMinSize(100, 150);
         centerPlayerContainer.setMaxSize(100, 150);
         topPlayersContainer.setMinSize(100, 150);
         topPlayersContainer.setMaxSize(100, 150);
         bottomPlayersContainer.setMinSize(100, 150);
-        bottomPlayersContainer.setMaxSize(100, 150);
+        bottomPlayersContainer.setMaxSize(100, 150);*/
     
         // Ajout de la pioche et de la défausse avec bordure pour tester la visibilité
         PickView pickView = new PickView(remainingCards);
@@ -118,8 +118,8 @@ public class GameView {
         pickView.setStyle("-fx-border-color: red; -fx-border-width: 3px;"); // Ajout d'une bordure rouge
         discardView.setStyle("-fx-border-color: blue; -fx-border-width: 3px;"); // Ajout d'une bordure bleue
     
-        pickView.setPrefSize(150, 200);
-        discardView.setPrefSize(150, 200);
+        pickView.setPrefSize(150, 100);
+        discardView.setPrefSize(150, 100);
     
         HBox commonPiles = new HBox(20, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
