@@ -103,37 +103,29 @@ public class GameView {
                 bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
             }
         }
-
-        centerPlayerContainer.setMinSize(150, 200);
-        centerPlayerContainer.setMaxSize(150, 200);
-        topPlayersContainer.setMinSize(150, 200);
-        topPlayersContainer.setMaxSize(150, 200);
-        bottomPlayersContainer.setMinSize(150, 200);
-        bottomPlayersContainer.setMaxSize(150, 200);
     
-        // Ajout de la pioche et de la défausse avec bordure pour tester la visibilité
+        // Création de la pioche et de la défausse
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
     
-        pickView.setStyle("-fx-border-color: red; -fx-border-width: 3px;"); // Ajout d'une bordure rouge
-        discardView.setStyle("-fx-border-color: blue; -fx-border-width: 3px;"); // Ajout d'une bordure bleue
+        pickView.setStyle("-fx-border-color: red; -fx-border-width: 3px;"); // Bordure rouge pour voir si visible
+        discardView.setStyle("-fx-border-color: blue; -fx-border-width: 3px;"); // Bordure bleue
     
-        pickView.setPrefSize(150, 100);
-        discardView.setPrefSize(150, 100);
+        pickView.setPrefSize(150, 200);
+        discardView.setPrefSize(150, 200);
     
-        HBox commonPiles = new HBox(20, pickView, discardView);
-        commonPiles.setAlignment(Pos.CENTER);
-        commonPiles.setStyle("-fx-border-color: green; -fx-border-width: 3px;"); // Bordure verte pour voir si le conteneur est affiché
-        commonPiles.setPrefSize(150,200);
-        commonPiles.setMaxSize(150,200);
+        // Conteneur pour la zone centrale : pioche - joueur - défausse
+        HBox centerArea = new HBox(40, pickView, centerPlayerContainer, discardView);
+        centerArea.setAlignment(Pos.CENTER);
     
-        VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
+        VBox mainContainer = new VBox(20, topPlayersContainer, centerArea, bottomPlayersContainer);
         mainContainer.setAlignment(Pos.CENTER);
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
     
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
+    
     
 
     private Player getPlayerByName(List<Player> players, String name) {
