@@ -121,6 +121,8 @@ public class GameView {
 
         mainContainer.setPrefSize(1200, 800);
 
+        cardsContainer.setPrefSize(1200, 800);
+
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
