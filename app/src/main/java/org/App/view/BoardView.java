@@ -25,7 +25,7 @@ public class BoardView extends GridPane {
         DropShadow shadow = new DropShadow(10, 5, 5, Color.GRAY);
         this.setEffect(shadow);
 
-        this.setMaxSize(300, 200);
-        this.setPrefSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        this.setMaxSize(200, 150);
+        this.setPrefSize(200, 150);
     }
 }
