@@ -49,6 +49,8 @@ public class GameView {
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
         this.scene = new Scene(borderPane);
+
+        stage.setScene(scene);
     }
     
     public Scene getScene() {
