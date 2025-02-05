@@ -14,7 +14,6 @@ public final class GameController {
     private final SkyjoGame game;
     private final GameView view;
     private Card pickedCard;
-    private boolean hasPick;
     private boolean hasDiscard;
     private int count_reveal = 0;
 
@@ -39,7 +38,6 @@ public final class GameController {
 
         if (pickedCard != null) {
             System.out.println(game.getActualPlayer().getName() + " a pioché " + pickedCard.valeur());
-            hasPick = true;
         }
     }
 
@@ -51,7 +49,6 @@ public final class GameController {
         if (pickedCard != null) {
             game.addToDiscard(pickedCard);
             pickedCard = null;
-            hasPick = false;
             hasDiscard = true;
         } else {
             pickedCard = game.pickDiscard();
@@ -65,7 +62,6 @@ public final class GameController {
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             pickedCard = null;
-            hasPick = false;
             endTurn();
         }
         if (hasDiscard && count_reveal < 2) {
