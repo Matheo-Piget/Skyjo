@@ -45,12 +45,13 @@ public class GameView {
         // Add menu bar to the scene
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
+        root.setPrefSize(1200, 800);
+        root.setMaxSize(1200, 800);
         borderPane.setCenter(root);
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
         this.scene = new Scene(borderPane);
 
-        stage.setScene(scene);
     }
     
     public Scene getScene() {
