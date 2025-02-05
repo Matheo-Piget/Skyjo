@@ -84,8 +84,8 @@ public class GameView {
         cardsContainer.getChildren().clear();
     
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
-        HBox topPlayersContainer = new HBox(40);
-        HBox bottomPlayersContainer = new HBox(40);
+        HBox topPlayersContainer = new HBox(20);
+        HBox bottomPlayersContainer = new HBox(20);
         topPlayersContainer.setAlignment(Pos.CENTER);
         bottomPlayersContainer.setAlignment(Pos.CENTER);
     
@@ -104,12 +104,12 @@ public class GameView {
             }
         }
 
-        /*centerPlayerContainer.setMinSize(100, 150);
-        centerPlayerContainer.setMaxSize(100, 150);
-        topPlayersContainer.setMinSize(100, 150);
-        topPlayersContainer.setMaxSize(100, 150);
-        bottomPlayersContainer.setMinSize(100, 150);
-        bottomPlayersContainer.setMaxSize(100, 150);*/
+        centerPlayerContainer.setMinSize(150, 200);
+        centerPlayerContainer.setMaxSize(150, 200);
+        topPlayersContainer.setMinSize(150, 200);
+        topPlayersContainer.setMaxSize(150, 200);
+        bottomPlayersContainer.setMinSize(150, 200);
+        bottomPlayersContainer.setMaxSize(150, 200);
     
         // Ajout de la pioche et de la défausse avec bordure pour tester la visibilité
         PickView pickView = new PickView(remainingCards);
