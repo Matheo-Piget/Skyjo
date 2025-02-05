@@ -31,6 +31,9 @@ public final class GameController {
         game.startGame();
         game.revealInitialCards();
         updateView();
+
+        List<CardView> cardViews = view.getAllCardViews();
+        view.distributeCards(game.getPlayers(), cardViews);
     }
 
     public void handlePickClick() {

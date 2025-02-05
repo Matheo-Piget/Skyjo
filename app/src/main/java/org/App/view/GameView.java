@@ -7,27 +7,36 @@ import org.App.App;
 import org.App.model.Card;
 import org.App.model.Player;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class GameView {
 
     private final Stage stage;
     private final VBox cardsContainer;
     private final Scene scene;
+    private Pane rootPane;
+
+    private List<CardView> cardsViews;
 
     public GameView(Stage stage) {
         this.stage = stage;
+        rootPane = new Pane();
         stage.setTitle("Skyjo");
         stage.setFullScreen(false);  // Désactive le mode plein écran
         stage.setMaximized(true);    // Maximiser la fenêtre à la place
@@ -86,6 +95,18 @@ public class GameView {
     }
     
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
+        
+        // Clear previous cards
+        rootPane.getChildren().clear();
+
+        // Create and add CardView objects to the rootPane
+        for (Player player : players) {
+            for (Card card : player.getCartes()) {
+                CardView cardView = new CardView(card, player.getCartes().indexOf(card));
+                rootPane.getChildren().add(cardView);
+            }
+        }
+        
         cardsContainer.getChildren().clear();
     
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
@@ -197,5 +218,50 @@ public class GameView {
         messageText.setFill(Color.WHITE);
         cardsContainer.getChildren().add(messageText);
         stage.show();
+    }
+
+    public List<CardView> getAllCardViews() {
+        List<CardView> cardViews = new ArrayList<>();
+        for (Node node : rootPane.getChildren()) {
+            if (node instanceof CardView cardView) {
+                cardViews.add(cardView);
+            }
+        }
+        return cardViews;
+    }
+
+    public void distributeCards(List<Player> players, List<CardView> cardViews) {
+        double startX = 400; // Starting X position of the deck
+        double startY = 300; // Starting Y position of the deck
+    
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            double targetX = 100 + i * 200; // Target X position for each player's hand
+            double targetY = 500; // Target Y position for each player's hand
+    
+            for (int j = 0; j < player.getCartes().size(); j++) {
+                CardView cardView = cardViews.get(i * player.getCartes().size() + j);
+                animateCard(cardView, startX, startY, targetX + j * 20, targetY, j); // Pass card index
+            }
+        }
+    }
+
+    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, int cardIndex) {
+        cardView.setLayoutX(startX);
+        cardView.setLayoutY(startY);
+
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), cardView);
+        transition.setToX(targetX - startX);
+        transition.setToY(targetY - startY);
+        transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100))); // Ensure delay is non-negative
+        transition.setInterpolator(Interpolator.EASE_BOTH); // Smooth animation
+        transition.setOnFinished(event -> {
+            System.out.println("Animation finished for card: " + cardView.getValue());
+        });
+        transition.play();
+    }
+
+    public Pane getRootPane() {
+        return rootPane;
     }
 }
