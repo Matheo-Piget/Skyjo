@@ -50,6 +50,8 @@ public class GameMenuView {
         playerCountLabel.setTextFill(Color.WHITE);
 
         TextField playerCountField = new TextField("2");
+        playerCountField.setPrefWidth(50);
+        playerCountField.setMaxWidth(250);
         styleTextField(playerCountField);
 
         Button generateFieldsButton = createStyledButton("Configurer joueurs");
@@ -71,7 +73,7 @@ public class GameMenuView {
         int numPlayers;
         try {
             numPlayers = Integer.parseInt(playerCountField.getText());
-            if (numPlayers < 2 || numPlayers > 6) {
+            if (numPlayers < 2 || numPlayers > 8) {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
@@ -111,9 +113,10 @@ public class GameMenuView {
 
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;");
+        button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;  -fx-padding: 10px 20px; -fx-border-radius: 5px;");
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;"));
+        button.setPrefSize(200, 40);
         return button;
     }
 

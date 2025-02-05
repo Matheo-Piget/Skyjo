@@ -15,6 +15,8 @@ public final class GameController {
     private final GameView view;
     private Card pickedCard;
     private boolean hasPick;
+    private boolean hasDiscard;
+    private int count_reveal = 0;
 
     public GameController(GameView view, List<Player> players) {
         this.view = view;
@@ -50,7 +52,7 @@ public final class GameController {
             game.addToDiscard(pickedCard);
             pickedCard = null;
             hasPick = false;
-            endTurn();
+            hasDiscard = true;
         } else {
             pickedCard = game.pickDiscard();
             if (pickedCard == null) {
@@ -60,10 +62,19 @@ public final class GameController {
     }
 
     public void handleCardClick(CardView cardView) {
+        if (hasDiscard && count_reveal < 2) {
+            game.revealCard(game.getActualPlayer(), cardView.getIndex());
+            updateView();
+            count_reveal++;
+        }
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             pickedCard = null;
             hasPick = false;
+            endTurn();
+        }
+        if (count_reveal == 2) {
+            count_reveal = 0;
             endTurn();
         }
     }

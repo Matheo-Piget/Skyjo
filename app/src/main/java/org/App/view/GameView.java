@@ -65,8 +65,8 @@ public class GameView {
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
 
-        startNewGame.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
-        exitGame.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
+        startNewGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
+        exitGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
 
         startNewGame.setOnAction(event -> GameController.getInstance().startGame());
         exitGame.setOnAction(event -> stage.close());
