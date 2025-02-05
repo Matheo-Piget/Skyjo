@@ -104,12 +104,12 @@ public class GameView {
             }
         }
 
-        centerPlayerContainer.setMinSize(200, 300);
-        centerPlayerContainer.setMaxSize(200, 300);
-        topPlayersContainer.setMinSize(200, 300);
-        topPlayersContainer.setMaxSize(200, 300);
-        bottomPlayersContainer.setMinSize(200, 300);
-        bottomPlayersContainer.setMaxSize(200, 300);
+        centerPlayerContainer.setMinSize(100, 150);
+        centerPlayerContainer.setMaxSize(100, 150);
+        topPlayersContainer.setMinSize(100, 150);
+        topPlayersContainer.setMaxSize(100, 150);
+        bottomPlayersContainer.setMinSize(100, 150);
+        bottomPlayersContainer.setMaxSize(100, 150);
     
         // Ajout de la pioche et de la défausse avec bordure pour tester la visibilité
         PickView pickView = new PickView(remainingCards);
