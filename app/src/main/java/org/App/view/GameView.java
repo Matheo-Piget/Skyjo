@@ -103,6 +103,13 @@ public class GameView {
                 bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
             }
         }
+
+        centerPlayerContainer.setMinSize(200, 300);
+        centerPlayerContainer.setMaxSize(200, 300);
+        topPlayersContainer.setMinSize(200, 300);
+        topPlayersContainer.setMaxSize(200, 300);
+        bottomPlayersContainer.setMinSize(200, 300);
+        bottomPlayersContainer.setMaxSize(200, 300);
     
         // Ajout de la pioche et de la défausse avec bordure pour tester la visibilité
         PickView pickView = new PickView(remainingCards);
