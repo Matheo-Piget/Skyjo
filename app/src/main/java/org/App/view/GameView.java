@@ -3,7 +3,7 @@ package org.App.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.App.controller.GameController;
+import org.App.App;
 import org.App.model.Card;
 import org.App.model.Player;
 
@@ -46,6 +46,9 @@ public class GameView {
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
         this.scene = new Scene(borderPane, 1400, 900); // Augmenter la taille de la scène
+
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
     
         // Redimensionner dynamiquement
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
@@ -62,13 +65,15 @@ public class GameView {
 
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu("Game");
+        gameMenu.setStyle(
+        "-fx-font-size: 16px; -fx-text-fill: black;");
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
 
         startNewGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
         exitGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
 
-        startNewGame.setOnAction(event -> GameController.getInstance().startGame());
+        startNewGame.setOnAction(event -> App.getINSTANCE().restart());
         exitGame.setOnAction(event -> stage.close());
 
         gameMenu.getItems().addAll(startNewGame, exitGame);

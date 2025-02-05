@@ -31,6 +31,8 @@ public class GameMenuView {
         this.playerInputs.setAlignment(Pos.CENTER);
 
         stage.setFullScreen(true);
+
+        
         
         setupMenu();
     }
@@ -62,6 +64,7 @@ public class GameMenuView {
 
         menuContainer.getChildren().addAll(title, playerCountLabel, playerCountField, generateFieldsButton, playerInputs, startButton);
         Scene scene = new Scene(menuContainer, 600, 400);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }

@@ -8,13 +8,13 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.guava) // Garde cette dépendance si tu l’utilises
+    implementation(libs.guava)
 
-    // Ajout des dépendances JavaFX
+    // Add JavaFX dependencies
     implementation("org.openjfx:javafx-controls:21")
     implementation("org.openjfx:javafx-fxml:21")
 
-    // Ajout des dépendances JUnit pour les tests
+    // JUnit dependencies for testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
@@ -35,5 +35,19 @@ tasks.test {
 }
 
 application {
-    mainClass.set("org.App.App") 
+    mainClass.set("org.App.App")
+}
+
+// Correct Kotlin syntax for adding resources
+tasks.processResources {
+    from("src/main/resources") {
+        include("**/*")
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+sourceSets {
+    main {
+        resources.srcDirs("src/main/resources")
+    }
 }

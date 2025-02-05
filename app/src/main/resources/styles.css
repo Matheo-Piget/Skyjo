@@ -1,0 +1,38 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);
+    -fx-padding: 20px;
+}
+
+.menu-bar {
+    -fx-background-color: linear-gradient(to right, #1E3C72, #2A5298);
+}
+
+.menu {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px 20px;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.text-field {
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+    -fx-border-color: #3498db;
+    -fx-border-radius: 5px;
+}
+
+.vbox {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+}
