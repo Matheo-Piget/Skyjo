@@ -118,8 +118,8 @@ public class GameView {
         pickView.setStyle("-fx-border-color: red; -fx-border-width: 3px;"); // Ajout d'une bordure rouge
         discardView.setStyle("-fx-border-color: blue; -fx-border-width: 3px;"); // Ajout d'une bordure bleue
     
-        pickView.setMinSize(150, 200);
-        discardView.setMinSize(150, 200);
+        pickView.setPrefSize(150, 200);
+        discardView.setPrefSize(150, 200);
     
         HBox commonPiles = new HBox(20, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
@@ -127,7 +127,7 @@ public class GameView {
         commonPiles.setPrefSize(150,200);
         commonPiles.setMaxSize(150,200);
     
-        VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
+        VBox mainContainer = new VBox(40, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
     
