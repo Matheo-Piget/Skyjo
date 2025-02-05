@@ -75,6 +75,7 @@ public final class GameController {
         }
         if (count_reveal == 2) {
             count_reveal = 0;
+            hasDiscard = false;
             endTurn();
         }
     }
