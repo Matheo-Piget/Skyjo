@@ -120,8 +120,10 @@ public class GameView {
         mainContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-padding: 20px; -fx-border-radius: 10px; -fx-border-color: white;");
 
         mainContainer.setPrefSize(1200, 800);
+        mainContainer.setMaxSize(1200, 800);
 
         cardsContainer.setPrefSize(1200, 800);
+        cardsContainer.setMaxSize(1200, 800);
 
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
