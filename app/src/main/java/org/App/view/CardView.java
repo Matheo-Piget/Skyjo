@@ -3,15 +3,20 @@ package org.App.view;
 import org.App.controller.GameController;
 import org.App.model.Card;
 
+import javafx.animation.TranslateTransition;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
+import javafx.util.Duration;
 
 public class CardView extends StackPane {
     private Card value;
     private final int index;
+
+    private double initialX = 0;
+    private double initialY = -100; // Commence au-dessus de l'écran
 
     public CardView(Card value, int index) {
         this.value = value;
@@ -49,6 +54,9 @@ public class CardView extends StackPane {
             cardValue.setFill(Color.WHITE); 
         }
 
+        setTranslateX(initialX);
+        setTranslateY(initialY);
+
         // Scaling transition for interaction
         cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
         cardBackground.setOnMouseExited(event -> scaleDown(cardBackground));
@@ -67,6 +75,14 @@ public class CardView extends StackPane {
 
     private void scaleDown(Rectangle cardBackground) {
         cardBackground.getTransforms().clear();
+    }
+
+    public void animateCard(double targetX, double targetY) {
+        // Animation de la carte vers sa position cible
+        TranslateTransition translate = new TranslateTransition(Duration.seconds(0.5), this);
+        translate.setToX(targetX);
+        translate.setToY(targetY);
+        translate.play();
     }
 
     private void handleClick() {

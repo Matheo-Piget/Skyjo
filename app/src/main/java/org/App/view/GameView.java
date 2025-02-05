@@ -125,10 +125,23 @@ public class GameView {
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
     
         cardsContainer.getChildren().add(mainContainer);
+    
+        // Animation de distribution des cartes
+        double targetX = centerPlayerContainer.getLayoutX(); // Cible des cartes
+        double targetY = centerPlayerContainer.getLayoutY();
+    
+        // Pour chaque joueur, distribuer les cartes avec animation
+        for (VBox playerContainer : sidePlayers) {
+            Player player = getPlayerByName(players, ((Text) ((VBox) playerContainer.getChildren().get(0)).getChildren().get(0)).getText());
+    
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                CardView cardView = (CardView) playerContainer.getChildren().get(i + 1); // Supposons que la première composante est le nom du joueur
+                cardView.animateCard(targetX, targetY);
+            }
+        }
+    
         stage.show();
     }
-    
-    
 
     private Player getPlayerByName(List<Player> players, String name) {
         for (Player player : players) {
