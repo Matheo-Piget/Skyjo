@@ -112,10 +112,7 @@ public class GameView {
         // Création de la pioche et de la défausse
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
-    
-        pickView.setStyle("-fx-border-color: red; -fx-border-width: 3px;"); // Bordure rouge pour voir si visible
-        discardView.setStyle("-fx-border-color: blue; -fx-border-width: 3px;"); // Bordure bleue
-    
+        
         pickView.setPrefSize(150, 200);
         discardView.setPrefSize(150, 200);
     

@@ -1,56 +1,56 @@
 /* Style général */
 .root {
-    background-color: linear-gradient(to bottom, #121212, #1e1e1e);
-    padding: 20px;
-    font-family: "Segoe UI", sans-serif;
+    -fx-background-color: linear-gradient(to bottom, #121212, #1e1e1e);
+    -fx-padding: 20px;
+    -fx-font-family: "Segoe UI", sans-serif;
     -fx-text-fill: #e0e0e0;
 }
 
 /* Effet de verre dépoli */
 .glass {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 15px;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12px;
+    -fx-padding: 15px;
     -fx-effect: dropshadow(three-pass-box, rgba(255, 255, 255, 0.1), 10, 0, 0, 3);
 }
 
 /* Barre de menu */
 .menu-bar {
-    background-color: linear-gradient(to right, #232526, #414345);
-    padding: 8px;
-    border-radius: 6px;
+    -fx-background-color: linear-gradient(to right, #232526, #414345);
+    -fx-padding: 8px;
+    -fx-border-radius: 6px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 10, 0, 0, 3);
 }
 
 .menu {
-    font-size: 15px;
+    -fx-font-size: 15px;
     -fx-text-fill: #e0e0e0;
 }
 
 .menu-item {
-    font-size: 14px;
+    -fx-font-size: 14px;
     -fx-text-fill: white;
 }
 
 .menu-item:hover {
-    background-color: #414345;
+    -fx-background-color: #414345;
     -fx-text-fill: white;
 }
 
 /* Boutons stylisés */
 .button {
-    background-color: linear-gradient(to right, #2193b0, #6dd5ed);
+    -fx-background-color: linear-gradient(to right, #2193b0, #6dd5ed);
     -fx-text-fill: white;
-    font-size: 15px;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: bold;
-    cursor: hand;
+    -fx-font-size: 15px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px 20px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 6, 0, 0, 3);
 }
 
 .button:hover {
-    background-color: linear-gradient(to right, #30cfd0, #330867);
+    -fx-background-color: linear-gradient(to right, #30cfd0, #330867);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.5), 12, 0, 0, 5);
@@ -58,44 +58,44 @@
 
 /* Champs de texte */
 .text-field {
-    font-size: 14px;
-    padding: 8px;
-    border-color: #2193b0;
-    border-radius: 6px;
-    background-color: #2c2c2c;
+    -fx-font-size: 14px;
+    -fx-padding: 8px;
+    -fx-border-color: #2193b0;
+    -fx-border-radius: 6px;
+    -fx-background-color: #2c2c2c;
     -fx-text-fill: #e0e0e0;
 }
 
 .text-field:focused {
-    border-color: #6dd5ed;
-    background-color: #383838;
+    -fx-border-color: #6dd5ed;
+    -fx-background-color: #383838;
 }
 
 /* Conteneurs */
 .vbox {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 12px;
+    -fx-padding: 15px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 8, 0, 0, 3);
 }
 
 /* Titres */
 .label {
-    font-size: 18px;
-    font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
 .label.title {
-    font-size: 28px;
+    -fx-font-size: 28px;
     -fx-text-fill: #6dd5ed;
 }
 
 /* Cartes */
 .card {
-    background-color: linear-gradient(to bottom, #434343, #262626);
-    border-radius: 10px;
-    padding: 12px;
+    -fx-background-color: linear-gradient(to bottom, #434343, #262626);
+    -fx-border-radius: 10px;
+    -fx-padding: 12px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 8, 0, 0, 4);
 }
 
@@ -107,12 +107,12 @@
 
 /* Animation pour le texte */
 .text {
-    font-size: 16px;
-    fill: white;
+    -fx-font-size: 16px;
+    -fx-fill: white;
 }
 
 .text:hover {
-    fill: #6dd5ed;
+    -fx-fill: #6dd5ed;
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
 }
