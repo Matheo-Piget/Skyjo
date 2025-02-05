@@ -32,8 +32,6 @@ public class GameView {
     private final Scene scene;
     private Pane rootPane;
 
-    private List<CardView> cardsViews;
-
     public GameView(Stage stage) {
         this.stage = stage;
         rootPane = new Pane();
@@ -51,7 +49,9 @@ public class GameView {
         // Conteneur principal
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-        borderPane.setCenter(cardsContainer);
+        
+        borderPane.setCenter(rootPane);
+        borderPane.setBottom(cardsContainer);
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
         this.scene = new Scene(borderPane, 1400, 900); // Augmenter la taille de la scène
@@ -234,30 +234,74 @@ public class GameView {
         double startX = 400; // Starting X position of the deck
         double startY = 300; // Starting Y position of the deck
     
+        // Clear the rootPane and add all cards to it
+        rootPane.getChildren().clear();
+        rootPane.getChildren().addAll(cardViews);
+    
+        // Animate cards to their target positions in the BoardView
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
-            double targetX = 100 + i * 200; // Target X position for each player's hand
-            double targetY = 500; // Target Y position for each player's hand
+            VBox playerBoard = createPlayerBoard(player, false); // Create the player's board
+            BoardView boardView = (BoardView) playerBoard.getChildren().get(1); // Get the BoardView
     
             for (int j = 0; j < player.getCartes().size(); j++) {
                 CardView cardView = cardViews.get(i * player.getCartes().size() + j);
-                animateCard(cardView, startX, startY, targetX + j * 20, targetY, j); // Pass card index
+    
+                // Calculate the target position in the BoardView
+                int row = j / boardView.getColumnCount();
+                int col = j % boardView.getColumnCount();
+                double targetX = boardView.getLayoutX() + col * (cardView.getWidth() + boardView.getHgap());
+                double targetY = boardView.getLayoutY() + row * (cardView.getHeight() + boardView.getVgap());
+    
+                // Animate the card to its target position
+                animateCard(cardView, startX, startY, targetX, targetY, j, () -> {
+                    // After animation, add the card to the BoardView
+                    boardView.add(cardView, col, row);
+                });
             }
         }
+    
+        // Animate the pick and discard cards
+        PickView pickView = new PickView(0); // Replace with actual pick view
+        DiscardView discardView = new DiscardView(null); // Replace with actual discard view
+    
+        // Example: Animate a card to the pick view
+        CardView pickCard = cardViews.get(0); // Replace with actual pick card
+        animateCard(pickCard, startX, startY, pickView.getLayoutX(), pickView.getLayoutY(), 0, () -> {
+            pickView.getChildren().add(pickCard);
+        });
+    
+        // Example: Animate a card to the discard view
+        CardView discardCard = cardViews.get(1); // Replace with actual discard card
+        animateCard(discardCard, startX, startY, discardView.getLayoutX(), discardView.getLayoutY(), 0, () -> {
+            discardView.setTopCard(discardCard.getValue());
+        });
     }
-
-    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, int cardIndex) {
+    
+    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, int cardIndex, Runnable onFinished) {
+        System.out.println("Animating card from (" + startX + ", " + startY + ") to (" + targetX + ", " + targetY + ")");
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
-
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), cardView);
+    
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(2), cardView);
         transition.setToX(targetX - startX);
         transition.setToY(targetY - startY);
-        transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100))); // Ensure delay is non-negative
-        transition.setInterpolator(Interpolator.EASE_BOTH); // Smooth animation
+        transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100)));
+        transition.setInterpolator(Interpolator.EASE_BOTH);
+    
         transition.setOnFinished(event -> {
-            System.out.println("Animation finished for card: " + cardView.getValue());
+            System.out.println("Updating card position to (" + targetX + ", " + targetY + ")");
+            cardView.setLayoutX(targetX);
+            cardView.setLayoutY(targetY);
+            cardView.setTranslateX(0);
+            cardView.setTranslateY(0);
+    
+            // Execute the onFinished callback
+            if (onFinished != null) {
+                onFinished.run();
+            }
         });
+    
         transition.play();
     }
 

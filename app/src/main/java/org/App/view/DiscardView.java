@@ -35,6 +35,10 @@ public class DiscardView extends StackPane {
         }
     }
 
+    public void addCard(CardView cardView) {
+        this.getChildren().add(cardView);
+    }
+
     private void handleClick(javafx.scene.input.MouseEvent event) {
         GameController.getInstance().handleDiscardClick();
         // Empêche la propagation du clic aux enfants

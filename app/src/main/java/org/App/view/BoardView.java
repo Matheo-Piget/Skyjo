@@ -7,7 +7,7 @@ import javafx.scene.layout.GridPane;
 public class BoardView extends GridPane {
 
     public BoardView(List<CardView> cardViews) {
-        int cols = cardViews.size()/3;
+        int cols = cardViews.size() / 3;
 
         for (int i = 0; i < cardViews.size(); i++) {
             int row = i / cols;

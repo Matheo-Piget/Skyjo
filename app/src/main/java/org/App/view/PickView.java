@@ -52,4 +52,8 @@ public class PickView extends StackPane {
     private void handleClick() {
         GameController.getInstance().handlePickClick();
     }
+
+    public void addCard(CardView cardView) {
+        this.getChildren().add(cardView);
+    }
 }
