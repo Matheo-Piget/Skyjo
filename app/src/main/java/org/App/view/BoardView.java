@@ -19,7 +19,8 @@ public class BoardView extends GridPane {
         this.setHgap(10);
         this.setVgap(10);
 
-        this.setMaxSize(200, 150);
-        this.setPrefSize(200, 150);
+        this.setMaxSize(100, 75);
+        this.setPrefSize(100, 75);
+        this.setMinSize(100, 75);
     }
 }
