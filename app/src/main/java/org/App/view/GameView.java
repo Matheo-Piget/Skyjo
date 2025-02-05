@@ -127,7 +127,7 @@ public class GameView {
         commonPiles.setPrefSize(150,200);
         commonPiles.setMaxSize(150,200);
     
-        VBox mainContainer = new VBox(40, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
+        VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
     
