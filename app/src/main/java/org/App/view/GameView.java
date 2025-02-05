@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -119,9 +118,7 @@ public class GameView {
         VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
         mainContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-padding: 20px; -fx-border-radius: 10px; -fx-border-color: white;");
-        mainContainer.setEffect(new DropShadow(10, 5, 5, Color.GRAY));
-    
-        centerPlayerContainer.setEffect(new DropShadow(10, 5, 5, Color.GRAY));
+
         
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
