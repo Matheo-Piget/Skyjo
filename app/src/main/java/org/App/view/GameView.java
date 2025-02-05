@@ -121,9 +121,11 @@ public class GameView {
         pickView.setMinSize(150, 200);
         discardView.setMinSize(150, 200);
     
-        HBox commonPiles = new HBox(40, pickView, discardView);
+        HBox commonPiles = new HBox(20, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
         commonPiles.setStyle("-fx-border-color: green; -fx-border-width: 3px;"); // Bordure verte pour voir si le conteneur est affiché
+        commonPiles.setPrefSize(150,200);
+        commonPiles.setMaxSize(150,200);
     
         VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
