@@ -14,7 +14,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -30,28 +29,27 @@ public class GameView {
     public GameView(Stage stage) {
         this.stage = stage;
         stage.setTitle("Skyjo");
-        stage.setFullScreen(true);
+        stage.setFullScreen(false);  // Désactive le mode plein écran
+        stage.setMaximized(true);    // Maximiser la fenêtre à la place
     
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
     
-        // Create Menu Bar with Styling
+        // Barre de menu
         MenuBar menuBar = createMenuBar();
         menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 10px;");
     
-        StackPane root = new StackPane(cardsContainer);
-        StackPane.setAlignment(cardsContainer, Pos.CENTER);
-    
-        // Add menu bar to the scene
+        // Conteneur principal
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-        root.setPrefSize(1200, 800);
-        root.setMaxSize(1200, 800);
-        borderPane.setCenter(root);
+        borderPane.setCenter(cardsContainer);
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
     
-        this.scene = new Scene(borderPane);
-
+        this.scene = new Scene(borderPane, 1400, 900); // Augmenter la taille de la scène
+    
+        // Redimensionner dynamiquement
+        cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
+        cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
     }
     
     public Scene getScene() {
@@ -84,27 +82,22 @@ public class GameView {
     
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
         cardsContainer.getChildren().clear();
-        
-        int indexCurrentPlayer = 0;
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).getName().equals(currentPlayerName)) {
-                indexCurrentPlayer = i;
-                break;
-            }
-        }
     
-        VBox centerPlayerContainer = createPlayerBoard(players.get(indexCurrentPlayer), true);
+        // Création des conteneurs
+        VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = new HBox(40);
         HBox bottomPlayersContainer = new HBox(40);
         topPlayersContainer.setAlignment(Pos.CENTER);
         bottomPlayersContainer.setAlignment(Pos.CENTER);
-        
+    
+        // Ajouter les joueurs
         List<VBox> sidePlayers = new ArrayList<>();
-        for (int i = 1; i < players.size(); i++) {
-            int playerIndex = (indexCurrentPlayer + i) % players.size();
-            sidePlayers.add(createPlayerBoard(players.get(playerIndex), false));
+        for (Player player : players) {
+            if (!player.getName().equals(currentPlayerName)) {
+                sidePlayers.add(createPlayerBoard(player, false));
+            }
         }
-        
+    
         for (int i = 0; i < sidePlayers.size(); i++) {
             if (i % 2 == 0) {
                 topPlayersContainer.getChildren().add(sidePlayers.get(i));
@@ -112,24 +105,32 @@ public class GameView {
                 bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
             }
         }
-        
+    
+        // Pioche et défausse
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
         HBox commonPiles = new HBox(40, pickView, discardView);
         commonPiles.setAlignment(Pos.CENTER);
-        
+    
+        // Conteneur global
         VBox mainContainer = new VBox(20, topPlayersContainer, centerPlayerContainer, bottomPlayersContainer, commonPiles);
         mainContainer.setAlignment(Pos.CENTER);
-        mainContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-padding: 20px; -fx-border-radius: 10px; -fx-border-color: white;");
-
-        mainContainer.setPrefSize(1200, 800);
-        mainContainer.setMaxSize(1200, 800);
-
-        cardsContainer.setPrefSize(1200, 800);
-        cardsContainer.setMaxSize(1200, 800);
-
+    
+        // Binding dynamique pour l'ajustement automatique
+        mainContainer.prefHeightProperty().bind(cardsContainer.heightProperty().subtract(50));
+        mainContainer.prefWidthProperty().bind(cardsContainer.widthProperty().subtract(50));
+    
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
+    }
+
+    private Player getPlayerByName(List<Player> players, String name) {
+        for (Player player : players) {
+            if (player.getName().equals(name)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     private VBox createPlayerBoard(Player player, boolean isCurrent) {

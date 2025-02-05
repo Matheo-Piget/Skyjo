@@ -9,9 +9,6 @@ public final class App extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        primaryStage.setResizable(true);
-        primaryStage.setTitle("Skyjo");
-        primaryStage.sizeToScene();
         GameMenuView menuView = new GameMenuView(primaryStage);
     }
 
