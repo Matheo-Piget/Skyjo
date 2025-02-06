@@ -36,38 +36,43 @@ public class GameView {
         this.stage = stage;
         rootPane = new Pane();
         stage.setTitle("Skyjo");
-        stage.setFullScreen(false);  // Désactive le mode plein écran
-        stage.setMaximized(true);    // Maximiser la fenêtre à la place
-    
+        stage.setFullScreen(false); // Désactive le mode plein écran
+        stage.setMaximized(true); // Maximiser la fenêtre à la place
+
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
-    
+
         // Barre de menu
         MenuBar menuBar = createMenuBar();
         menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 10px;");
-    
+
         // Conteneur principal
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-        
+
         borderPane.setCenter(rootPane);
         borderPane.setBottom(cardsContainer);
         borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
-    
+
         this.scene = new Scene(borderPane, 1400, 900); // Augmenter la taille de la scène
 
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
 
-    
         // Redimensionner dynamiquement
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
+
+        rootPane.setOnMouseClicked(event -> {
+            double x = event.getX();
+            double y = event.getY();
+            System.out.println("Clicked at: (" + x + ", " + y + ")");
+        });
     }
-    
+
     public Scene getScene() {
         return scene;
     }
-    
+
     public void show() {
         stage.show();
     }
@@ -75,7 +80,7 @@ public class GameView {
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu("Game");
         gameMenu.setStyle(
-        "-fx-font-size: 16px; -fx-text-fill: black;");
+                "-fx-font-size: 16px; -fx-text-fill: black;");
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
 
@@ -87,15 +92,15 @@ public class GameView {
 
         gameMenu.getItems().addAll(startNewGame, exitGame);
         gameMenu.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-    
+
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(gameMenu);
-        
+
         return menuBar;
     }
-    
+
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
-        
+
         // Clear previous cards
         rootPane.getChildren().clear();
 
@@ -106,22 +111,22 @@ public class GameView {
                 rootPane.getChildren().add(cardView);
             }
         }
-        
+
         cardsContainer.getChildren().clear();
-    
+
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = new HBox(20);
         HBox bottomPlayersContainer = new HBox(20);
         topPlayersContainer.setAlignment(Pos.CENTER);
         bottomPlayersContainer.setAlignment(Pos.CENTER);
-    
+
         List<VBox> sidePlayers = new ArrayList<>();
         for (Player player : players) {
             if (!player.getName().equals(currentPlayerName)) {
                 sidePlayers.add(createPlayerBoard(player, false));
             }
         }
-    
+
         for (int i = 0; i < sidePlayers.size(); i++) {
             if (i % 2 == 0) {
                 topPlayersContainer.getChildren().add(sidePlayers.get(i));
@@ -129,26 +134,24 @@ public class GameView {
                 bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
             }
         }
-    
+
         // Création de la pioche et de la défausse
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
         pickView.setPrefSize(150, 200);
         discardView.setPrefSize(150, 200);
-    
+
         // Conteneur pour la zone centrale : pioche - joueur - défausse
         HBox centerArea = new HBox(40, pickView, centerPlayerContainer, discardView);
         centerArea.setAlignment(Pos.CENTER);
-    
+
         VBox mainContainer = new VBox(20, topPlayersContainer, centerArea, bottomPlayersContainer);
         mainContainer.setAlignment(Pos.CENTER);
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
-    
+
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
-    
-    
 
     private Player getPlayerByName(List<Player> players, String name) {
         for (Player player : players) {
@@ -163,24 +166,24 @@ public class GameView {
         Text playerNameText = new Text(player.getName());
         playerNameText.setFont(Font.font("Arial", isCurrent ? 22 : 18));
         playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
-        
+
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
             cardViews.add(new CardView(player.getCartes().get(i), i));
         }
-        
+
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
-        playerContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.15); -fx-border-radius: 10px; -fx-padding: 10px;");
-        
+        playerContainer.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.15); -fx-border-radius: 10px; -fx-padding: 10px;");
+
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
-    
+
         return playerContainer;
     }
-    
 
     public void showRanking(java.util.Map<Player, Integer> ranking) {
         cardsContainer.getChildren().clear();
@@ -235,29 +238,29 @@ public class GameView {
         double startX = 400;
         double startY = 300;
         int numberOfPlayers = players.size();
-        
+
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-        
-        final int[] index = {0};
+
+        final int[] index = { 0 };
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
             double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
-    
+
             for (int j = 0; j < player.getCartes().size(); j++) {
                 CardView cardView = cardViews.get(index[0]++);
-                double cardOffsetX = (j % 5) * 50;  // Adjust X based on card index
-                double cardOffsetY = (j / 5) * 70;  // Adjust Y based on card index
-    
+                double cardOffsetX = (j % 5) * 50; // Adjust X based on card index
+                double cardOffsetY = (j / 5) * 70; // Adjust Y based on card index
+
                 animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
                     if (index[0] == cardViews.size()) {
-                        onComplete.run();  // Call the next step after animation
+                        onComplete.run(); // Call the next step after animation
                     }
                 });
             }
         }
     }
-    
+
     private double getPlayerXPosition(int playerIndex, int numberOfPlayers) {
         // Dynamically adjust the X position based on the number of players (max 8)
         switch (numberOfPlayers) {
@@ -317,7 +320,7 @@ public class GameView {
             }
         }
     }
-    
+
     private double getPlayerYPosition(int playerIndex, int numberOfPlayers) {
         // Dynamically adjust the Y position based on the number of players (max 8)
         switch (numberOfPlayers) {
@@ -377,22 +380,20 @@ public class GameView {
             }
         }
     }
-    
-    
-    
+
     public void setupBoardViews(List<Player> players) {
         cardsContainer.getChildren().clear();
         VBox mainContainer = new VBox(20);
-    
+
         for (Player player : players) {
             BoardView boardView = new BoardView(createPlayerCardViews(player));
             VBox playerBoard = new VBox(new Text(player.getName()), boardView);
             mainContainer.getChildren().add(playerBoard);
         }
-    
+
         cardsContainer.getChildren().add(mainContainer);
     }
-    
+
     private List<CardView> createPlayerCardViews(Player player) {
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
@@ -400,32 +401,33 @@ public class GameView {
         }
         return cardViews;
     }
-    
-    
-    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, int cardIndex, Runnable onFinished) {
-        System.out.println("Animating card from (" + startX + ", " + startY + ") to (" + targetX + ", " + targetY + ")");
+
+    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY,
+            int cardIndex, Runnable onFinished) {
+        System.out
+                .println("Animating card from (" + startX + ", " + startY + ") to (" + targetX + ", " + targetY + ")");
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
-    
+
         TranslateTransition transition = new TranslateTransition(Duration.seconds(4), cardView);
         transition.setToX(targetX - startX);
         transition.setToY(targetY - startY);
         transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100)));
         transition.setInterpolator(Interpolator.EASE_BOTH);
-    
+
         transition.setOnFinished(event -> {
             System.out.println("Updating card position to (" + targetX + ", " + targetY + ")");
             cardView.setLayoutX(targetX);
             cardView.setLayoutY(targetY);
             cardView.setTranslateX(0);
             cardView.setTranslateY(0);
-    
+
             // Execute the onFinished callback
             if (onFinished != null) {
                 onFinished.run();
             }
         });
-    
+
         transition.play();
     }
 
