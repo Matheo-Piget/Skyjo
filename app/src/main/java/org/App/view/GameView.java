@@ -163,23 +163,24 @@ public class GameView {
         Text playerNameText = new Text(player.getName());
         playerNameText.setFont(Font.font("Arial", isCurrent ? 22 : 18));
         playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
-    
+        
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
             cardViews.add(new CardView(player.getCartes().get(i), i));
         }
-    
+        
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         playerContainer.setStyle("-fx-background-color: rgba(255, 255, 255, 0.15); -fx-border-radius: 10px; -fx-padding: 10px;");
-    
+        
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
-
+    
         return playerContainer;
     }
+    
 
     public void showRanking(java.util.Map<Player, Integer> ranking) {
         cardsContainer.getChildren().clear();
@@ -230,60 +231,183 @@ public class GameView {
         return cardViews;
     }
 
-    public void distributeCards(List<Player> players, List<CardView> cardViews) {
-        double startX = 400; // Starting X position of the deck
-        double startY = 300; // Starting Y position of the deck
-    
-        // Clear the rootPane and add all cards to it
+    public void distributeCardsWithAnimation(List<Player> players, List<CardView> cardViews, Runnable onComplete) {
+        double startX = 400;
+        double startY = 300;
+        int numberOfPlayers = players.size();
+        
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-    
-        // Animate cards to their target positions in the BoardView
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            VBox playerBoard = createPlayerBoard(player, false); // Create the player's board
-            BoardView boardView = (BoardView) playerBoard.getChildren().get(1); // Get the BoardView
+        
+        final int[] index = {0};
+        for (Player player : players) {
+            double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
+            double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
     
             for (int j = 0; j < player.getCartes().size(); j++) {
-                CardView cardView = cardViews.get(i * player.getCartes().size() + j);
+                CardView cardView = cardViews.get(index[0]++);
+                double cardOffsetX = (j % 5) * 50;  // Adjust X based on card index
+                double cardOffsetY = (j / 5) * 70;  // Adjust Y based on card index
     
-                // Calculate the target position in the BoardView
-                int row = j / boardView.getColumnCount();
-                int col = j % boardView.getColumnCount();
-                double targetX = boardView.getLayoutX() + col * (cardView.getWidth() + boardView.getHgap());
-                double targetY = boardView.getLayoutY() + row * (cardView.getHeight() + boardView.getVgap());
-    
-                // Animate the card to its target position
-                animateCard(cardView, startX, startY, targetX, targetY, j, () -> {
-                    // After animation, add the card to the BoardView
-                    boardView.add(cardView, col, row);
+                animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
+                    if (index[0] == cardViews.size()) {
+                        onComplete.run();  // Call the next step after animation
+                    }
                 });
             }
         }
-    
-        // Animate the pick and discard cards
-        PickView pickView = new PickView(0); // Replace with actual pick view
-        DiscardView discardView = new DiscardView(null); // Replace with actual discard view
-    
-        // Example: Animate a card to the pick view
-        CardView pickCard = cardViews.get(0); // Replace with actual pick card
-        animateCard(pickCard, startX, startY, pickView.getLayoutX(), pickView.getLayoutY(), 0, () -> {
-            pickView.getChildren().add(pickCard);
-        });
-    
-        // Example: Animate a card to the discard view
-        CardView discardCard = cardViews.get(1); // Replace with actual discard card
-        animateCard(discardCard, startX, startY, discardView.getLayoutX(), discardView.getLayoutY(), 0, () -> {
-            discardView.setTopCard(discardCard.getValue());
-        });
     }
+    
+    private double getPlayerXPosition(int playerIndex, int numberOfPlayers) {
+        // Dynamically adjust the X position based on the number of players (max 8)
+        switch (numberOfPlayers) {
+            case 2 -> {
+                return playerIndex == 0 ? 300 : 1000;
+            }
+            case 3 -> {
+                return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : 650);
+            }
+            case 4 -> {
+                return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : (playerIndex == 2 ? 650 : 300));
+            }
+            case 5 -> {
+                return switch (playerIndex) {
+                    case 0 -> 300;
+                    case 1 -> 1000;
+                    case 2 -> 650;
+                    case 3 -> 100;
+                    default -> 1200;
+                };
+            }
+            case 6 -> {
+                return switch (playerIndex) {
+                    case 0 -> 300;
+                    case 1 -> 1000;
+                    case 2 -> 650;
+                    case 3 -> 100;
+                    case 4 -> 1200;
+                    default -> 650;
+                };
+            }
+            case 7 -> {
+                return switch (playerIndex) {
+                    case 0 -> 300;
+                    case 1 -> 1000;
+                    case 2 -> 650;
+                    case 3 -> 100;
+                    case 4 -> 1200;
+                    case 5 -> 200;
+                    default -> 1100;
+                };
+            }
+            case 8 -> {
+                return switch (playerIndex) {
+                    case 0 -> 300;
+                    case 1 -> 1000;
+                    case 2 -> 650;
+                    case 3 -> 100;
+                    case 4 -> 1200;
+                    case 5 -> 200;
+                    case 6 -> 1100;
+                    default -> 1500;
+                };
+            }
+            default -> {
+                return 300;
+            }
+        }
+    }
+    
+    private double getPlayerYPosition(int playerIndex, int numberOfPlayers) {
+        // Dynamically adjust the Y position based on the number of players (max 8)
+        switch (numberOfPlayers) {
+            case 2 -> {
+                return 400;
+            }
+            case 3 -> {
+                return playerIndex == 0 ? 200 : 600;
+            }
+            case 4 -> {
+                return playerIndex == 0 ? 200 : (playerIndex == 1 ? 600 : 400);
+            }
+            case 5 -> {
+                return switch (playerIndex) {
+                    case 0 -> 200;
+                    case 1 -> 600;
+                    case 2 -> 400;
+                    case 3 -> 600;
+                    default -> 200;
+                };
+            }
+            case 6 -> {
+                return switch (playerIndex) {
+                    case 0 -> 200;
+                    case 1 -> 600;
+                    case 2 -> 400;
+                    case 3 -> 600;
+                    case 4 -> 400;
+                    default -> 200;
+                };
+            }
+            case 7 -> {
+                return switch (playerIndex) {
+                    case 0 -> 200;
+                    case 1 -> 600;
+                    case 2 -> 400;
+                    case 3 -> 600;
+                    case 4 -> 400;
+                    case 5 -> 600;
+                    default -> 200;
+                };
+            }
+            case 8 -> {
+                return switch (playerIndex) {
+                    case 0 -> 200;
+                    case 1 -> 600;
+                    case 2 -> 400;
+                    case 3 -> 600;
+                    case 4 -> 400;
+                    case 5 -> 600;
+                    case 6 -> 400;
+                    default -> 200;
+                };
+            }
+            default -> {
+                return 400;
+            }
+        }
+    }
+    
+    
+    
+    public void setupBoardViews(List<Player> players) {
+        cardsContainer.getChildren().clear();
+        VBox mainContainer = new VBox(20);
+    
+        for (Player player : players) {
+            BoardView boardView = new BoardView(createPlayerCardViews(player));
+            VBox playerBoard = new VBox(new Text(player.getName()), boardView);
+            mainContainer.getChildren().add(playerBoard);
+        }
+    
+        cardsContainer.getChildren().add(mainContainer);
+    }
+    
+    private List<CardView> createPlayerCardViews(Player player) {
+        List<CardView> cardViews = new ArrayList<>();
+        for (int i = 0; i < player.getCartes().size(); i++) {
+            cardViews.add(new CardView(player.getCartes().get(i), i));
+        }
+        return cardViews;
+    }
+    
     
     private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, int cardIndex, Runnable onFinished) {
         System.out.println("Animating card from (" + startX + ", " + startY + ") to (" + targetX + ", " + targetY + ")");
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
     
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(2), cardView);
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(4), cardView);
         transition.setToX(targetX - startX);
         transition.setToY(targetY - startY);
         transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100)));

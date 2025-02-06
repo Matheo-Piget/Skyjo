@@ -103,12 +103,9 @@ public class GameMenuView {
     
         GameView gameView = new GameView(stage);
         GameController controller = new GameController(gameView, players);
-        controller.startGame();
     
         stage.setScene(gameView.getScene());
         stage.setFullScreen(true);
-    
-        gameView.showPlaying(players, players.get(0).getName(), 50, null); 
     
         gameView.show();
         controller.startGame();

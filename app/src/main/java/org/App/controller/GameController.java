@@ -1,5 +1,6 @@
 package org.App.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,11 +31,29 @@ public final class GameController {
     public void startGame() {
         game.startGame();
         game.revealInitialCards();
-        updateView();
-
-        List<CardView> cardViews = view.getAllCardViews();
-        view.distributeCards(game.getPlayers(), cardViews);
+        
+        // Step 1: Create CardView instances without associating them with BoardView
+        List<CardView> cardViews = createCardViews();
+        
+        // Step 2: Distribute Cards with Animation
+        view.distributeCardsWithAnimation(game.getPlayers(), cardViews, () -> {
+            // Step 3: After animation completes, THEN create BoardView and update view
+            view.setupBoardViews(game.getPlayers());
+            updateView(); // Ensure UI is properly refreshed
+        });
     }
+    
+
+    private List<CardView> createCardViews() {
+        List<CardView> cardViews = new ArrayList<>();
+        for (Player player : game.getPlayers()) {
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                cardViews.add(new CardView(player.getCartes().get(i), i));
+            }
+        }
+        return cardViews;
+    }
+
 
     public void handlePickClick() {
         pickedCard = game.pickCard();
