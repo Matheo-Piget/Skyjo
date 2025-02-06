@@ -270,10 +270,10 @@ public class GameView {
         // Dynamically adjust the X position based on the number of players (max 8)
         switch (numberOfPlayers) {
             case 2 -> {
-                return 800;
+                return 650;
             }
             case 3 -> {
-                return 800;
+                return 650;
             }
             case 4 -> {
                 return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : (playerIndex == 2 ? 650 : 300));
@@ -330,7 +330,7 @@ public class GameView {
         // Dynamically adjust the Y position based on the number of players (max 8)
         switch (numberOfPlayers) {
             case 2 -> {
-                return playerIndex == 0 ? 540 : 220;
+                return playerIndex == 0 ? 440 : 120;
             }
             case 3 -> {
                 return playerIndex == 0 ? 740 : (playerIndex == 1 ? 480 : 180);
