@@ -24,6 +24,10 @@ public class CardView extends StackPane {
 
         Text cardValue = new Text();
 
+        // Apply gradient background and rounded corners
+        this.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));" +
+                      "-fx-background-radius: 10px; -fx-border-radius: 10px; -fx-border-color: rgba(255, 255, 255, 0.3);");
+
         // Card color styles
         if (value.faceVisible()) {
             // Update the card color logic based on value

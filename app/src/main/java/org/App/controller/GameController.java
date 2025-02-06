@@ -10,6 +10,9 @@ import org.App.model.SkyjoGame;
 import org.App.view.CardView;
 import org.App.view.GameView;
 
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+
 public final class GameController {
     private static GameController instance;
     private final SkyjoGame game;
@@ -30,16 +33,23 @@ public final class GameController {
 
     public void startGame() {
         game.startGame();
-        
-        
+
         // Step 1: Create CardView instances without associating them with BoardView
         List<CardView> cardViews = createCardViews();
-        
+
         // Step 2: Distribute Cards with Animation
         view.distributeCardsWithAnimation(game.getPlayers(), cardViews, () -> {
-            // Step 3: After animation completes, THEN create BoardView and update view
-            view.setupBoardViews(game.getPlayers());
-            updateView(); // Ensure UI is properly refreshed
+            // Add a small delay before fading in the gameplay elements
+            PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+            delay.setOnFinished(event -> {
+                // Step 3: After delay, fade in the gameplay elements
+                view.fadeInGameplayElements(view.getRootPane(), () -> {
+                    // Step 4: Setup the board and update the view
+                    view.setupBoardViews(game.getPlayers());
+                    updateView(); // Ensure UI is properly refreshed
+                });
+            });
+            delay.play();
         });
 
         game.revealInitialCards();

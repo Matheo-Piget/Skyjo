@@ -7,6 +7,7 @@ import org.App.App;
 import org.App.model.Card;
 import org.App.model.Player;
 
+import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
@@ -36,26 +37,29 @@ public class GameView {
         this.stage = stage;
         rootPane = new Pane();
         stage.setTitle("Skyjo");
-        stage.setFullScreen(false); // Désactive le mode plein écran
-        stage.setMaximized(true); // Maximiser la fenêtre à la place
+        stage.setFullScreen(false);
+        stage.setMaximized(true);
+
+        // Apply gradient background to the root pane
+        rootPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
 
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
+        this.cardsContainer.setStyle("-fx-background-color: transparent;");
 
         // Barre de menu
         MenuBar menuBar = createMenuBar();
         menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 10px;");
+        menuBar.prefHeight(25);
+        menuBar.prefWidthProperty().bind(stage.widthProperty());
 
         // Conteneur principal
         BorderPane borderPane = new BorderPane();
-        borderPane.setTop(menuBar);
-
+        borderPane.setTop(new BorderPane(menuBar));
         borderPane.setCenter(rootPane);
         borderPane.setBottom(cardsContainer);
-        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
 
-        this.scene = new Scene(borderPane, 1400, 900); // Augmenter la taille de la scène
-
+        this.scene = new Scene(borderPane, 1400, 900);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
 
         // Redimensionner dynamiquement
@@ -77,25 +81,35 @@ public class GameView {
 
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu("Game");
-        gameMenu.setStyle(
-                "-fx-font-size: 16px; -fx-text-fill: black;");
+        gameMenu.setStyle("-fx-font-size: 12px; -fx-text-fill: white;"); // Taille plus petite pour le texte du menu
+    
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
-
-        startNewGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
-        exitGame.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
-
+    
+        // Réduire la taille de la police et du padding pour chaque élément du menu
+        startNewGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
+        exitGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
+    
         startNewGame.setOnAction(event -> App.getINSTANCE().restart());
         exitGame.setOnAction(event -> stage.close());
-
+    
         gameMenu.getItems().addAll(startNewGame, exitGame);
-        gameMenu.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-
+        
+        // Réduire la taille du menu lui-même
+        gameMenu.setStyle("-fx-font-size: 12px; -fx-text-fill: white; -fx-padding: 5px 10px;");
+    
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(gameMenu);
-
+    
+        // Réduire la hauteur et le padding de la barre de menu
+        menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 2px;");
+        
+        // Ajuster la hauteur de la barre de menu
+        menuBar.prefHeight(25); // Taille plus petite pour la barre de menu
+    
         return menuBar;
     }
+    
 
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
 
@@ -403,9 +417,23 @@ public class GameView {
         }
     }
 
+    public void fadeInGameplayElements(Node node, Runnable onFinished) {
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), node);
+        fadeTransition.setFromValue(0); // Start fully transparent
+        fadeTransition.setToValue(1);   // End fully opaque
+        fadeTransition.setInterpolator(Interpolator.EASE_IN);
+        fadeTransition.setOnFinished(event -> {
+            if (onFinished != null) {
+                onFinished.run();
+            }
+        });
+        fadeTransition.play();
+    }
+
     public void setupBoardViews(List<Player> players) {
         cardsContainer.getChildren().clear();
         VBox mainContainer = new VBox(20);
+        mainContainer.setOpacity(0); // Start fully transparent
 
         for (Player player : players) {
             BoardView boardView = new BoardView(createPlayerCardViews(player));
