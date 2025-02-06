@@ -236,26 +236,26 @@ public class GameView {
         double startX = 400;
         double startY = 300;
         int numberOfPlayers = players.size();
-    
+
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-    
+
         final int[] index = { 0 };
-        final int totalCards = cardViews.size();  // Get total number of cards to distribute
-        int[] remainingAnimations = { totalCards };  // Track how many animations are remaining
-    
+        final int totalCards = cardViews.size(); // Get total number of cards to distribute
+        int[] remainingAnimations = { totalCards }; // Track how many animations are remaining
+
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
             double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
-    
+
             for (int j = 0; j < player.getCartes().size(); j++) {
                 CardView cardView = cardViews.get(index[0]++);
-    
-                double cardOffsetX = (j % 4) * 50;  // Adjust X based on card index
-                double cardOffsetY = (j / 4) * 70;  // Adjust Y based on card index
-    
+
+                double cardOffsetX = (j % 4) * 50; // Adjust X based on card index
+                double cardOffsetY = (j / 4) * 70; // Adjust Y based on card index
+
                 animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
-                    remainingAnimations[0]--;  // Decrease the remaining animation count
+                    remainingAnimations[0]--; // Decrease the remaining animation count
                     if (remainingAnimations[0] == 0) {
                         // Once all animations are completed, execute the callback
                         onComplete.run();
@@ -264,7 +264,6 @@ public class GameView {
             }
         }
     }
-    
 
     private double getPlayerXPosition(int playerIndex, int numberOfPlayers) {
         // Dynamically adjust the X position based on the number of players (max 8)
@@ -276,48 +275,53 @@ public class GameView {
                 return 650;
             }
             case 4 -> {
-                return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : (playerIndex == 2 ? 650 : 300));
+                return switch (playerIndex) {
+                    case 0 -> 650;
+                    case 1 -> 650;
+                    case 2 -> 540;
+                    default -> 775;
+                };
             }
             case 5 -> {
                 return switch (playerIndex) {
-                    case 0 -> 300;
-                    case 1 -> 1000;
-                    case 2 -> 650;
-                    case 3 -> 100;
-                    default -> 1200;
+                    case 0 -> 775;
+                    case 1 -> 540;
+                    case 2 -> 540;
+                    case 3 -> 775;
+                    default -> 650;
                 };
             }
             case 6 -> {
                 return switch (playerIndex) {
-                    case 0 -> 300;
-                    case 1 -> 1000;
-                    case 2 -> 650;
-                    case 3 -> 100;
-                    case 4 -> 1200;
-                    default -> 650;
+                    case 0 -> 650;
+                    case 1 -> 540;
+                    case 2 -> 775;
+                    case 3 -> 420;
+                    case 4 -> 650;
+                    default -> 880;
                 };
             }
             case 7 -> {
-                return switch (playerIndex) {
-                    case 0 -> 300;
-                    case 1 -> 1000;
+                return switch (playerIndex){
+                    case 0 -> 420;
+                    case 1 -> 420;
                     case 2 -> 650;
-                    case 3 -> 100;
-                    case 4 -> 1200;
-                    case 5 -> 200;
-                    default -> 1100;
+                    case 3 -> 650;
+                    case 4 -> 880;
+                    case 5 -> 880;
+                    default -> 650;
                 };
             }
             case 8 -> {
                 return switch (playerIndex) {
-                    case 0 -> 300;
-                    case 1 -> 1000;
-                    case 2 -> 650;
-                    case 3 -> 100;
-                    case 4 -> 1200;
-                    case 5 -> 200;
-                    case 6 -> 1100;
-                    default -> 1500;
+                    case 0 -> 290;
+                    case 1 -> 520;
+                    case 2 -> 760;
+                    case 3 -> 1000;
+                    case 4 -> 650;
+                    case 5 -> 420;
+                    case 6 -> 650;
+                    default -> 880;
                 };
             }
             default -> {
@@ -333,51 +337,64 @@ public class GameView {
                 return playerIndex == 0 ? 440 : 120;
             }
             case 3 -> {
-                return playerIndex == 0 ? 740 : (playerIndex == 1 ? 480 : 180);
+                return playerIndex == 0 ? 590 : (playerIndex == 1 ? 320 : 35);
             }
             case 4 -> {
-                return playerIndex == 0 ? 200 : (playerIndex == 1 ? 600 : 400);
+                switch (playerIndex) {
+                    case 0 -> {
+                        return 590;
+                    }
+                    case 1 -> {
+                        return 320;
+                    }
+                    case 2 -> {
+                        return 35;
+                    }
+                    default -> {
+                        return 35;
+                    }
+                }
             }
             case 5 -> {
                 return switch (playerIndex) {
-                    case 0 -> 200;
-                    case 1 -> 600;
-                    case 2 -> 400;
-                    case 3 -> 600;
-                    default -> 200;
+                    case 0 -> 590;
+                    case 1 -> 590;
+                    case 2 -> 35;
+                    case 3 -> 35;
+                    default -> 320;
                 };
             }
             case 6 -> {
                 return switch (playerIndex) {
-                    case 0 -> 200;
-                    case 1 -> 600;
-                    case 2 -> 400;
-                    case 3 -> 600;
-                    case 4 -> 400;
-                    default -> 200;
+                    case 0 -> 320;
+                    case 1 -> 590;
+                    case 2 -> 590;
+                    case 3 -> 35;
+                    case 4 -> 35;
+                    default -> 35;
                 };
             }
             case 7 -> {
                 return switch (playerIndex) {
-                    case 0 -> 200;
-                    case 1 -> 600;
-                    case 2 -> 400;
-                    case 3 -> 600;
-                    case 4 -> 400;
-                    case 5 -> 600;
-                    default -> 200;
+                    case 0 -> 35;
+                    case 1 -> 590;
+                    case 2 -> 35;
+                    case 3 -> 590;
+                    case 4 -> 35;
+                    case 5 -> 590;
+                    default -> 320;
                 };
             }
             case 8 -> {
                 return switch (playerIndex) {
-                    case 0 -> 200;
-                    case 1 -> 600;
-                    case 2 -> 400;
-                    case 3 -> 600;
-                    case 4 -> 400;
-                    case 5 -> 600;
-                    case 6 -> 400;
-                    default -> 200;
+                    case 0 -> 35;
+                    case 1 -> 35;
+                    case 2 -> 35;
+                    case 3 -> 35;
+                    case 4 -> 320;
+                    case 5 -> 590;
+                    case 6 -> 590;
+                    default -> 590;
                 };
             }
             default -> {
