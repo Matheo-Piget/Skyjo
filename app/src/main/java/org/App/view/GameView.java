@@ -62,10 +62,8 @@ public class GameView {
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
 
-        rootPane.setOnMouseClicked(event -> {
-            double x = event.getX();
-            double y = event.getY();
-            System.out.println("Clicked at: (" + x + ", " + y + ")");
+        scene.setOnMouseClicked(event -> {
+            System.out.println("Scene clicked at (" + event.getX() + ", " + event.getY() + ")");
         });
     }
 
@@ -238,37 +236,44 @@ public class GameView {
         double startX = 400;
         double startY = 300;
         int numberOfPlayers = players.size();
-
+    
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-
+    
         final int[] index = { 0 };
+        final int totalCards = cardViews.size();  // Get total number of cards to distribute
+        int[] remainingAnimations = { totalCards };  // Track how many animations are remaining
+    
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
             double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
-
+    
             for (int j = 0; j < player.getCartes().size(); j++) {
                 CardView cardView = cardViews.get(index[0]++);
-                double cardOffsetX = (j % 5) * 50; // Adjust X based on card index
-                double cardOffsetY = (j / 5) * 70; // Adjust Y based on card index
-
+    
+                double cardOffsetX = (j % 4) * 50;  // Adjust X based on card index
+                double cardOffsetY = (j / 4) * 70;  // Adjust Y based on card index
+    
                 animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
-                    if (index[0] == cardViews.size()) {
-                        onComplete.run(); // Call the next step after animation
+                    remainingAnimations[0]--;  // Decrease the remaining animation count
+                    if (remainingAnimations[0] == 0) {
+                        // Once all animations are completed, execute the callback
+                        onComplete.run();
                     }
                 });
             }
         }
     }
+    
 
     private double getPlayerXPosition(int playerIndex, int numberOfPlayers) {
         // Dynamically adjust the X position based on the number of players (max 8)
         switch (numberOfPlayers) {
             case 2 -> {
-                return playerIndex == 0 ? 300 : 1000;
+                return 800;
             }
             case 3 -> {
-                return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : 650);
+                return 800;
             }
             case 4 -> {
                 return playerIndex == 0 ? 300 : (playerIndex == 1 ? 1000 : (playerIndex == 2 ? 650 : 300));
@@ -325,10 +330,10 @@ public class GameView {
         // Dynamically adjust the Y position based on the number of players (max 8)
         switch (numberOfPlayers) {
             case 2 -> {
-                return 400;
+                return playerIndex == 0 ? 540 : 220;
             }
             case 3 -> {
-                return playerIndex == 0 ? 200 : 600;
+                return playerIndex == 0 ? 740 : (playerIndex == 1 ? 480 : 180);
             }
             case 4 -> {
                 return playerIndex == 0 ? 200 : (playerIndex == 1 ? 600 : 400);

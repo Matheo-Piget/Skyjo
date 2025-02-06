@@ -30,7 +30,7 @@ public final class GameController {
 
     public void startGame() {
         game.startGame();
-        game.revealInitialCards();
+        
         
         // Step 1: Create CardView instances without associating them with BoardView
         List<CardView> cardViews = createCardViews();
@@ -41,6 +41,8 @@ public final class GameController {
             view.setupBoardViews(game.getPlayers());
             updateView(); // Ensure UI is properly refreshed
         });
+
+        game.revealInitialCards();
     }
     
 
@@ -86,13 +88,13 @@ public final class GameController {
             pickedCard = null;
             endTurn();
         }
-        if (hasDiscard && count_reveal < 2) {
+        if (hasDiscard && count_reveal < 1) {
             game.revealCard(game.getActualPlayer(), cardView.getIndex());
             updateView();
             count_reveal++;
         }
         
-        if (count_reveal == 2) {
+        if (count_reveal == 1) {
             count_reveal = 0;
             hasDiscard = false;
             endTurn();
