@@ -130,7 +130,6 @@ public final class SkyjoGame {
         } else {
             Card oldCard = player.getCartes().set(cardIndex, newCard);
             addToDiscard(oldCard);
-            revealCard(player, cardIndex);
         }
     }
 

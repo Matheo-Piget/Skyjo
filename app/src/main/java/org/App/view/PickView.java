@@ -37,8 +37,8 @@ public class PickView extends StackPane {
 
     private void scaleUp(Rectangle cardBackground) {
         ScaleTransition transition = new ScaleTransition(Duration.millis(200), cardBackground);
-        transition.setToX(1.1);
-        transition.setToY(1.1);
+        transition.setToX(1.3);
+        transition.setToY(1.3);
         transition.play();
     }
 

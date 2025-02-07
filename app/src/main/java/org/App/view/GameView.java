@@ -188,9 +188,6 @@ public class GameView {
         boardView.setAlignment(Pos.CENTER);
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
-        playerContainer.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.15); -fx-border-radius: 10px; -fx-padding: 10px;");
-
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
 

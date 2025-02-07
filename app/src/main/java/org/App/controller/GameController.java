@@ -20,6 +20,7 @@ public final class GameController {
     private Card pickedCard;
     private boolean hasDiscard;
     private int count_reveal = 0;
+    private CardView pickedCardView;
 
     public GameController(GameView view, List<Player> players) {
         this.view = view;
@@ -69,9 +70,20 @@ public final class GameController {
 
     public void handlePickClick() {
         pickedCard = game.pickCard();
-
+        pickedCard = pickedCard.retourner();
         if (pickedCard != null) {
             System.out.println(game.getActualPlayer().getName() + " a pioché " + pickedCard.valeur());
+            // Create a CardView for the picked card
+            pickedCardView = new CardView(pickedCard, -1);
+            view.getRootPane().getChildren().add(pickedCardView);
+
+            // Set up mouse movement tracking
+            view.getScene().setOnMouseMoved(event -> {
+                if (pickedCardView != null) {
+                    pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
+                    pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
+                }
+            });
         }
     }
 
@@ -82,7 +94,9 @@ public final class GameController {
     public void handleDiscardClick() {
         if (pickedCard != null) {
             game.addToDiscard(pickedCard);
+            view.getRootPane().getChildren().remove(pickedCardView); // Remove the card view
             pickedCard = null;
+            pickedCardView = null; // Reset the picked card view
             hasDiscard = true;
         } else {
             pickedCard = game.pickDiscard();
@@ -95,7 +109,9 @@ public final class GameController {
     public void handleCardClick(CardView cardView) {
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
+            view.getRootPane().getChildren().remove(pickedCardView); // Remove the card view
             pickedCard = null;
+            pickedCardView = null; // Reset the picked card view
             endTurn();
         }
         if (hasDiscard && count_reveal < 1) {
@@ -103,7 +119,7 @@ public final class GameController {
             updateView();
             count_reveal++;
         }
-        
+
         if (count_reveal == 1) {
             count_reveal = 0;
             hasDiscard = false;
