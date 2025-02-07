@@ -100,6 +100,17 @@ public final class GameController {
             hasDiscard = true;
         } else {
             pickedCard = game.pickDiscard();
+            pickedCard = pickedCard.retourner();
+            pickedCardView = new CardView(pickedCard, -1);
+            view.getRootPane().getChildren().add(pickedCardView);
+
+            // Set up mouse movement tracking
+            view.getScene().setOnMouseMoved(event -> {
+                if (pickedCardView != null) {
+                    pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
+                    pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
+                }
+            });
             if (pickedCard == null) {
                 view.showMessageBox("La défausse est vide !");
             }
