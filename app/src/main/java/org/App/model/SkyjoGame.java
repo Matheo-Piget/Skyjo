@@ -118,16 +118,9 @@ public final class SkyjoGame {
             player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur
             pick.subList(0, 12).clear(); // Retirer ces cartes de la pioche
         });
-
-        // Vérifier si la distribution s'est bien passée
-        System.out.println("Cartes restantes dans la pioche après distribution : " + pick.size());
-        players.forEach(player -> System.out.println(player.getName() + " a " + player.getCartes().size() + " cartes"));
-
-        // Ajoute la première carte de la pioche à la défausse
         if (!pick.isEmpty()) {
             Card firstCard = pick.remove(0).retourner(); // La retourner face visible
             discard.add(firstCard);
-            System.out.println("Première carte dans la défausse : " + firstCard.valeur());
         }
     }
 

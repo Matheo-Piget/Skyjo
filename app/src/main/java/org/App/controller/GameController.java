@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.App.model.AIPlayer;
 import org.App.model.Card;
 import org.App.model.Player;
 import org.App.model.SkyjoGame;
@@ -54,8 +55,12 @@ public final class GameController {
         });
 
         game.revealInitialCards();
+
+        if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+            aIPlayer.playTurn(game);
+            endTurn();
+        }
     }
-    
 
     private List<CardView> createCardViews() {
         List<CardView> cardViews = new ArrayList<>();
@@ -66,7 +71,6 @@ public final class GameController {
         }
         return cardViews;
     }
-
 
     public void handlePickClick() {
         pickedCard = game.pickCard();
@@ -88,7 +92,8 @@ public final class GameController {
     }
 
     public void updateView() {
-        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(), game.getTopDiscard());
+        view.showPlaying(game.getPlayers(), game.getActualPlayer().getName(), game.getPick().size(),
+                game.getTopDiscard());
     }
 
     public void handleDiscardClick() {
@@ -145,7 +150,13 @@ public final class GameController {
             Map<Player, Integer> ranking = game.getRanking();
             view.showRanking(ranking);
         } else {
-            game.nextPlayer();
+            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+                aIPlayer.playTurn(game);
+                endTurn();
+            } else {
+                game.nextPlayer();
+                updateView();
+            }
             updateView();
         }
     }
