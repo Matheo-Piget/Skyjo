@@ -40,7 +40,6 @@ public final class SkyjoGame {
         System.out.println("Nombre total de cartes générées : " + cards.size()); // DEBUG
         return cards;
     }
-    
 
     public List<Player> getPlayers() {
         return players;
@@ -55,7 +54,7 @@ public final class SkyjoGame {
             return null; // Si la défausse est vide
         } else {
             Card topCard = discard.remove(discard.size() - 1);
-            System.out.println("Joueur " + indexActualPlayer + " a pioché de la défausse un " + topCard.valeur()); 
+            System.out.println("Joueur " + indexActualPlayer + " a pioché de la défausse un " + topCard.valeur());
             return topCard.retourner(); // On retourne la carte
         }
     }
@@ -63,7 +62,7 @@ public final class SkyjoGame {
     public void addToDiscard(final Card card) {
         System.out.println("Joueur " + indexActualPlayer + " a mit dans la défausse un " + card.valeur());
         discard.add(card.faceVisible() ? card : card.retourner()); // On ajoute la carte retournée si elle est cachée
-    }    
+    }
 
     public Player getActualPlayer() {
         return players.get(indexActualPlayer);
@@ -78,7 +77,14 @@ public final class SkyjoGame {
     }
 
     public void revealAllCards() {
-        players.forEach(player -> player.getCartes().replaceAll(card -> card.faceVisible() ? card : card.retourner()));
+        for (Player player : players) {
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                if (!player.getCartes().get(i).faceVisible()) {
+                    player.getCartes().set(i, player.getCartes().get(i).retourner());
+                }
+            }
+        }
+        GameController.getInstance().updateView();
     }
 
     public Map<Player, Integer> getRanking() {
@@ -101,20 +107,22 @@ public final class SkyjoGame {
     }
 
     public void startGame() {
-        if (!pick.isEmpty()) pick.clear();
-        if (!discard.isEmpty()) discard.clear();
+        if (!pick.isEmpty())
+            pick.clear();
+        if (!discard.isEmpty())
+            discard.clear();
         players.forEach(player -> player.getCartes().clear());
-    
+
         pick = createPick(); // Créer une nouvelle pioche
         players.forEach(player -> {
             player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur
             pick.subList(0, 12).clear(); // Retirer ces cartes de la pioche
         });
-    
+
         // Vérifier si la distribution s'est bien passée
         System.out.println("Cartes restantes dans la pioche après distribution : " + pick.size());
         players.forEach(player -> System.out.println(player.getName() + " a " + player.getCartes().size() + " cartes"));
-    
+
         // Ajoute la première carte de la pioche à la défausse
         if (!pick.isEmpty()) {
             Card firstCard = pick.remove(0).retourner(); // La retourner face visible
@@ -122,7 +130,6 @@ public final class SkyjoGame {
             System.out.println("Première carte dans la défausse : " + firstCard.valeur());
         }
     }
-    
 
     public void exchangeOrRevealCard(final Player player, final Card newCard, final int cardIndex) {
         if (cardIndex == -1) {
@@ -140,7 +147,7 @@ public final class SkyjoGame {
     public void checkColumns() {
         Player player = players.get(indexActualPlayer);
 
-        int columns = player.getCartes().size()/3; 
+        int columns = player.getCartes().size() / 3;
         int rows = 3;
         List<Card> cartes = player.getCartes();
         boolean columnRemoved = false;

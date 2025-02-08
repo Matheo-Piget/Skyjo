@@ -6,6 +6,12 @@ import java.util.List;
  */
 public interface Player {
 
+    public enum Difficulty {
+        EASY,
+        MEDIUM,
+        HARD
+    }
+
     /**
      * Gets the name of the player.
      *

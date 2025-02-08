@@ -13,6 +13,7 @@ import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -90,7 +91,11 @@ public class GameView {
         startNewGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
         exitGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
     
-        startNewGame.setOnAction(event -> App.getINSTANCE().restart());
+        startNewGame.setOnAction(event -> 
+        {
+            stage.close();
+            App.getINSTANCE().restart();
+        });
         exitGame.setOnAction(event -> stage.close());
     
         gameMenu.getItems().addAll(startNewGame, exitGame);
@@ -195,24 +200,31 @@ public class GameView {
     }
 
     public void showRanking(java.util.Map<Player, Integer> ranking) {
-        cardsContainer.getChildren().clear();
-        VBox rankingContainer = new VBox(10);
-        rankingContainer.setAlignment(Pos.CENTER);
 
-        Text rankingTitle = new Text("Classement des joueurs:");
-        rankingTitle.setFont(Font.font("Arial", 24));
-        rankingTitle.setFill(Color.LIGHTGRAY);
-        rankingContainer.getChildren().add(rankingTitle);
 
-        ranking.forEach((player, score) -> {
-            Text playerScore = new Text(player.getName() + ": " + score);
-            playerScore.setFont(Font.font("Arial", 18));
-            playerScore.setFill(Color.WHITE);
-            rankingContainer.getChildren().add(playerScore);
+        Button showRankingButton = new Button("Show Ranking");
+        showRankingButton.setOnAction(event -> {
+            cardsContainer.getChildren().clear();
+            VBox rankingContainer = new VBox(10);
+            rankingContainer.setAlignment(Pos.CENTER);
+
+            Text rankingTitle = new Text("Classement des joueurs:");
+            rankingTitle.setFont(Font.font("Arial", 24));
+            rankingTitle.setFill(Color.LIGHTGRAY);
+            rankingContainer.getChildren().add(rankingTitle);
+
+            ranking.forEach((player, score) -> {
+                Text playerScore = new Text(player.getName() + ": " + score);
+                playerScore.setFont(Font.font("Arial", 18));
+                playerScore.setFill(Color.WHITE);
+                rankingContainer.getChildren().add(playerScore);
+            });
+
+            cardsContainer.getChildren().add(rankingContainer);
+            stage.show();
         });
 
-        cardsContainer.getChildren().add(rankingContainer);
-        stage.show();
+        cardsContainer.getChildren().add(showRankingButton);
     }
 
     public void showEndGame() {
