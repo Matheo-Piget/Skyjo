@@ -58,6 +58,7 @@ public final class GameController {
 
         if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
             aIPlayer.playTurn(game);
+            updateView();
             endTurn();
         }
     }
@@ -150,14 +151,21 @@ public final class GameController {
             Map<Player, Integer> ranking = game.getRanking();
             view.showRanking(ranking);
         } else {
-            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-                aIPlayer.playTurn(game);
-                endTurn();
-            } else {
-                game.nextPlayer();
-                updateView();
-            }
+            game.nextPlayer(); // Passer au joueur suivant
             updateView();
+    
+            // Vérifier si le prochain joueur est une IA
+            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+                // Ajouter un délai avant que l'IA ne joue son tour
+                PauseTransition delay = new PauseTransition(Duration.seconds(1)); // Délai de 1 seconde
+                delay.setOnFinished(event -> {
+                    aIPlayer.playTurn(game);
+                    updateView();
+                    endTurn(); // Passer au tour suivant après que l'IA a joué
+                });
+                delay.play();
+            }
+            // Si c'est un joueur humain, ne rien faire (attendre l'interaction utilisateur)
         }
     }
 }
