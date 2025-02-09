@@ -207,8 +207,10 @@ public class GameMenuView {
     }
 
     private void openOptionsMenu() {
-        // Ajouter ici la logique pour afficher un menu d'options
-        System.out.println("Options");
+        OptionsView optionsView = new OptionsView(stage);
+        stage.setScene(optionsView.getScene());
+        stage.setFullScreen(true);
+        optionsView.show(); 
     }
 
     private Button createStyledButton(String text) {
@@ -225,5 +227,13 @@ public class GameMenuView {
 
     private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
         comboBox.getStyleClass().add("combo-box"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+    }
+
+    public Scene getScene() {
+        return stage.getScene();
+    }
+
+    public void show() {
+        stage.show();
     }
 }
