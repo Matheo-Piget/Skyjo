@@ -152,11 +152,13 @@ public class GameMenuView {
             ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
             difficultyBox.getItems().addAll(Player.Difficulty.values());
             difficultyBox.setValue(Player.Difficulty.MEDIUM);
+            difficultyBox.setPrefWidth(150);  // Set preferred width to fit more boxes
             styleComboBox(difficultyBox);
             difficultyBoxes.add(difficultyBox);
 
-            playerInputs.getChildren().add(new Label("IA " + i + " :"));
-            playerInputs.getChildren().add(difficultyBox);
+            HBox aiBox = new HBox(10, new Label("IA " + i + " :"), difficultyBox);
+            aiBox.setAlignment(Pos.CENTER);
+            playerInputs.getChildren().add(aiBox);
         }
     }
 
