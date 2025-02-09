@@ -42,17 +42,16 @@ public class GameView {
         stage.setMaximized(true);
 
         // Apply gradient background to the root pane
-        rootPane.setStyle("-fx-background-color: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);");
+        rootPane.getStyleClass().add("root");
 
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
-        this.cardsContainer.setStyle("-fx-background-color: transparent;");
+        this.cardsContainer.getStyleClass().add("vbox");
 
         // Barre de menu
         MenuBar menuBar = createMenuBar();
-        menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 10px;");
-        menuBar.prefHeight(25);
-        menuBar.prefWidthProperty().bind(stage.widthProperty());
+        menuBar.getStyleClass().add("menu-bar");
+
 
         // Conteneur principal
         BorderPane borderPane = new BorderPane();
@@ -82,36 +81,26 @@ public class GameView {
 
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu("Game");
-        gameMenu.setStyle("-fx-font-size: 12px; -fx-text-fill: white;"); // Taille plus petite pour le texte du menu
-    
+        gameMenu.getStyleClass().add("menu");
+
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem exitGame = new MenuItem("Exit");
-    
-        // Réduire la taille de la police et du padding pour chaque élément du menu
-        startNewGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
-        exitGame.setStyle("-fx-font-size: 10px; -fx-text-fill: black; -fx-padding: 5px 10px;");
-    
+
+        startNewGame.getStyleClass().add("menu-item");
+        exitGame.getStyleClass().add("menu-item");
+
         startNewGame.setOnAction(event -> 
         {
             stage.close();
             App.getINSTANCE().restart();
         });
         exitGame.setOnAction(event -> stage.close());
-    
+
         gameMenu.getItems().addAll(startNewGame, exitGame);
-        
-        // Réduire la taille du menu lui-même
-        gameMenu.setStyle("-fx-font-size: 12px; -fx-text-fill: white; -fx-padding: 5px 10px;");
-    
+
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(gameMenu);
-    
-        // Réduire la hauteur et le padding de la barre de menu
-        menuBar.setStyle("-fx-background-color: linear-gradient(to right, #1E3C72, #2A5298); -fx-padding: 2px;");
-        
-        // Ajuster la hauteur de la barre de menu
-        menuBar.prefHeight(25); // Taille plus petite pour la barre de menu
-    
+
         return menuBar;
     }
     

@@ -11,12 +11,10 @@ import org.App.model.Player;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -25,6 +23,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class GameMenuView {
+    private final TextField aiCountField;
     private final Stage stage;
     private final VBox playerInputs;
     private final List<TextField> nameFields;
@@ -36,7 +35,8 @@ public class GameMenuView {
         this.difficultyBoxes = new ArrayList<>();
         this.playerInputs = new VBox(10);
         this.playerInputs.setAlignment(Pos.CENTER);
-
+        this.aiCountField = new TextField("1");
+        
         stage.setFullScreen(true);
 
         setupMenu();
@@ -104,44 +104,59 @@ public class GameMenuView {
 
         // Si un seul joueur humain, ajouter les champs pour les IA
         if (numPlayers == 1) {
-            TextInputDialog dialog = new TextInputDialog("1");
-            dialog.setTitle("Nombre d'IA");
-            dialog.setHeaderText("Contre combien d'IA voulez-vous jouer ?");
-            dialog.setContentText("Nombre d'IA (1-7):");
+            Label aiLabel = new Label("Nombre d'IA :");
+            aiLabel.setTextFill(Color.WHITE);
 
-            dialog.showAndWait().ifPresent(response -> {
-                try {
-                    int numAI = Integer.parseInt(response);
-                    if (numAI < 1 || numAI > 7) {
-                        throw new NumberFormatException();
-                    }
+            aiCountField.setPrefWidth(50);
+            aiCountField.setMaxWidth(250);
+            styleTextField(aiCountField);
+            
+            Button confirmAIButton = createStyledButton("Ajouter IA");
+            confirmAIButton.setOnAction(e ->{ 
+                
+                clearAIFields();
+                generateAIFields();
 
-                    // Ajouter les champs pour les IA
-                    for (int i = 1; i <= numAI; i++) {
-                        HBox aiBox = new HBox(10);
-                        aiBox.setAlignment(Pos.CENTER_LEFT);
+                
+                });
 
-                        Label aiLabel = new Label("IA " + i + " - Difficulté :");
-                        aiLabel.setTextFill(Color.WHITE);
+            HBox aiSelectionBox = new HBox(10, aiLabel, aiCountField, confirmAIButton);
+            aiSelectionBox.setAlignment(Pos.CENTER);
+            playerInputs.getChildren().add(aiSelectionBox);
+        }
+    }
 
-                        ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
-                        difficultyBox.getItems().addAll(Player.Difficulty.values());
-                        difficultyBox.setValue(Player.Difficulty.MEDIUM); // Valeur par défaut
-                        styleComboBox(difficultyBox);
+    private void clearAIFields() {
+        playerInputs.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("IA"));
+        playerInputs.getChildren().removeAll(difficultyBoxes);
+        difficultyBoxes.clear();
+    }
 
-                        difficultyBoxes.add(difficultyBox);
+    private void generateAIFields() {
+        playerInputs.getChildren().remove(aiCountField);
 
-                        aiBox.getChildren().addAll(aiLabel, difficultyBox);
-                        playerInputs.getChildren().add(aiBox);
-                    }
-                } catch (NumberFormatException e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Erreur");
-                    alert.setHeaderText("Nombre d'IA invalide");
-                    alert.setContentText("Veuillez entrer un nombre entre 1 et 7.");
-                    alert.showAndWait();
-                }
-            });
+        int numAI;
+        try {
+            numAI = Integer.parseInt(aiCountField.getText());
+            if (numAI < 1 || numAI > 7) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            Label errorLabel = new Label("Veuillez entrer un nombre entre 1 et 7.");
+            errorLabel.setTextFill(Color.RED);
+            playerInputs.getChildren().add(errorLabel);
+            return;
+        }
+
+        for (int i = 1; i <= numAI; i++) {
+            ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
+            difficultyBox.getItems().addAll(Player.Difficulty.values());
+            difficultyBox.setValue(Player.Difficulty.MEDIUM);
+            styleComboBox(difficultyBox);
+            difficultyBoxes.add(difficultyBox);
+
+            playerInputs.getChildren().add(new Label("IA " + i + " :"));
+            playerInputs.getChildren().add(difficultyBox);
         }
     }
 
@@ -171,19 +186,15 @@ public class GameMenuView {
 
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.setStyle(
-                "-fx-background-color: #3498db; -fx-text-fill: white;  -fx-padding: 10px 20px; -fx-border-radius: 5px;");
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;"));
+        button.getStyleClass().add("button");  // Add the 'button' class from CSS
         button.setPrefSize(200, 40);
         return button;
     }
-
     private void styleTextField(TextField textField) {
-        textField.setStyle("-fx-font-size: 14px; -fx-padding: 5px; -fx-border-color: #3498db; -fx-border-radius: 5px;");
+        textField.getStyleClass().add("text-field");  // Add the 'text-field' class from CSS
     }
 
     private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
-        comboBox.setStyle("-fx-font-size: 14px; -fx-padding: 5px; -fx-border-color: #3498db; -fx-border-radius: 5px;");
+        comboBox.getStyleClass().add("combo-box");  // Assuming you may want a style for ComboBox
     }
 }

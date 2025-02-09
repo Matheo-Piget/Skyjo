@@ -95,7 +95,7 @@ public final class SkyjoGame {
     }
 
     public boolean isFinished() {
-        return hasPlayerRevealedAllCards();
+        return hasPlayerRevealedAllCards() || pick.isEmpty();
     }
 
     public List<Card> getPick() {

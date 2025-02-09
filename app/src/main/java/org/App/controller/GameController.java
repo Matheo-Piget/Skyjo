@@ -35,10 +35,10 @@ public final class GameController {
 
     public void startGame() {
         game.startGame();
-
+    
         // Step 1: Create CardView instances without associating them with BoardView
         List<CardView> cardViews = createCardViews();
-
+    
         // Step 2: Distribute Cards with Animation
         view.distributeCardsWithAnimation(game.getPlayers(), cardViews, () -> {
             // Add a small delay before fading in the gameplay elements
@@ -49,18 +49,24 @@ public final class GameController {
                     // Step 4: Setup the board and update the view
                     view.setupBoardViews(game.getPlayers());
                     updateView(); // Ensure UI is properly refreshed
+    
+                    // Step 5: Start the game logic after the animation is complete
+                    game.revealInitialCards();
+    
+                    // Step 6: Check if the current player is an AI and play their turn
+                    if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+                        PauseTransition aiDelay = new PauseTransition(Duration.seconds(1)); // Délai de 1 seconde
+                        aiDelay.setOnFinished(aiEvent -> {
+                            aIPlayer.playTurn(game);
+                            updateView();
+                            endTurn(); // Passer au tour suivant après que l'IA a joué
+                        });
+                        aiDelay.play();
+                    }
                 });
             });
             delay.play();
         });
-
-        game.revealInitialCards();
-
-        if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-            aIPlayer.playTurn(game);
-            updateView();
-            endTurn();
-        }
     }
 
     private List<CardView> createCardViews() {
@@ -151,6 +157,7 @@ public final class GameController {
             Map<Player, Integer> ranking = game.getRanking();
             view.showRanking(ranking);
         } else {
+            updateView();
             game.nextPlayer(); // Passer au joueur suivant
             updateView();
     

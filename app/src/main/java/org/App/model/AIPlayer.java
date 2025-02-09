@@ -53,20 +53,30 @@ public class AIPlayer implements Player {
         Card pickedCard;
     
         if (pickFromDiscard && game.getTopDiscard() != null) {
+            // Choix 1 : Prendre la carte de la défausse
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
-                // Obligation de remplacer une carte si on prend la défausse
+                // Obligation d'échanger cette carte avec une carte du plateau
+                pickedCard = pickedCard.retourner();
                 replaceCard(game, pickedCard);
+                GameController.getInstance().updateView();
             }
         } else {
+            // Choix 2 : Prendre une carte de la pioche
             pickedCard = game.pickCard();
             if (pickedCard != null) {
-                // Choix aléatoire entre défausser ou remplacer une carte
+                // Choix aléatoire entre échanger ou défausser
                 if (random.nextBoolean()) {
-                    game.addToDiscard(pickedCard); // Défausser la carte piochée
-                    revealRandomCard(); // Retourner une carte cachée
+                    // Échanger la carte piochée avec une carte du plateau
+                    pickedCard = pickedCard.retourner();
+                    replaceCard(game, pickedCard);
+                    GameController.getInstance().updateView();
                 } else {
-                    replaceCard(game, pickedCard); // Remplacer une carte cachée
+                    // Défausser la carte piochée et retourner une carte cachée
+                    game.addToDiscard(pickedCard);
+                    GameController.getInstance().updateView();
+                    revealRandomCard();
+                    GameController.getInstance().updateView();
                 }
             }
         }
@@ -78,16 +88,23 @@ public class AIPlayer implements Player {
         Card pickedCard;
     
         if (topDiscard != null && isCardBeneficial(topDiscard)) {
+            // Choix 1 : Prendre la carte de la défausse
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
-                replaceCard(game, pickedCard); // Obligation de remplacer une carte
+                // Obligation d'échanger cette carte avec une carte du plateau
+                pickedCard = pickedCard.retourner();
+                replaceCard(game, pickedCard);
+                GameController.getInstance().updateView();
             }
         } else {
+            // Choix 2 : Prendre une carte de la pioche
             pickedCard = game.pickCard();
             if (pickedCard != null) {
                 // Remplacer la carte de plus haute valeur si possible
                 int highestValueIndex = findHighestValueCardIndex();
+                pickedCard = pickedCard.retourner();
                 game.exchangeOrRevealCard(this, pickedCard, highestValueIndex);
+                GameController.getInstance().updateView();
             }
         }
     }
@@ -98,28 +115,33 @@ public class AIPlayer implements Player {
         Card pickedCard;
     
         if (topDiscard != null && isCardBeneficial(topDiscard)) {
+            // Choix 1 : Prendre la carte de la défausse
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
-                replaceCard(game, pickedCard); // Obligation de remplacer une carte
+                // Obligation d'échanger cette carte avec une carte du plateau
+                pickedCard = pickedCard.retourner();
+                replaceCard(game, pickedCard);
+                GameController.getInstance().updateView();
             }
         } else {
+            // Choix 2 : Prendre une carte de la pioche
             pickedCard = game.pickCard();
             if (pickedCard != null) {
                 // Remplacer la carte qui minimise la valeur totale de la main
                 int bestIndex = findBestCardToReplace(pickedCard);
+                pickedCard = pickedCard.retourner();
                 game.exchangeOrRevealCard(this, pickedCard, bestIndex);
+                GameController.getInstance().updateView();
             }
         }
     }
-    
+
     private void replaceCard(SkyjoGame game, Card newCard) {
-        // Remplacer une carte cachée
-        int cardIndex = findHiddenCardIndex();
+        // Remplacer une carte cachée ou visible
+        int cardIndex = findBestCardToReplace(newCard); // Trouver la meilleure carte à remplacer
         if (cardIndex != -1) {
             game.exchangeOrRevealCard(this, newCard, cardIndex);
-        } else {
-            // Si aucune carte cachée, défausser la carte piochée
-            game.addToDiscard(newCard);
+            GameController.getInstance().updateView();
         }
     }
     
@@ -128,6 +150,7 @@ public class AIPlayer implements Player {
         int cardIndex = findHiddenCardIndex();
         if (cardIndex != -1) {
             cartes.set(cardIndex, cartes.get(cardIndex).retourner());
+            GameController.getInstance().updateView();
         }
     }
     
