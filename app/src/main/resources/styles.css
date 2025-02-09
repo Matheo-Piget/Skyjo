@@ -6,6 +6,12 @@
     -fx-text-fill: #e0e0e0;
 }
 
+.skyjo-title {
+    -fx-font-size: 70px; /* Taille augmentée pour le titre Skyjo */
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 8);
+}
+
 /* Boutons stylisés */
 .button {
     -fx-background-color: linear-gradient(to right, #00adb5, #008080);
@@ -88,11 +94,6 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 8);
 }
 
-.skyjo-title {
-    -fx-font-size: 70px; /* Taille augmentée pour le titre Skyjo */
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 8);
-}
 
 .text.title {
     -fx-font-size: 50px;
