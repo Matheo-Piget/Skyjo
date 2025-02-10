@@ -10,13 +10,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /**
  * Represents the options view of the application.
- * This view allows the user to select and save preferences such as theme and game mode.
+ * This view allows the user to select and save preferences such as theme, game mode, and volume.
  * 
  * @version 1.0
  * @author Piget Mathéo
@@ -28,66 +31,148 @@ public class OptionsView {
 
     private final Stage stage;
     private final Scene scene;
-
-    private MusicManager musicManager;
+    private final MusicManager musicManager;
 
     /**
      * Constructs the options view.
      * 
      * @param stage The primary stage of the application.
+     * @param musicManager The music manager to control background music.
      */
-    public OptionsView(Stage stage) {
+    /**
+     * Constructs the options view.
+     * 
+     * @param stage The primary stage of the application.
+     * @param musicManager The music manager to control background music.
+     */
+    public OptionsView(Stage stage, MusicManager musicManager) {
         this.stage = stage;
-        this.musicManager = new MusicManager("C:\\Users\\mathe\\Documents\\Projet Perso\\Skyjo\\Skyjo\\app\\src\\main\\resources\\Kikou.mp3");
+        this.musicManager = musicManager;
 
         // Create UI elements
-        VBox optionsContainer = new VBox(20);
-        optionsContainer.setPadding(new Insets(30));
-        optionsContainer.setAlignment(Pos.CENTER);
-        optionsContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);");
 
-
-
-        MusicManager.getINSTANCE().play();
-        Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
-        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            musicManager.setVolume(newVal.doubleValue());
-        });
-
-        volumeSlider.getStyleClass().add("slider");
-
+        // Title
         Label title = new Label("Options");
-        title.setFont(new javafx.scene.text.Font("Arial", 32));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.WHITE);
-        title.setEffect(new DropShadow(5, Color.BLACK));
+        title.setEffect(new DropShadow(10, Color.BLACK));
 
-        // ComboBox for theme selection
+        // Theme selection
+        GridPane themePanel = createPanel("Theme");
         Label themeLabel = new Label("Select theme:");
         themeLabel.setTextFill(Color.WHITE);
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Clair", "Sombre");
+        themeComboBox.setValue(OptionsManager.getTheme());
+        themePanel.add(themeLabel, 0, 0);
+        themePanel.add(themeComboBox, 1, 0);
 
-        // ComboBox for game mode selection
+        // Game mode selection
+        GridPane modePanel = createPanel("Game Mode");
         Label modeLabel = new Label("Select game mode:");
         modeLabel.setTextFill(Color.WHITE);
-        
         ComboBox<String> modeComboBox = new ComboBox<>();
         modeComboBox.getItems().addAll("Classique", "Rapide");
-        themeComboBox.setValue(OptionsManager.getTheme());
         modeComboBox.setValue(OptionsManager.getMode());
+        modePanel.add(modeLabel, 0, 0);
+        modePanel.add(modeComboBox, 1, 0);
 
-        // Button to save options
+        // Volume control
+        GridPane volumePanel = createPanel("Volume");
+        Label volumeLabel = new Label("Adjust volume:");
+        volumeLabel.setTextFill(Color.WHITE);
+        Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            musicManager.setVolume(newVal.doubleValue());
+        });
+        volumeSlider.getStyleClass().add("slider");
+        volumePanel.add(volumeLabel, 0, 0);
+        volumePanel.add(volumeSlider, 1, 0);
+
+        // Buttons
         Button saveButton = createStyledButton("Save");
-        saveButton.setOnAction(e -> saveOptions(themeComboBox.getValue(), modeComboBox.getValue()));
+        saveButton.setOnAction(e -> {
+            saveOptions(themeComboBox.getValue(), modeComboBox.getValue());
+            showConfirmation("Options saved successfully!");
+        });
 
-        // Button to return to the main menu
-        Button backButton = createStyledButton("Back");
+        Button resetButton = createStyledButton("Reset to Default");
+        resetButton.setOnAction(e -> {
+            themeComboBox.setValue("Clair");
+            modeComboBox.setValue("Classique");
+            volumeSlider.setValue(0.5);
+            showConfirmation("Options reset to default!");
+        });
+
+        Button backButton = createStyledButton("Back to Menu");
         backButton.setOnAction(e -> goBackToMenu());
 
-        optionsContainer.getChildren().addAll(title, volumeSlider, themeLabel, themeComboBox, modeLabel, modeComboBox, saveButton, backButton);
+        // Add elements to root
+        root.getChildren().addAll(title, themePanel, modePanel, volumePanel, saveButton, resetButton, backButton);
 
-        this.scene = new Scene(optionsContainer, 700, 500);
+        // Create scene
+        this.scene = new Scene(root, 800, 600);
         this.scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+    }
+
+    /**
+     * Creates a styled panel with a title.
+     * 
+     * @param title The title of the panel.
+     * @return The styled GridPane.
+     */
+    private GridPane createPanel(String title) {
+        GridPane panel = new GridPane();
+        panel.setHgap(20);
+        panel.setVgap(10);
+        panel.setPadding(new Insets(20));
+        panel.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 10; -fx-background-radius: 10;");
+
+        Label panelTitle = new Label(title);
+        panelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        panelTitle.setTextFill(Color.WHITE);
+        panel.add(panelTitle, 0, 0, 2, 1);
+
+        return panel;
+    }
+
+    /**
+     * Creates a styled button with the specified text.
+     * 
+     * @param text The text to display on the button.
+     * @return The styled button.
+     */
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.getStyleClass().add("button");
+        button.setPrefSize(200, 40);
+        return button;
+    }
+
+    /**
+     * Displays a confirmation message.
+     * 
+     * @param message The message to display.
+     */
+    private void showConfirmation(String message) {
+        Label confirmation = new Label(message);
+        confirmation.setTextFill(Color.LIGHTGREEN);
+        confirmation.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        ((VBox) scene.getRoot()).getChildren().add(confirmation);
+
+        // Remove the message after 3 seconds
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                javafx.application.Platform.runLater(() -> ((VBox) scene.getRoot()).getChildren().remove(confirmation));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     /**
@@ -97,13 +182,6 @@ public class OptionsView {
      */
     public Scene getScene() {
         return scene;
-    }
-
-    /**
-     * Displays the options view on the stage.
-     */
-    public void show() {
-        stage.show();
     }
 
     /**
@@ -124,22 +202,19 @@ public class OptionsView {
      * Navigates back to the main menu.
      */
     private void goBackToMenu() {
-        GameMenuView gameMenuView = new GameMenuView(stage);
+        GameMenuView gameMenuView = new GameMenuView(stage, musicManager);
         stage.setScene(gameMenuView.getScene());
         stage.setFullScreen(true);
         gameMenuView.show();
     }
 
     /**
-     * Creates a styled button with the specified text.
-     * 
-     * @param text The text to display on the button.
-     * @return The styled button.
+     * Shows the options view.
      */
-    private Button createStyledButton(String text) {
-        Button button = new Button(text);
-        button.getStyleClass().add("button"); // Ensure this class is defined in your CSS file
-        button.setPrefSize(200, 40);
-        return button;
+    public void show() {
+        stage.setScene(scene);
+        stage.setFullScreen(true);
+        stage.show();
     }
 }
+

@@ -12,7 +12,6 @@ import javafx.scene.media.MediaPlayer;
 public class MusicManager {
 
     private MediaPlayer mediaPlayer;
-    private  static MusicManager INSTANCE;
 
     /**
      * Initialise le MusicManager avec un fichier audio.
@@ -21,7 +20,6 @@ public class MusicManager {
      */
     public MusicManager(String musicFilePath) {
 
-        INSTANCE = this;
         Media media = new Media(new File(musicFilePath).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Répète la musique en boucle
@@ -34,10 +32,6 @@ public class MusicManager {
         if (mediaPlayer != null) {
             mediaPlayer.play();
         }
-    }
-
-    public static MusicManager getINSTANCE() {
-        return INSTANCE;
     }
 
     /**

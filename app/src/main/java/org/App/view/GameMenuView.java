@@ -45,6 +45,7 @@ public class GameMenuView {
     private final VBox playerInputs;
     private final List<TextField> nameFields;
     private final List<ComboBox<Player.Difficulty>> difficultyBoxes;
+    private final MusicManager musicManager; // Ajout du MusicManager
 
     private boolean hasPressOnGenerateFieldsButton;
 
@@ -53,9 +54,10 @@ public class GameMenuView {
      *
      * @param stage The primary stage for the application.
      */
-    public GameMenuView(Stage stage) {
+    public GameMenuView(Stage stage, MusicManager musicManager) {
         this.stage = stage;
         this.nameFields = new ArrayList<>();
+        this.musicManager = musicManager; 
         this.difficultyBoxes = new ArrayList<>();
         this.playerInputs = new VBox(10);
         this.playerInputs.setAlignment(Pos.CENTER);
@@ -68,6 +70,9 @@ public class GameMenuView {
 
         // Appliquer les options enregistrées
         applySavedOptions();
+
+        // Jouer la musique
+        musicManager.play();
     }
 
     /**
@@ -285,7 +290,7 @@ public class GameMenuView {
      * Opens the options menu.
      */
     private void openOptionsMenu() {
-        OptionsView optionsView = new OptionsView(stage);
+        OptionsView optionsView = new OptionsView(stage, musicManager);
         stage.setScene(optionsView.getScene());
         stage.setFullScreen(true);
 

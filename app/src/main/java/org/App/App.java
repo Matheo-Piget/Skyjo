@@ -1,6 +1,7 @@
 package org.App;
 
 import org.App.view.GameMenuView;
+import org.App.view.MusicManager;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -30,7 +31,13 @@ public final class App extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        GameMenuView menuView = new GameMenuView(primaryStage);
+        MusicManager musicManager = new MusicManager("src/main/resources/Kikou.mp3");
+
+        // Passer le MusicManager à GameMenuView
+        GameMenuView gameMenuView = new GameMenuView(primaryStage, musicManager);
+        primaryStage.setScene(gameMenuView.getScene());
+        primaryStage.show();
+
         INSTANCE = this;
     }
 

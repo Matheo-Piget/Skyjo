@@ -53,6 +53,7 @@ public class GameView {
     private final VBox cardsContainer;
     private final Scene scene;
     private Pane rootPane;
+    private MusicManager musicManager;
 
     /**
      * Constructs a new GameView with the specified stage.
@@ -65,6 +66,8 @@ public class GameView {
         stage.setTitle("Skyjo");
         stage.setFullScreen(false);
         stage.setMaximized(true);
+
+        //MusicManager musicManager = new MusicManager("game_music.mp3");
 
         // Apply gradient background to the root pane
         rootPane.getStyleClass().add("root");
@@ -93,8 +96,6 @@ public class GameView {
         scene.setOnMouseClicked(event -> {
             System.out.println("Scene clicked at (" + event.getX() + ", " + event.getY() + ")");
         });
-
-        MusicManager.getINSTANCE().play();
     }
 
     /**
