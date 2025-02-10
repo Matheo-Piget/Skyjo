@@ -52,6 +52,14 @@ public final class GameController {
     
                     // Step 5: Start the game logic after the animation is complete
                     game.revealInitialCards();
+
+                    PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                    pause.setOnFinished(e -> {
+                        updateView();
+                    });
+                    pause.play();
+
+                    
     
                     // Step 6: Check if the current player is an AI and play their turn
                     if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
@@ -132,17 +140,19 @@ public final class GameController {
     public void handleCardClick(CardView cardView) {
         if (pickedCard != null) {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
-            view.getRootPane().getChildren().remove(pickedCardView); // Remove the card view
+            cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
+            view.getRootPane().getChildren().remove(pickedCardView); // Supprime la carte piochée
             pickedCard = null;
-            pickedCardView = null; // Reset the picked card view
+            pickedCardView = null;
             endTurn();
         }
         if (hasDiscard && count_reveal < 1) {
             game.revealCard(game.getActualPlayer(), cardView.getIndex());
+            cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
             updateView();
             count_reveal++;
         }
-
+    
         if (count_reveal == 1) {
             count_reveal = 0;
             hasDiscard = false;
