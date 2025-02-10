@@ -21,6 +21,24 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+/**
+ * Represents the main menu view for the Skyjo game.
+ * This class is responsible for displaying the game menu, allowing players to configure the game,
+ * and starting the game with the specified settings.
+ * 
+ * <p>
+ * The menu includes options to set the number of players, configure AI players, and access game options.
+ * </p>
+ * 
+ * @see GameController
+ * @see GameView
+ * @see AIPlayer
+ * @see HumanPlayer
+ * @see Player
+ * 
+ * @author Mathéo Piget
+ * @version 1.0
+ */
 public class GameMenuView {
     private final TextField aiCountField;
     private final Stage stage;
@@ -30,6 +48,11 @@ public class GameMenuView {
 
     private boolean hasPressOnGenerateFieldsButton;
 
+    /**
+     * Constructs a new GameMenuView with the specified stage.
+     *
+     * @param stage The primary stage for the application.
+     */
     public GameMenuView(Stage stage) {
         this.stage = stage;
         this.nameFields = new ArrayList<>();
@@ -38,21 +61,22 @@ public class GameMenuView {
         this.playerInputs.setAlignment(Pos.CENTER);
         this.aiCountField = new TextField("1");
         this.hasPressOnGenerateFieldsButton = false;
-    
-        
-    
+
         stage.setFullScreen(true);
-    
+
         setupMenu();
 
         // Appliquer les options enregistrées
         applySavedOptions();
     }
 
+    /**
+     * Applies the saved options (theme and mode) to the game menu.
+     */
     private void applySavedOptions() {
         String theme = OptionsManager.getTheme();
         String mode = OptionsManager.getMode();
-    
+
         // Appliquer le thème
         if (theme.equals("Sombre")) {
             if (!stage.getScene().getStylesheets().isEmpty()) {
@@ -65,18 +89,18 @@ public class GameMenuView {
             }
             stage.getScene().getStylesheets().add(getClass().getResource("/lighttheme.css").toExternalForm());
         }
-    
+
         // Appliquer le mode de jeu si nécessaire
         if (mode.equals("Rapide")) {
             System.out.println("Mode rapide activé !");
             // Ajouter ici des ajustements spécifiques au mode rapide
         }
     }
-    
-    
 
+    /**
+     * Sets up the main menu with all its components.
+     */
     private void setupMenu() {
-
         // Menu principal avec un style moderne
         VBox menuContainer = new VBox(20);
         menuContainer.setPadding(new Insets(30));
@@ -131,6 +155,11 @@ public class GameMenuView {
         stage.show();
     }
 
+    /**
+     * Generates input fields for the specified number of players.
+     *
+     * @param playerCountField The text field containing the number of players.
+     */
     private void generatePlayerFields(TextField playerCountField) {
         playerInputs.getChildren().clear();
         nameFields.clear();
@@ -179,12 +208,18 @@ public class GameMenuView {
         }
     }
 
+    /**
+     * Clears the AI input fields.
+     */
     private void clearAIFields() {
         playerInputs.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("IA"));
         playerInputs.getChildren().removeAll(difficultyBoxes);
         difficultyBoxes.clear();
     }
 
+    /**
+     * Generates input fields for AI players.
+     */
     private void generateAIFields() {
         playerInputs.getChildren().remove(aiCountField);
 
@@ -215,47 +250,57 @@ public class GameMenuView {
         }
     }
 
+    /**
+     * Starts the game with the configured players.
+     */
     private void startGame() {
         List<Player> players = new ArrayList<>();
         for (TextField nameField : nameFields) {
             players.add(new HumanPlayer(nameField.getText()));
         }
-    
+
         for (int i = 0; i < difficultyBoxes.size(); i++) {
             ComboBox<Player.Difficulty> difficultyBox = difficultyBoxes.get(i);
             Player.Difficulty difficulty = difficultyBox.getValue();
             players.add(new AIPlayer("IA " + (i + 1), difficulty));
         }
-    
+
         GameView gameView = new GameView(stage);
         GameController controller = new GameController(gameView, players);
-    
+
         // Appliquer le mode enregistré
         String mode = OptionsManager.getMode();
         if (mode.equals("Rapide")) {
             //controller.enableFastMode(); // Ajoute une méthode pour gérer ce mode dans GameController
         }
-    
+
         stage.setScene(gameView.getScene());
         stage.setFullScreen(true);
-    
+
         gameView.show();
         controller.startGame();
     }
-    
 
+    /**
+     * Opens the options menu.
+     */
     private void openOptionsMenu() {
         OptionsView optionsView = new OptionsView(stage);
         stage.setScene(optionsView.getScene());
         stage.setFullScreen(true);
-    
+
         optionsView.show();
-    
+
         // Appliquer les nouvelles options après la fermeture du menu options
         stage.setOnCloseRequest(event -> applySavedOptions());
     }
-    
 
+    /**
+     * Creates a styled button with the specified text.
+     *
+     * @param text The text to display on the button.
+     * @return The styled button.
+     */
     private Button createStyledButton(String text) {
         Button button = new Button(text);
         button.getStyleClass().add("button"); // Assurez-vous que cette classe est bien dans votre fichier CSS
@@ -263,18 +308,36 @@ public class GameMenuView {
         return button;
     }
 
+    /**
+     * Applies a style to the specified text field.
+     *
+     * @param textField The text field to style.
+     */
     private void styleTextField(TextField textField) {
         textField.getStyleClass().add("text-field"); // Assurez-vous que cette classe est bien dans votre fichier CSS
     }
 
+    /**
+     * Applies a style to the specified combo box.
+     *
+     * @param comboBox The combo box to style.
+     */
     private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
         comboBox.getStyleClass().add("combo-box"); // Assurez-vous que cette classe est bien dans votre fichier CSS
     }
 
+    /**
+     * Gets the scene associated with this view.
+     *
+     * @return The scene.
+     */
     public Scene getScene() {
         return stage.getScene();
     }
 
+    /**
+     * Displays the game menu.
+     */
     public void show() {
         stage.show();
     }

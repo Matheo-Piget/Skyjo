@@ -11,19 +11,40 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 
+/**
+ * Represents the view of a card in the Skyjo game.
+ * This class is responsible for displaying a card and handling its interactions.
+ * 
+ * <p>
+ * The card can be face up or face down, and its appearance changes based on its value.
+ * It also supports animations for flipping and scaling.
+ * </p>
+ * 
+ * @see Card
+ * @see GameController
+ * 
+ * @author Mathéo Piget
+ * @version 1.0
+ */
 public class CardView extends StackPane {
     private Card value;
     private final int index;
     private final Rectangle cardBackground = new Rectangle(40, 60);
     private final Text cardValue = new Text();
 
+    /**
+     * Constructs a new CardView with the specified card value and index.
+     *
+     * @param value The card value to display.
+     * @param index The index of the card in the player's hand.
+     */
     public CardView(Card value, int index) {
         this.value = value;
         this.index = index;
 
         cardBackground.setStroke(Color.BLACK);
         cardBackground.setArcWidth(15); // Rounded corners
-        cardBackground.setArcHeight(15); 
+        cardBackground.setArcHeight(15);
 
         // Apply gradient background and rounded corners
         this.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));" +
@@ -37,7 +58,7 @@ public class CardView extends StackPane {
                 case ZERO -> cardBackground.setFill(Color.CYAN);
                 case UN, DEUX, TROIS, QUATRE -> cardBackground.setFill(Color.GREENYELLOW);
                 case CINQ, SIX, SEPT, HUIT -> cardBackground.setFill(Color.YELLOW);
-                case NEUF, DIX, ONZE , DOUZE -> cardBackground.setFill(Color.RED);
+                case NEUF, DIX, ONZE, DOUZE -> cardBackground.setFill(Color.RED);
                 default -> throw new AssertionError();
             }
             cardValue.setText(String.valueOf((int) switch (value.valeur()) {
@@ -46,37 +67,48 @@ public class CardView extends StackPane {
                 default -> value.valeur().getValue();
             }));
 
-            cardValue.setFont( new javafx.scene.text.Font(24));
-            
+            cardValue.setFont(new javafx.scene.text.Font(24));
         } else {
             cardBackground.setFill(Color.BLACK);
             cardValue.setText("?");
-            cardValue.setFill(Color.WHITE); 
+            cardValue.setFill(Color.WHITE);
         }
 
         // Scaling transition for interaction
         cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
         cardBackground.setOnMouseExited(event -> scaleDown(cardBackground));
 
-
         getChildren().addAll(cardBackground, cardValue);
-        StackPane.setAlignment(cardValue, javafx.geometry.Pos.CENTER); 
+        StackPane.setAlignment(cardValue, javafx.geometry.Pos.CENTER);
 
         setOnMouseClicked(event -> handleClick());
     }
 
+    /**
+     * Scales up the card background when the mouse enters.
+     *
+     * @param cardBackground The rectangle representing the card background.
+     */
     private void scaleUp(Rectangle cardBackground) {
         Scale scale = new Scale(1.15, 1.15, cardBackground.getWidth() / 2, cardBackground.getHeight() / 2);
         cardBackground.getTransforms().add(scale);
     }
 
+    /**
+     * Scales down the card background when the mouse exits.
+     *
+     * @param cardBackground The rectangle representing the card background.
+     */
     private void scaleDown(Rectangle cardBackground) {
         cardBackground.getTransforms().clear();
     }
 
+    /**
+     * Updates the card's appearance based on its value and visibility.
+     */
     private void updateCardAppearance() {
         if (value.faceVisible()) {
-            // Mettre à jour la couleur de la carte en fonction de sa valeur
+            // Update the card color logic based on value
             switch (value.valeur()) {
                 case MOINS_DEUX, MOINS_UN -> cardBackground.setFill(Color.MAGENTA);
                 case ZERO -> cardBackground.setFill(Color.CYAN);
@@ -97,21 +129,27 @@ public class CardView extends StackPane {
         }
     }
 
+    /**
+     * Flips the card with a rotation animation.
+     */
     public void flipCard() {
-        // Créer une animation de rotation pour simuler le retournement
+        // Create a rotation animation to simulate flipping
         RotateTransition rotateTransition = new RotateTransition(Duration.seconds(2), this);
-        rotateTransition.setAxis(javafx.scene.transform.Rotate.Y_AXIS); // Rotation autour de l'axe Y
-        rotateTransition.setFromAngle(0); // Commence à 0 degré
-        rotateTransition.setToAngle(180); // Termine à 180 degrés
+        rotateTransition.setAxis(javafx.scene.transform.Rotate.Y_AXIS); // Rotate around the Y-axis
+        rotateTransition.setFromAngle(0); // Start at 0 degrees
+        rotateTransition.setToAngle(180); // End at 180 degrees
 
-        // Changer l'apparence de la carte à mi-chemin de l'animation
+        // Change the card's appearance halfway through the animation
         rotateTransition.setOnFinished(event -> {
-            updateCardAppearance(); // Mettre à jour l'apparence de la carte après le retournement
+            updateCardAppearance(); // Update the card's appearance after flipping
         });
 
         rotateTransition.play();
     }
 
+    /**
+     * Handles the click event on the card.
+     */
     private void handleClick() {
         System.out.println("Carte cliquée, index = " + getIndex());
         if (GameController.getInstance() == null) {
@@ -121,15 +159,30 @@ public class CardView extends StackPane {
         }
     }
 
+    /**
+     * Gets the card value.
+     *
+     * @return The card value as a {@link Card}.
+     */
     public Card getValue() {
         return value;
     }
 
+    /**
+     * Sets the card value and triggers a flip animation.
+     *
+     * @param value The new card value.
+     */
     public void setValue(Card value) {
         this.value = value;
-        flipCard(); // Lancer l'animation de retournement lorsque la carte est mise à jour
+        flipCard(); // Trigger the flip animation when the card is updated
     }
 
+    /**
+     * Gets the index of the card in the player's hand.
+     *
+     * @return The index of the card.
+     */
     public int getIndex() {
         return index;
     }

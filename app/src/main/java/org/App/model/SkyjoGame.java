@@ -11,6 +11,22 @@ import java.util.Set;
 
 import org.App.controller.GameController;
 
+/**
+ * Represents the main game logic for the Skyjo game.
+ * This class manages the game state, including the players, the deck, and the discard pile.
+ * 
+ * <p>
+ * The game involves players drawing and discarding cards to minimize the total value of their hands.
+ * The game ends when a player reveals all their cards or the deck is empty.
+ * </p>
+ * 
+ * @see Player
+ * @see Card
+ * @see GameController
+ * 
+ * @author Mathéo Piget
+ * @version 1.0
+ */
 public final class SkyjoGame {
     private final List<Player> players;
     private List<Card> pick;
@@ -18,12 +34,22 @@ public final class SkyjoGame {
     private int indexActualPlayer = 0;
     private final Random random = new Random();
 
+    /**
+     * Constructs a new SkyjoGame with the specified players.
+     *
+     * @param players The list of players participating in the game.
+     */
     public SkyjoGame(final List<Player> players) {
         this.players = List.copyOf(players);
         this.pick = createPick();
         this.discard = new ArrayList<>();
     }
 
+    /**
+     * Creates and shuffles the deck of cards for the game.
+     *
+     * @return A shuffled list of {@link Card} instances representing the deck.
+     */
     private List<Card> createPick() {
         List<Card> cards = new ArrayList<>();
         for (CardValue value : CardValue.values()) {
@@ -41,14 +67,29 @@ public final class SkyjoGame {
         return cards;
     }
 
+    /**
+     * Gets the list of players in the game.
+     *
+     * @return The list of players as a {@link List} of {@link Player} instances.
+     */
     public List<Player> getPlayers() {
         return players;
     }
 
+    /**
+     * Picks a card from the deck.
+     *
+     * @return The picked card, or null if the deck is empty.
+     */
     public Card pickCard() {
         return pick.isEmpty() ? null : pick.remove(0);
     }
 
+    /**
+     * Picks a card from the discard pile.
+     *
+     * @return The picked card, or null if the discard pile is empty.
+     */
     public Card pickDiscard() {
         if (discard.isEmpty()) {
             return null; // Si la défausse est vide
@@ -59,23 +100,44 @@ public final class SkyjoGame {
         }
     }
 
+    /**
+     * Adds a card to the discard pile.
+     *
+     * @param card The card to add to the discard pile.
+     */
     public void addToDiscard(final Card card) {
         System.out.println("Joueur " + indexActualPlayer + " a mit dans la défausse un " + card.valeur());
         discard.add(card.faceVisible() ? card : card.retourner()); // On ajoute la carte retournée si elle est cachée
     }
 
+    /**
+     * Gets the current player.
+     *
+     * @return The current player as a {@link Player} instance.
+     */
     public Player getActualPlayer() {
         return players.get(indexActualPlayer);
     }
 
+    /**
+     * Moves to the next player in the game.
+     */
     public void nextPlayer() {
         indexActualPlayer = (indexActualPlayer + 1) % players.size();
     }
 
+    /**
+     * Checks if any player has revealed all their cards.
+     *
+     * @return True if any player has revealed all their cards, false otherwise.
+     */
     private boolean hasPlayerRevealedAllCards() {
         return players.stream().anyMatch(player -> player.getCartes().stream().allMatch(Card::faceVisible));
     }
 
+    /**
+     * Reveals all cards for all players.
+     */
     public void revealAllCards() {
         for (Player player : players) {
             for (int i = 0; i < player.getCartes().size(); i++) {
@@ -87,6 +149,11 @@ public final class SkyjoGame {
         GameController.getInstance().updateView();
     }
 
+    /**
+     * Gets the ranking of players based on the total value of their cards.
+     *
+     * @return A map of players to their total card values.
+     */
     public Map<Player, Integer> getRanking() {
         Map<Player, Integer> ranking = new HashMap<>();
         players.forEach(
@@ -94,18 +161,37 @@ public final class SkyjoGame {
         return ranking;
     }
 
+    /**
+     * Checks if the game is finished.
+     *
+     * @return True if the game is finished, false otherwise.
+     */
     public boolean isFinished() {
         return hasPlayerRevealedAllCards() || pick.isEmpty();
     }
 
+    /**
+     * Gets the current deck of cards.
+     *
+     * @return The deck as a {@link List} of {@link Card} instances.
+     */
     public List<Card> getPick() {
         return List.copyOf(pick);
     }
 
+    /**
+     * Gets the current discard pile.
+     *
+     * @return The discard pile as a {@link List} of {@link Card} instances.
+     */
     public List<Card> getDiscard() {
         return List.copyOf(discard);
     }
 
+    /**
+     * Starts the game by initializing the deck, distributing cards to players,
+     * and setting up the discard pile.
+     */
     public void startGame() {
         if (!pick.isEmpty())
             pick.clear();
@@ -124,6 +210,13 @@ public final class SkyjoGame {
         }
     }
 
+    /**
+     * Exchanges or reveals a card for the specified player.
+     *
+     * @param player    The player performing the action.
+     * @param newCard   The new card to exchange or reveal.
+     * @param cardIndex The index of the card to replace or reveal.
+     */
     public void exchangeOrRevealCard(final Player player, final Card newCard, final int cardIndex) {
         if (cardIndex == -1) {
             addToDiscard(newCard);
@@ -133,10 +226,19 @@ public final class SkyjoGame {
         }
     }
 
+    /**
+     * Reveals a specific card for the specified player.
+     *
+     * @param player    The player whose card is being revealed.
+     * @param cardIndex The index of the card to reveal.
+     */
     public void revealCard(final Player player, final int cardIndex) {
         player.getCartes().set(cardIndex, player.getCartes().get(cardIndex).retourner());
     }
 
+    /**
+     * Checks for completed columns in the current player's hand and removes them.
+     */
     public void checkColumns() {
         Player player = players.get(indexActualPlayer);
 
@@ -187,6 +289,9 @@ public final class SkyjoGame {
         }
     }
 
+    /**
+     * Reveals two random cards for each player to determine the starting player.
+     */
     public void revealInitialCards() {
         int highestTotal = -1;
         int startingPlayerIndex = 0;
@@ -213,6 +318,11 @@ public final class SkyjoGame {
         indexActualPlayer = startingPlayerIndex;
     }
 
+    /**
+     * Gets the top card of the discard pile.
+     *
+     * @return The top card of the discard pile, or null if the pile is empty.
+     */
     public Card getTopDiscard() {
         return discard.isEmpty() ? null : discard.get(discard.size() - 1);
     }
