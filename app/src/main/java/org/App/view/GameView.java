@@ -93,6 +93,8 @@ public class GameView {
         scene.setOnMouseClicked(event -> {
             System.out.println("Scene clicked at (" + event.getX() + ", " + event.getY() + ")");
         });
+
+        MusicManager.getINSTANCE().play();
     }
 
     /**

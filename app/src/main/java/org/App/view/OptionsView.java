@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -28,6 +29,8 @@ public class OptionsView {
     private final Stage stage;
     private final Scene scene;
 
+    private MusicManager musicManager;
+
     /**
      * Constructs the options view.
      * 
@@ -35,12 +38,20 @@ public class OptionsView {
      */
     public OptionsView(Stage stage) {
         this.stage = stage;
+        this.musicManager = new MusicManager("C:\\Users\\mathe\\Documents\\Projet Perso\\Skyjo\\Skyjo\\app\\src\\main\\resources\\Kikou.mp3");
 
         // Create UI elements
         VBox optionsContainer = new VBox(20);
         optionsContainer.setPadding(new Insets(30));
         optionsContainer.setAlignment(Pos.CENTER);
         optionsContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
+
+
+        MusicManager.getINSTANCE().play();
+        Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            musicManager.setVolume(newVal.doubleValue());
+        });
 
         Label title = new Label("Options");
         title.setFont(new javafx.scene.text.Font("Arial", 32));
@@ -70,7 +81,7 @@ public class OptionsView {
         Button backButton = createStyledButton("Back");
         backButton.setOnAction(e -> goBackToMenu());
 
-        optionsContainer.getChildren().addAll(title, themeLabel, themeComboBox, modeLabel, modeComboBox, saveButton, backButton);
+        optionsContainer.getChildren().addAll(title, volumeSlider, themeLabel, themeComboBox, modeLabel, modeComboBox, saveButton, backButton);
 
         this.scene = new Scene(optionsContainer, 700, 500);
         this.scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
