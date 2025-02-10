@@ -46,8 +46,19 @@ tasks.processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+tasks.javadoc {
+    source = sourceSets.main.get().allJava
+    classpath = configurations.compileClasspath.get()
+    destinationDir = file("${buildDir}/docs/javadoc")
+    options {
+        this as StandardJavadocDocletOptions
+        links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+    }
+}
+
 sourceSets {
     main {
         resources.srcDirs("src/main/resources")
     }
 }
+
