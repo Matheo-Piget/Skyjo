@@ -47,11 +47,14 @@ public class OptionsView {
         optionsContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
 
 
+
         MusicManager.getINSTANCE().play();
         Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             musicManager.setVolume(newVal.doubleValue());
         });
+
+        volumeSlider.getStyleClass().add("slider");
 
         Label title = new Label("Options");
         title.setFont(new javafx.scene.text.Font("Arial", 32));
