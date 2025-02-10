@@ -14,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -29,12 +30,15 @@ import javafx.util.Duration;
 
 /**
  * Represents the main game view for the Skyjo game.
- * This class is responsible for displaying the game interface, including the cards,
+ * This class is responsible for displaying the game interface, including the
+ * cards,
  * players, and game controls.
  * 
  * <p>
- * The view supports animations for card distribution, player boards, and game transitions.
- * It also provides methods to display rankings, end-game messages, and other UI elements.
+ * The view supports animations for card distribution, player boards, and game
+ * transitions.
+ * It also provides methods to display rankings, end-game messages, and other UI
+ * elements.
  * </p>
  * 
  * @see Card
@@ -122,24 +126,68 @@ public class GameView {
      * @return The menu bar.
      */
     private MenuBar createMenuBar() {
-        Menu gameMenu = new Menu("Game");
-        gameMenu.getStyleClass().add("menu");
+        // Créer un menu avec une icône de trois barres (hamburger icon)
+        Menu gameMenu = new Menu();
+        Label menuIcon = new Label("☰"); // Icône de trois barres (Unicode)
+        menuIcon.setStyle("-fx-font-size: 18; -fx-text-fill: white;");
+        gameMenu.setGraphic(menuIcon);
 
+        // Options du menu
         MenuItem startNewGame = new MenuItem("Start New Game");
+        MenuItem toggleMusic = new MenuItem("Toggle Music");
+        MenuItem increaseVolume = new MenuItem("Increase Volume");
+        MenuItem decreaseVolume = new MenuItem("Decrease Volume");
         MenuItem exitGame = new MenuItem("Exit");
 
+        // Appliquer des styles aux éléments du menu
         startNewGame.getStyleClass().add("menu-item");
+        toggleMusic.getStyleClass().add("menu-item");
+        increaseVolume.getStyleClass().add("menu-item");
+        decreaseVolume.getStyleClass().add("menu-item");
         exitGame.getStyleClass().add("menu-item");
 
+        // Gestion des événements
         startNewGame.setOnAction(event -> {
+
+            musicManager.stop();
             stage.close();
             App.getINSTANCE().restart();
         });
+
+        toggleMusic.setOnAction(event -> {
+            if (musicManager != null) {
+                if (musicManager.isPlaying()) {
+                    musicManager.pause();
+                    toggleMusic.setText("Resume Music");
+                } else {
+                    musicManager.play();
+                    toggleMusic.setText("Pause Music");
+                }
+            }
+        });
+
+        increaseVolume.setOnAction(event -> {
+            if (musicManager != null) {
+                double newVolume = Math.min(1.0, musicManager.getVolume() + 0.1);
+                musicManager.setVolume(newVolume);
+            }
+        });
+
+        decreaseVolume.setOnAction(event -> {
+            if (musicManager != null) {
+                double newVolume = Math.max(0.0, musicManager.getVolume() - 0.1);
+                musicManager.setVolume(newVolume);
+            }
+        });
+
         exitGame.setOnAction(event -> stage.close());
 
-        gameMenu.getItems().addAll(startNewGame, exitGame);
+        // Ajouter les éléments au menu
+        gameMenu.getItems().addAll(startNewGame, toggleMusic, increaseVolume, decreaseVolume, exitGame);
 
+        // Créer la barre de menu
         MenuBar menuBar = new MenuBar();
+        menuBar.getStyleClass().add("menu-bar");
         menuBar.getMenus().add(gameMenu);
 
         return menuBar;
@@ -148,10 +196,10 @@ public class GameView {
     /**
      * Displays the game interface with the current state of the players and cards.
      *
-     * @param players          The list of players in the game.
+     * @param players           The list of players in the game.
      * @param currentPlayerName The name of the current player.
-     * @param remainingCards   The number of remaining cards in the deck.
-     * @param topDiscardCard   The top card of the discard pile.
+     * @param remainingCards    The number of remaining cards in the deck.
+     * @param topDiscardCard    The top card of the discard pile.
      */
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
         // Clear previous cards
@@ -225,8 +273,8 @@ public class GameView {
     /**
      * Creates a player board for the specified player.
      *
-     * @param player     The player to create the board for.
-     * @param isCurrent  Whether the player is the current player.
+     * @param player    The player to create the board for.
+     * @param isCurrent Whether the player is the current player.
      * @return The player board as a VBox.
      */
     private VBox createPlayerBoard(Player player, boolean isCurrent) {
@@ -362,7 +410,8 @@ public class GameView {
     }
 
     /**
-     * Gets the X position for a player based on their index and the number of players.
+     * Gets the X position for a player based on their index and the number of
+     * players.
      *
      * @param playerIndex     The index of the player.
      * @param numberOfPlayers The total number of players.
@@ -434,7 +483,8 @@ public class GameView {
     }
 
     /**
-     * Gets the Y position for a player based on their index and the number of players.
+     * Gets the Y position for a player based on their index and the number of
+     * players.
      *
      * @param playerIndex     The index of the player.
      * @param numberOfPlayers The total number of players.
@@ -522,7 +572,7 @@ public class GameView {
     public void fadeInGameplayElements(Node node, Runnable onFinished) {
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), node);
         fadeTransition.setFromValue(0); // Start fully transparent
-        fadeTransition.setToValue(1);   // End fully opaque
+        fadeTransition.setToValue(1); // End fully opaque
         fadeTransition.setInterpolator(Interpolator.EASE_IN);
         fadeTransition.setOnFinished(event -> {
             if (onFinished != null) {
@@ -543,7 +593,7 @@ public class GameView {
         mainContainer.setOpacity(0); // Start fully transparent
 
         for (Player player : players) {
-           
+
             BoardView boardView = new BoardView(createPlayerCardViews(player));
             VBox playerBoard = new VBox(new Text(player.getName()), boardView);
             mainContainer.getChildren().add(playerBoard);
@@ -569,12 +619,12 @@ public class GameView {
     /**
      * Animates a card from one position to another.
      *
-     * @param cardView  The card view to animate.
-     * @param startX    The starting X position.
-     * @param startY    The starting Y position.
-     * @param targetX   The target X position.
-     * @param targetY   The target Y position.
-     * @param cardIndex The index of the card.
+     * @param cardView   The card view to animate.
+     * @param startX     The starting X position.
+     * @param startY     The starting Y position.
+     * @param targetX    The target X position.
+     * @param targetY    The target Y position.
+     * @param cardIndex  The index of the card.
      * @param onFinished A callback to execute when the animation is complete.
      */
     private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY,

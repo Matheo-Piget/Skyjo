@@ -71,4 +71,13 @@ public class MusicManager {
     public double getVolume() {
         return mediaPlayer != null ? mediaPlayer.getVolume() : 0.0;
     }
+
+    /**
+     * Indique si la musique est en cours de lecture.
+     *
+     * @return {@code true} si la musique est en cours de lecture, {@code false} sinon.
+     */
+    public boolean isPlaying() {
+        return mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING;
+    }
 }
