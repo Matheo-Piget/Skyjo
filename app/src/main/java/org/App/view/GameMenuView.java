@@ -259,6 +259,8 @@ public class GameMenuView {
      * Starts the game with the configured players.
      */
     private void startGame() {
+
+        musicManager.stop();
         List<Player> players = new ArrayList<>();
         for (TextField nameField : nameFields) {
             players.add(new HumanPlayer(nameField.getText()));

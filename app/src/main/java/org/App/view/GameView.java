@@ -67,7 +67,9 @@ public class GameView {
         stage.setFullScreen(false);
         stage.setMaximized(true);
 
-        //MusicManager musicManager = new MusicManager("game_music.mp3");
+        musicManager = new MusicManager("src/main/resources/game_music.mp3");
+
+        musicManager.play();
 
         // Apply gradient background to the root pane
         rootPane.getStyleClass().add("root");
