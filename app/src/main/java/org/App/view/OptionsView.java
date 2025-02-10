@@ -35,14 +35,16 @@ public class OptionsView {
         themeLabel.setTextFill(Color.WHITE);
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Clair", "Sombre");
-        themeComboBox.setValue("Clair");
 
         // ComboBox pour sélectionner le mode de jeu
         Label modeLabel = new Label("Sélectionner le mode de jeu :");
         modeLabel.setTextFill(Color.WHITE);
+        
         ComboBox<String> modeComboBox = new ComboBox<>();
         modeComboBox.getItems().addAll("Classique", "Rapide");
-        modeComboBox.setValue("Classique");
+        themeComboBox.setValue(OptionsManager.getTheme());
+        modeComboBox.setValue(OptionsManager.getMode());
+
 
         // Bouton pour sauvegarder les options
         Button saveButton = createStyledButton("Sauvegarder");
@@ -67,11 +69,9 @@ public class OptionsView {
     }
 
     private void saveOptions(String theme, String mode) {
-        // Logique pour sauvegarder les options sélectionnées
-        System.out.println("Thème sélectionné : " + theme);
-        System.out.println("Mode de jeu sélectionné : " + mode);
-        // Vous pouvez ajouter ici la logique pour appliquer les options sélectionnées
+        OptionsManager.saveOptions(theme, mode);
     }
+    
 
     private void goBackToMenu() {
         GameMenuView gameMenuView = new GameMenuView(stage);

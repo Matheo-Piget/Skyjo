@@ -38,11 +38,42 @@ public class GameMenuView {
         this.playerInputs.setAlignment(Pos.CENTER);
         this.aiCountField = new TextField("1");
         this.hasPressOnGenerateFieldsButton = false;
-
+    
+        
+    
         stage.setFullScreen(true);
-
+    
         setupMenu();
+
+        // Appliquer les options enregistrées
+        applySavedOptions();
     }
+
+    private void applySavedOptions() {
+        String theme = OptionsManager.getTheme();
+        String mode = OptionsManager.getMode();
+    
+        // Appliquer le thème
+        if (theme.equals("Sombre")) {
+            if (!stage.getScene().getStylesheets().isEmpty()) {
+                stage.getScene().getStylesheets().clear();
+            }
+            stage.getScene().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        } else {
+            if (!stage.getScene().getStylesheets().isEmpty()) {
+                stage.getScene().getStylesheets().clear();
+            }
+            stage.getScene().getStylesheets().add(getClass().getResource("/lighttheme.css").toExternalForm());
+        }
+    
+        // Appliquer le mode de jeu si nécessaire
+        if (mode.equals("Rapide")) {
+            System.out.println("Mode rapide activé !");
+            // Ajouter ici des ajustements spécifiques au mode rapide
+        }
+    }
+    
+    
 
     private void setupMenu() {
 
@@ -189,35 +220,46 @@ public class GameMenuView {
         for (TextField nameField : nameFields) {
             players.add(new HumanPlayer(nameField.getText()));
         }
-
+    
         for (int i = 0; i < difficultyBoxes.size(); i++) {
             ComboBox<Player.Difficulty> difficultyBox = difficultyBoxes.get(i);
             Player.Difficulty difficulty = difficultyBox.getValue();
             players.add(new AIPlayer("IA " + (i + 1), difficulty));
         }
-
+    
         GameView gameView = new GameView(stage);
         GameController controller = new GameController(gameView, players);
-
+    
+        // Appliquer le mode enregistré
+        String mode = OptionsManager.getMode();
+        if (mode.equals("Rapide")) {
+            //controller.enableFastMode(); // Ajoute une méthode pour gérer ce mode dans GameController
+        }
+    
         stage.setScene(gameView.getScene());
         stage.setFullScreen(true);
-
+    
         gameView.show();
         controller.startGame();
     }
+    
 
     private void openOptionsMenu() {
         OptionsView optionsView = new OptionsView(stage);
         stage.setScene(optionsView.getScene());
         stage.setFullScreen(true);
-        optionsView.show(); 
+    
+        optionsView.show();
+    
+        // Appliquer les nouvelles options après la fermeture du menu options
+        stage.setOnCloseRequest(event -> applySavedOptions());
     }
+    
 
     private Button createStyledButton(String text) {
         Button button = new Button(text);
         button.getStyleClass().add("button"); // Assurez-vous que cette classe est bien dans votre fichier CSS
         button.setPrefSize(200, 40);
-        button.setStyle("-fx-background-radius: 20px; -fx-border-color: #ecf0f1;");
         return button;
     }
 

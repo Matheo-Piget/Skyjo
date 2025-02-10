@@ -61,8 +61,8 @@
     -fx-padding: 10px;
     -fx-border-color: #2193b0;
     -fx-border-radius: 8px;
-    -fx-background-color: #2c2c2c;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: #71aebd;
+    -fx-text-fill: #000000;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 5, 0, 0, 3);
 }
 
