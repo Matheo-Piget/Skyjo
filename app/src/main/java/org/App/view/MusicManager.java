@@ -8,6 +8,16 @@ import javafx.scene.media.MediaPlayer;
 /**
  * Gère la musique de fond du jeu.
  * Permet de jouer, arrêter, mettre en pause et ajuster le volume de la musique.
+ * 
+ * <p>
+ * La classe utilise la classe {@link MediaPlayer} de JavaFX pour lire des fichiers audio.
+ * </p>
+ * 
+ * @see MediaPlayer
+ * @see Media
+ * 
+ * @version 1.0
+ * @author Mathéo Piget
  */
 public class MusicManager {
 
