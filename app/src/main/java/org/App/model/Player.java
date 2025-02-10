@@ -23,6 +23,7 @@ public interface Player {
      * Represents the difficulty levels for AI players.
      */
     public enum Difficulty {
+        
         EASY,
         MEDIUM,
         HARD
