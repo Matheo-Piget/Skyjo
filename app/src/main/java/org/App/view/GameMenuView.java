@@ -256,7 +256,10 @@ public class GameMenuView {
             styleComboBox(difficultyBox);
             difficultyBoxes.add(difficultyBox);
 
-            HBox aiBox = new HBox(10, new Label("IA " + i + " :"), difficultyBox);
+            Label lab = new Label("IA " + i + " :");
+            lab.setTextFill(Color.WHITE);
+
+            HBox aiBox = new HBox(10, lab, difficultyBox);
             aiBox.setAlignment(Pos.CENTER);
             playerInputs.getChildren().add(aiBox);
         }

@@ -1,8 +1,10 @@
 package org.App.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.App.model.AIPlayer;
 import org.App.model.Card;
@@ -257,6 +259,15 @@ public final class GameController {
         if (game.isFinished()) {
             game.revealAllCards();
             Map<Player, Integer> ranking = game.getRanking();
+            ranking = ranking.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Player, Integer>comparingByValue())
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (e1, e2) -> e1,
+                    LinkedHashMap::new
+                ));
             view.showRanking(ranking);
         } else {
             updateView();
@@ -266,7 +277,7 @@ public final class GameController {
             // Vérifier si le prochain joueur est une IA
             if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
                 // Ajouter un délai avant que l'IA ne joue son tour
-                PauseTransition delay = new PauseTransition(Duration.seconds(1)); // Délai de 1 seconde
+                PauseTransition delay = new PauseTransition(Duration.seconds(0.1)); // Délai de 1 seconde
                 delay.setOnFinished(event -> {
                     aIPlayer.playTurn(game);
                     updateView();

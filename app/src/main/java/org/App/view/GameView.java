@@ -325,7 +325,8 @@ public class GameView {
             stage.show();
         });
 
-        cardsContainer.getChildren().add(showRankingButton);
+
+        cardsContainer.getChildren().add(0, showRankingButton);
     }
 
     /**
