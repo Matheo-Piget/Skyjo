@@ -87,7 +87,7 @@ public class GameMenuView {
             if (!stage.getScene().getStylesheets().isEmpty()) {
                 stage.getScene().getStylesheets().clear();
             }
-            stage.getScene().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+            stage.getScene().getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
         } else {
             if (!stage.getScene().getStylesheets().isEmpty()) {
                 stage.getScene().getStylesheets().clear();
@@ -112,16 +112,18 @@ public class GameMenuView {
         menuContainer.setAlignment(Pos.CENTER);
         menuContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
 
-        Label title = new Label("Bienvenu dans : Skyjo !");
+        Label title = new Label("Bienvenu dans Skyjo !");
         title.getStyleClass().add("skyjo-title"); // Assurez-vous que cette classe est bien dans votre fichier CSS
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(5, Color.BLACK));
 
         Label playerCountLabel = new Label("Nombre de joueurs :");
         playerCountLabel.setTextFill(Color.WHITE);
+        playerCountLabel.getStyleClass().add("number-of-players-label"); // Assurez-vous que cette classe est bien dans votre fichier CSS
 
         TextField playerCountField = new TextField("2");
         playerCountField.setPrefWidth(50);
+        playerCountField.setMaxWidth(200);
 
         Button generateFieldsButton = createStyledButton("Configurer joueurs");
         generateFieldsButton.setOnAction(e -> {

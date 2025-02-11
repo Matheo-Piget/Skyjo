@@ -2,8 +2,12 @@ package org.App.view;
 
 import java.io.File;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 /**
  * Gère la musique de fond du jeu.
@@ -19,47 +23,70 @@ import javafx.scene.media.MediaPlayer;
  * @version 1.0
  * @author Mathéo Piget
  */
+
 public class MusicManager {
 
     private MediaPlayer mediaPlayer;
+    private static final double FADE_DURATION = 1.0; // Durée du fondu en secondes
 
-    /**
-     * Initialise le MusicManager avec un fichier audio.
-     *
-     * @param musicFilePath Le chemin du fichier audio (par exemple, "music.mp3").
-     */
     public MusicManager(String musicFilePath) {
-
         Media media = new Media(new File(musicFilePath).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Répète la musique en boucle
     }
 
     /**
-     * Joue la musique de fond.
+     * Joue la musique de fond avec un fondu.
      */
     public void play() {
         if (mediaPlayer != null) {
+            mediaPlayer.setVolume(0.0); // Commence avec un volume de 0
             mediaPlayer.play();
+            fadeIn();
         }
     }
 
     /**
-     * Arrête la musique de fond.
+     * Arrête la musique de fond avec un fondu.
      */
     public void stop() {
         if (mediaPlayer != null) {
-            mediaPlayer.stop();
+            fadeOut(() -> mediaPlayer.stop());
         }
     }
 
     /**
-     * Met en pause la musique de fond.
+     * Met en pause la musique de fond avec un fondu.
      */
     public void pause() {
         if (mediaPlayer != null) {
-            mediaPlayer.pause();
+            fadeOut(() -> mediaPlayer.pause());
         }
+    }
+
+    /**
+     * Effectue un fondu en entrée (augmentation progressive du volume).
+     */
+    private void fadeIn() {
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(FADE_DURATION),
+                new KeyValue(mediaPlayer.volumeProperty(), 1.0))
+        );
+        timeline.play();
+    }
+
+    /**
+     * Effectue un fondu en sortie (diminution progressive du volume).
+     * 
+     * @param onFinished Une action à exécuter une fois le fondu terminé.
+     */
+    private void fadeOut(Runnable onFinished) {
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(FADE_DURATION),
+                new KeyValue(mediaPlayer.volumeProperty(), 0.0))
+        );
+        timeline.setOnFinished(event -> onFinished.run());
+        timeline.play();
     }
 
     /**

@@ -60,9 +60,10 @@ public class OptionsView {
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(10, Color.BLACK));
+        title.getStyleClass().add("options-title");
 
         // Theme selection
-        GridPane themePanel = createPanel("Theme");
+        GridPane themePanel = createPanel("");
         Label themeLabel = new Label("Select theme:");
         themeLabel.setTextFill(Color.WHITE);
         ComboBox<String> themeComboBox = new ComboBox<>();
@@ -72,17 +73,15 @@ public class OptionsView {
         themePanel.add(themeComboBox, 1, 0);
 
         // Game mode selection
-        GridPane modePanel = createPanel("Game Mode");
-        Label modeLabel = new Label("Select game mode:");
-        modeLabel.setTextFill(Color.WHITE);
+        GridPane modePanel = createPanel("");
         ComboBox<String> modeComboBox = new ComboBox<>();
         modeComboBox.getItems().addAll("Classique", "Rapide");
         modeComboBox.setValue(OptionsManager.getMode());
-        modePanel.add(modeLabel, 0, 0);
+        modePanel.add(new Label("Select game mode:"), 0, 0);
         modePanel.add(modeComboBox, 1, 0);
 
         // Volume control
-        GridPane volumePanel = createPanel("Volume");
+        GridPane volumePanel = createPanel("");
         Label volumeLabel = new Label("Adjust volume:");
         volumeLabel.setTextFill(Color.WHITE);
         Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
