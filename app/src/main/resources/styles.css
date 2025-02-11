@@ -192,7 +192,7 @@
     -fx-font-size: 18px;
 }
 
-.options-title{
+#options-title{
     -fx-font-size: 30px;
     -fx-text-fill: linear-gradient(to right, #ff7e5f, #feb47b); /* Dégradé de couleur pour le texte */
     -fx-font-weight: bold; /* Texte en gras */

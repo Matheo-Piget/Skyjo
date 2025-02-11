@@ -190,6 +190,8 @@ public class GameMenuView {
             TextField nameField = new TextField("Joueur " + i);
             nameField.setPromptText("Nom du Joueur " + i);
             styleTextField(nameField);
+            nameField.setPrefWidth(200);
+            nameField.setMaxWidth(200);
             nameFields.add(nameField);
             playerInputs.getChildren().add(nameField);
         }
@@ -199,8 +201,8 @@ public class GameMenuView {
             Label aiLabel = new Label("Nombre d'IA :");
             aiLabel.setTextFill(Color.WHITE);
 
-            aiCountField.setPrefWidth(50);
-            aiCountField.setMaxWidth(250);
+            aiCountField.setPrefWidth(35);
+            aiCountField.setMaxWidth(240);
             styleTextField(aiCountField);
 
             Button confirmAIButton = createStyledButton("Ajouter IA");
@@ -248,6 +250,9 @@ public class GameMenuView {
             difficultyBox.getItems().addAll(Player.Difficulty.values());
             difficultyBox.setValue(Player.Difficulty.MEDIUM);
             difficultyBox.setPrefWidth(150);
+            difficultyBox.setMaxWidth(150);
+            difficultyBox.setMaxHeight(40);
+            difficultyBox.setPrefHeight(40);
             styleComboBox(difficultyBox);
             difficultyBoxes.add(difficultyBox);
 
@@ -323,6 +328,7 @@ public class GameMenuView {
      * @param textField The text field to style.
      */
     private void styleTextField(TextField textField) {
+        textField.setPrefWidth(200);
         textField.getStyleClass().add("text-field"); // Assurez-vous que cette classe est bien dans votre fichier CSS
     }
 

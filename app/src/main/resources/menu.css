@@ -1,16 +1,16 @@
 /* Général */
 .root {
     -fx-background-color: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
-    -fx-padding: 20px;
+    -fx-padding: 10px; /* Padding réduit */
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-text-fill: #e0e0e0;
 }
 
 .skyjo-title {
-    -fx-font-size: 60px; /* Taille augmentée pour le titre Skyjo */
+    -fx-font-size: 50px; /* Taille réduite pour le titre Skyjo */
     -fx-text-fill: linear-gradient(to right, #6dd5ed, #2193b0); /* Dégradé de couleur pour le texte */
     -fx-font-weight: bold; /* Texte en gras */
-    -fx-padding: 10px; /* Ajout de padding */
+    -fx-padding: 5px; /* Padding réduit */
     -fx-border-color: #2193b0; /* Bordure de couleur */
     -fx-border-width: 2px; /* Largeur de la bordure */
     -fx-border-radius: 10px; /* Bordure arrondie */
@@ -20,158 +20,89 @@
 .button {
     -fx-background-color: linear-gradient(to right, #00adb5, #008080);
     -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-border-radius: 15px;
-    -fx-padding: 12px 24px;
+    -fx-font-size: 14px; /* Taille de police réduite */
+    -fx-border-radius: 10px; /* Bordure arrondie réduite */
+    -fx-padding: 8px 16px; /* Padding réduit */
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 10, 0, 0, 5);
-    -fx-transition: all 0.3s ease-in-out;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 3); /* Effet d'ombre réduit */
 }
 
 .button:hover {
     -fx-background-color: linear-gradient(to right, #00e0e0, #00a6a6);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 15, 0, 0, 8);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 5); /* Effet d'ombre réduit */
 }
 
 .button:pressed {
     -fx-scale-x: 0.95;
     -fx-scale-y: 0.95;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 5, 0, 0, 3); /* Effet d'ombre réduit */
 }
 
-/* Style pour la barre de menu */
-.menu-bar {
-    -fx-background-color: #2c3e50;
-    -fx-padding: 5px;
+/* Style pour les champs de texte */
+.text-field {
+    -fx-font-size: 14px; /* Taille de police réduite */
+    -fx-padding: 5px; /* Padding réduit */
+    -fx-border-color: #2193b0; /* Bordure de couleur */
+    -fx-border-radius: 5px; /* Bordure arrondie réduite */
+    -fx-background-color: #2c3e50; /* Fond sombre */
+    -fx-text-fill: #e0e0e0; /* Texte clair */
+    -fx-effect: none; /* Pas d'effet d'ombre */
 }
 
-/* Style pour le menu (icône de trois barres) */
-.menu {
-    -fx-padding: 5px;
+.text-field:focused {
+    -fx-border-color: #6dd5ed; /* Bordure colorée lorsqu'il est sélectionné */
 }
 
-/* Style pour les éléments du menu */
-.menu-item {
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-background-color: #34495e;
-}
-
-.menu-item:hover {
-    -fx-background-color: #4a6a8a;
-}
-
-/* Style pour l'icône de trois barres */
-.menu.label {
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
-}
-
-.label.title {
-    -fx-font-size: 32px;
-    -fx-text-fill: #6dd5ed;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 8);
-}
-
-
-.text.title {
-    -fx-font-size: 50px;
-    -fx-fill: #6dd5ed;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 8);
-}
-
-/* ComboBox (for Difficulty) */
+/* Style pour les ComboBox */
 .combo-box {
-    -fx-font-size: 14px;
-    -fx-padding: 10px;
-    -fx-border-color: #2193b0;
-    -fx-border-radius: 8px;
-    -fx-background-color: #71aebd;
-    -fx-text-fill: #000000;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 5, 0, 0, 3);
+    -fx-font-size: 14px; /* Taille de police réduite */
+    -fx-padding: 5px; /* Padding réduit */
+    -fx-border-color: #2193b0; /* Bordure de couleur */
+    -fx-border-radius: 5px; /* Bordure arrondie réduite */
+    -fx-background-color: #2c3e50; /* Fond sombre */
+    -fx-text-fill: #e0e0e0; /* Texte clair */
+    -fx-effect: none; /* Pas d'effet d'ombre */
 }
 
-.combo-box:focused {
-    -fx-border-color: #6dd5ed;
-    -fx-background-color: #383838;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.5), 8, 0, 0, 5);
+.combo-box .list-cell {
+    -fx-background-color: #2c3e50; /* Fond sombre */
+    -fx-text-fill: #e0e0e0; /* Texte clair */
+}
+
+.combo-box .list-view {
+    -fx-background-color: #2c3e50; /* Fond sombre */
+    -fx-border-color: #2193b0; /* Bordure de couleur */
+}
+
+.combo-box .arrow {
+    -fx-background-color: #2193b0; /* Couleur de la flèche */
+}
+
+.number-of-players-label {
+    -fx-font-size: 20px; /* Taille réduite */
+    -fx-text-fill: linear-gradient(to right, #ff7e5f, #feb47b); /* Dégradé de couleur pour le texte */
+    -fx-font-weight: bold; /* Texte en gras */
+    -fx-padding: 5px; /* Padding réduit */
+    -fx-border-color: #feb47b; /* Bordure de couleur */
+    -fx-border-width: 2px; /* Largeur de la bordure */
+    -fx-border-radius: 5px; /* Bordure arrondie réduite */
+    -fx-effect: none; /* Pas d'effet d'ombre */
 }
 
 /* Conteneurs */
 .vbox, .hbox {
     -fx-background-color: rgba(255, 255, 255, 0.05);
-    -fx-border-radius: 15px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+    -fx-border-radius: 10px; /* Bordure arrondie réduite */
+    -fx-padding: 10px; /* Padding réduit */
+    -fx-effect: none; /* Pas d'effet d'ombre */
 }
 
-
-/* Effets de survol pour les labels */
-.label:hover {
-    -fx-text-fill: #6dd5ed;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 8);
-}
-
-/* Effets de survol pour les champs de texte */
-.text-field:hover {
-    -fx-border-color: #6dd5ed;
-    -fx-background-color: #383838;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.5), 8, 0, 0, 5);
-}
-
-/* Effets de survol pour les ComboBox */
-.combo-box:hover {
-    -fx-border-color: #6dd5ed;
-    -fx-background-color: #383838;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.5), 8, 0, 0, 5);
-}
-
-/* Effets de survol pour les textes */
-.text:hover {
-    -fx-fill: #6dd5ed;
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 255, 255, 0.7), 10, 0, 0, 8);
-}
-
-.number-of-players-label {
-    -fx-font-size: 30px;
-    -fx-text-fill: linear-gradient(to right, #ff7e5f, #feb47b); /* Dégradé de couleur pour le texte */
-    -fx-font-weight: bold; /* Texte en gras */
-    -fx-padding: 10px; /* Ajout de padding */
-    -fx-border-color: #feb47b; /* Bordure de couleur */
-    -fx-border-width: 2px; /* Largeur de la bordure */
-    -fx-border-radius: 10px; /* Bordure arrondie */
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 3);
-}
-
-/* Style pour la barre de menu */
-.menu-bar {
-    -fx-background-color: #2c3e50;
-    -fx-padding: 5px;
-}
-
-/* Style pour le menu (icône de trois barres) */
-.menu {
-    -fx-padding: 5px;
-}
-
-/* Style pour les éléments du menu */
-.menu-item {
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-background-color: #34495e;
-}
-
-.menu-item:hover {
-    -fx-background-color: #4a6a8a;
-}
-
-/* Style pour l'icône de trois barres */
-.menu .label {
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
+/* Suppression des effets de survol pour les champs de texte et ComboBox */
+.text-field:hover, .combo-box:hover {
+    -fx-border-color: #2193b0; /* Bordure de couleur */
+    -fx-background-color: #2c3e50; /* Fond sombre */
+    -fx-effect: none; /* Pas d'effet d'ombre */
 }

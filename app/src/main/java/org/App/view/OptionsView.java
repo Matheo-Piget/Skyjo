@@ -61,7 +61,7 @@ public class OptionsView {
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(10, Color.BLACK));
-        title.getStyleClass().add("options-title");
+        title.setId("options-title");
 
         // Theme selection
         GridPane themePanel = createPanel("");
