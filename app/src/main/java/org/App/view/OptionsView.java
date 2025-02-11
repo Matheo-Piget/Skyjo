@@ -56,7 +56,8 @@ public class OptionsView {
         root.setStyle("-fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);");
 
         // Title
-        Label title = new Label("Options");
+        Label title = new Label();
+        title.setText("Options");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(10, Color.BLACK));
