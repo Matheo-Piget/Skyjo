@@ -4,7 +4,8 @@ import java.util.List;
 
 /**
  * Represents a player in the Skyjo game.
- * A player has a name, a list of cards, and a difficulty level (for AI players).
+ * A player has a name, a list of cards, and a difficulty level (for AI
+ * players).
  * 
  * <p>
  * This interface defines the common behavior for both human and AI players.
@@ -23,7 +24,7 @@ public interface Player {
      * Represents the difficulty levels for AI players.
      */
     public enum Difficulty {
-        
+
         EASY,
         MEDIUM,
         HARD

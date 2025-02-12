@@ -9,10 +9,12 @@ import javafx.scene.paint.Color;
 
 /**
  * Represents the discard pile view in the Skyjo game.
- * This class is responsible for displaying the top card of the discard pile and handling its interactions.
+ * This class is responsible for displaying the top card of the discard pile and
+ * handling its interactions.
  * 
  * <p>
- * The discard pile supports a shadow effect and updates its appearance when the top card changes.
+ * The discard pile supports a shadow effect and updates its appearance when the
+ * top card changes.
  * </p>
  * 
  * @see Card

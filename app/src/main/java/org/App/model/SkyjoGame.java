@@ -15,10 +15,12 @@ import org.App.controller.GameController;
 
 /**
  * Represents the main game logic for the Skyjo game.
- * This class manages the game state, including the players, the deck, and the discard pile.
+ * This class manages the game state, including the players, the deck, and the
+ * discard pile.
  * 
  * <p>
- * The game involves players drawing and discarding cards to minimize the total value of their hands.
+ * The game involves players drawing and discarding cards to minimize the total
+ * value of their hands.
  * The game ends when a player reveals all their cards or the deck is empty.
  * </p>
  * 
@@ -39,7 +41,6 @@ public final class SkyjoGame {
     private Card pickedCard;
     private boolean hasDiscard;
     private int countReveal;
-    
 
     /**
      * Constructs a new SkyjoGame with the specified players.
@@ -223,7 +224,8 @@ public final class SkyjoGame {
     public Map<Player, Integer> getRanking() {
         Map<Player, Integer> ranking = new HashMap<>();
         players.forEach(
-                player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum() + player.getCommutativeScore()));
+                player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()
+                        + player.getCommutativeScore()));
         return sortedRanking(ranking);
     }
 
@@ -284,14 +286,13 @@ public final class SkyjoGame {
      */
     public Map<Player, Integer> sortedRanking(Map<Player, Integer> ranking) {
         return ranking.entrySet()
-                 .stream()
-                 .sorted(Map.Entry.<Player, Integer>comparingByValue())
-                 .collect(Collectors.toMap(
-                     Map.Entry::getKey,
-                     Map.Entry::getValue,
-                     (e1, e2) -> e1,
-                     LinkedHashMap::new
-                 ));
+                .stream()
+                .sorted(Map.Entry.<Player, Integer>comparingByValue())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new));
     }
 
     /**
@@ -299,10 +300,12 @@ public final class SkyjoGame {
      * and setting up the discard pile.
      */
     public void startGame() {
-        if (!pick.isEmpty()) pick.clear();
-        if (!discard.isEmpty()) discard.clear();
+        if (!pick.isEmpty())
+            pick.clear();
+        if (!discard.isEmpty())
+            discard.clear();
         players.forEach(player -> player.getCartes().clear());
-    
+
         pick = createPick(); // Créer une nouvelle pioche
         players.forEach(player -> {
             player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur

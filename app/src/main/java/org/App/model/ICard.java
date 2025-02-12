@@ -2,7 +2,8 @@ package org.App.model;
 
 /**
  * Interface representing a card in the game.
- * A card has a value, a visibility state (face up or face down), and can be flipped.
+ * A card has a value, a visibility state (face up or face down), and can be
+ * flipped.
  * 
  * @see Card
  * @see CardValue

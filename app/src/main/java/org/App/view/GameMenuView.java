@@ -23,11 +23,13 @@ import javafx.stage.Stage;
 
 /**
  * Represents the main menu view for the Skyjo game.
- * This class is responsible for displaying the game menu, allowing players to configure the game,
+ * This class is responsible for displaying the game menu, allowing players to
+ * configure the game,
  * and starting the game with the specified settings.
  * 
  * <p>
- * The menu includes options to set the number of players, configure AI players, and access game options.
+ * The menu includes options to set the number of players, configure AI players,
+ * and access game options.
  * </p>
  * 
  * @see GameController
@@ -45,7 +47,7 @@ public class GameMenuView {
     private final VBox playerInputs;
     private final List<TextField> nameFields;
     private final List<ComboBox<Player.Difficulty>> difficultyBoxes;
-    private final MusicManager musicManager; 
+    private final MusicManager musicManager;
 
     private boolean hasPressOnGenerateFieldsButton;
 
@@ -57,7 +59,7 @@ public class GameMenuView {
     public GameMenuView(Stage stage, MusicManager musicManager) {
         this.stage = stage;
         this.nameFields = new ArrayList<>();
-        this.musicManager = musicManager; 
+        this.musicManager = musicManager;
         this.difficultyBoxes = new ArrayList<>();
         this.playerInputs = new VBox(10);
         this.playerInputs.setAlignment(Pos.CENTER);
@@ -109,13 +111,13 @@ public class GameMenuView {
         menuContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
 
         Label title = new Label("Bienvenu dans Skyjo !");
-        title.getStyleClass().add("skyjo-title"); 
+        title.getStyleClass().add("skyjo-title");
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(5, Color.BLACK));
 
         Label playerCountLabel = new Label("Nombre de joueurs :");
         playerCountLabel.setTextFill(Color.WHITE);
-        playerCountLabel.getStyleClass().add("number-of-players-label"); 
+        playerCountLabel.getStyleClass().add("number-of-players-label");
 
         TextField playerCountField = new TextField("2");
         playerCountField.setPrefWidth(50);
@@ -315,7 +317,7 @@ public class GameMenuView {
      */
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.getStyleClass().add("button"); 
+        button.getStyleClass().add("button");
         button.setPrefSize(200, 40);
         return button;
     }
@@ -327,7 +329,7 @@ public class GameMenuView {
      */
     private void styleTextField(TextField textField) {
         textField.setPrefWidth(200);
-        textField.getStyleClass().add("text-field"); 
+        textField.getStyleClass().add("text-field");
     }
 
     /**
@@ -336,7 +338,7 @@ public class GameMenuView {
      * @param comboBox The combo box to style.
      */
     private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
-        comboBox.getStyleClass().add("combo-box"); 
+        comboBox.getStyleClass().add("combo-box");
     }
 
     /**

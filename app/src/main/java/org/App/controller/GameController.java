@@ -17,7 +17,8 @@ import javafx.util.Duration;
 
 /**
  * The GameController class is responsible for handling the game logic and
- * updating the view based on the game state. It acts as the intermediary between
+ * updating the view based on the game state. It acts as the intermediary
+ * between
  * the model ({@link SkyjoGame}) and the view ({@link GameView}).
  * 
  * <p>
@@ -43,8 +44,8 @@ public final class GameController {
     /**
      * Constructs a new GameController with the specified view and players.
      * 
-     * @param view     The {@link GameView} instance representing the game's UI.
-     * @param players  A list of {@link Player} instances participating in the game.
+     * @param view    The {@link GameView} instance representing the game's UI.
+     * @param players A list of {@link Player} instances participating in the game.
      * 
      * @see GameView
      * @see Player
@@ -89,7 +90,8 @@ public final class GameController {
     }
 
     /**
-     * Creates a list of {@link CardView} instances for all cards held by the players.
+     * Creates a list of {@link CardView} instances for all cards held by the
+     * players.
      * 
      * @return A list of {@link CardView} instances.
      * 
@@ -268,7 +270,7 @@ public final class GameController {
         Map<Player, Integer> ranking = game.getRanking();
         ranking.forEach((player, score) -> player.addScore(score));
         view.showRanking(ranking);
-        
+
         if (game.hasPlayerReached100Points()) {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
             finalRanking.forEach((player, score) -> player.addScore(score));

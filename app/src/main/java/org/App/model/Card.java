@@ -11,7 +11,7 @@ package org.App.model;
  * @see ICard
  * @see CardValue
  * 
- * @param valeur The value of the card.
+ * @param valeur      The value of the card.
  * @param faceVisible The visibility state of the card.
  * 
  * @author Mathéo Piget

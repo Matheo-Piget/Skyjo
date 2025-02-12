@@ -13,10 +13,12 @@ import javafx.util.Duration;
 
 /**
  * Represents the view of a card in the Skyjo game.
- * This class is responsible for displaying a card and handling its interactions.
+ * This class is responsible for displaying a card and handling its
+ * interactions.
  * 
  * <p>
- * The card can be face up or face down, and its appearance changes based on its value.
+ * The card can be face up or face down, and its appearance changes based on its
+ * value.
  * It also supports animations for flipping and scaling.
  * </p>
  * 
@@ -47,8 +49,10 @@ public class CardView extends StackPane {
         cardBackground.setArcHeight(15);
 
         // Apply gradient background and rounded corners
-        this.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));" +
-                      "-fx-background-radius: 10px; -fx-border-radius: 10px; -fx-border-color: rgba(255, 255, 255, 0.3);");
+        this.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));"
+                        +
+                        "-fx-background-radius: 10px; -fx-border-radius: 10px; -fx-border-color: rgba(255, 255, 255, 0.3);");
 
         // Card color styles
         if (value.faceVisible()) {

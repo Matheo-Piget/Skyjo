@@ -30,25 +30,23 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * Represents the main game view for the Skyjo game.
- * This class is responsible for displaying the game interface, including the
- * cards,
- * players, and game controls.
- * 
+ * Represents the main game view for the Skyjo game. This class is responsible
+ * for displaying the game interface, including the cards, players, and game
+ * controls.
+ *
  * <p>
  * The view supports animations for card distribution, player boards, and game
- * transitions.
- * It also provides methods to display rankings, end-game messages, and other UI
- * elements.
+ * transitions. It also provides methods to display rankings, end-game messages,
+ * and other UI elements.
  * </p>
- * 
+ *
  * @see Card
  * @see Player
  * @see BoardView
  * @see CardView
  * @see DiscardView
  * @see PickView
- * 
+ *
  * @author Mathéo Piget
  * @version 1.0
  */
@@ -126,7 +124,7 @@ public class GameView implements GameViewInterface {
      */
     private MenuBar createMenuBar() {
         Menu gameMenu = new Menu();
-        Label menuIcon = new Label("☰"); 
+        Label menuIcon = new Label("☰");
         gameMenu.setGraphic(menuIcon);
 
         MenuItem startNewGame = new MenuItem("Start New Game");
@@ -190,39 +188,38 @@ public class GameView implements GameViewInterface {
     }
 
     /**
-     * Displays the game view with the specified players, current player, remaining
-     * cards, and top discard card.
+     * Displays the game view with the specified players, current player,
+     * remaining cards, and top discard card.
      *
-     * @param players          The list of players.
+     * @param players           The list of players.
      * @param currentPlayerName The name of the current player.
-     * @param remainingCards   The number of remaining cards.
-     * @param topDiscardCard   The top discard card.
+     * @param remainingCards    The number of remaining cards.
+     * @param topDiscardCard    The top discard card.
      */
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
         clearPreviousCards();
         addCardViewsToRootPane(players);
-    
+
         cardsContainer.getChildren().clear();
-    
+
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
         HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
-    
+
         HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
-    
+
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
-    
+
     /**
      * Clears the previous cards from the root pane.
      */
     private void clearPreviousCards() {
         rootPane.getChildren().clear();
     }
-
 
     /**
      * Adds card views to the root pane for all players.
@@ -237,40 +234,40 @@ public class GameView implements GameViewInterface {
             }
         }
     }
-    
+
     /**
      * Creates a container for side players based on the current player.
      *
-     * @param players          The list of players.
+     * @param players           The list of players.
      * @param currentPlayerName The name of the current player.
-     * @param isTop            Whether the container is for top players.
+     * @param isTop             Whether the container is for top players.
      * @return The HBox container for side players.
      */
     private HBox createSidePlayersContainer(List<Player> players, String currentPlayerName, boolean isTop) {
         HBox container = new HBox(20);
         container.setAlignment(Pos.CENTER);
-    
+
         List<VBox> sidePlayers = new ArrayList<>();
         for (Player player : players) {
             if (!player.getName().equals(currentPlayerName)) {
                 sidePlayers.add(createPlayerBoard(player, false));
             }
         }
-    
+
         for (int i = 0; i < sidePlayers.size(); i++) {
             if ((isTop && i % 2 == 0) || (!isTop && i % 2 != 0)) {
                 container.getChildren().add(sidePlayers.get(i));
             }
         }
-    
+
         return container;
     }
-    
+
     /**
      * Creates the center area of the game view.
      *
-     * @param remainingCards       The number of remaining cards.
-     * @param topDiscardCard       The top discard card.
+     * @param remainingCards        The number of remaining cards.
+     * @param topDiscardCard        The top discard card.
      * @param centerPlayerContainer The container for the center player.
      * @return The HBox container for the center area.
      */
@@ -279,12 +276,11 @@ public class GameView implements GameViewInterface {
         DiscardView discardView = new DiscardView(topDiscardCard);
         pickView.setPrefSize(150, 200);
         discardView.setPrefSize(150, 200);
-    
+
         HBox centerArea = new HBox(40, pickView, centerPlayerContainer, discardView);
         centerArea.setAlignment(Pos.CENTER);
         return centerArea;
     }
-    
 
     /**
      * Creates the main container for the game view.
@@ -330,15 +326,15 @@ public class GameView implements GameViewInterface {
         List<CardView> cardViews = createCardViewsForPlayer(player);
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
-    
+
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
-    
+
         return playerContainer;
     }
-    
+
     /**
      * Creates a text element for the player name.
      *
@@ -352,7 +348,7 @@ public class GameView implements GameViewInterface {
         playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
         return playerNameText;
     }
-    
+
     /**
      * Creates a list of card views for the specified player.
      *
@@ -370,7 +366,8 @@ public class GameView implements GameViewInterface {
     /**
      * Displays the final ranking of players.
      *
-     * @param ranking The final ranking of players as a map of players to their scores.
+     * @param ranking The final ranking of players as a map of players to their
+     *                scores.
      */
     @Override
     public void showFinalRanking(Map<Player, Integer> ranking) {
@@ -405,7 +402,8 @@ public class GameView implements GameViewInterface {
     /**
      * Displays the ranking of players.
      *
-     * @param ranking The ranking of players as a map of players to their scores.
+     * @param ranking The ranking of players as a map of players to their
+     *                scores.
      */
     @Override
     public void showRanking(java.util.Map<Player, Integer> ranking) {
@@ -492,40 +490,42 @@ public class GameView implements GameViewInterface {
     @Override
     public void distributeCardsWithAnimation(List<Player> players, List<CardView> cardViews, Runnable onComplete) {
         int numberOfPlayers = players.size();
-    
+
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-    
+
         final int[] index = { 0 };
         final int totalCards = cardViews.size();
         int[] remainingAnimations = { totalCards };
-    
+
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
             double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
-    
+
             animateCardsForPlayer(player, cardViews, index, targetX, targetY, remainingAnimations, onComplete);
         }
     }
-    
+
     /**
      * Animates cards for a player.
      *
-     * @param player             The player to animate cards for.
-     * @param cardViews          The list of card views to animate.
-     * @param index              The current index of the card views.
-     * @param targetX            The target X position for the cards.
-     * @param targetY            The target Y position for the cards.
+     * @param player              The player to animate cards for.
+     * @param cardViews           The list of card views to animate.
+     * @param index               The current index of the card views.
+     * @param targetX             The target X position for the cards.
+     * @param targetY             The target Y position for the cards.
      * @param remainingAnimations The number of remaining animations.
-     * @param onComplete         A callback to execute when the animation is complete.
+     * @param onComplete          A callback to execute when the animation is
+     *                            complete.
      */
-    private void animateCardsForPlayer(Player player, List<CardView> cardViews, int[] index, double targetX, double targetY,
-                                      int[] remainingAnimations, Runnable onComplete) {
+    private void animateCardsForPlayer(Player player, List<CardView> cardViews, int[] index, double targetX,
+            double targetY,
+            int[] remainingAnimations, Runnable onComplete) {
         for (int j = 0; j < player.getCartes().size(); j++) {
             CardView cardView = cardViews.get(index[0]++);
             double cardOffsetX = (j % 4) * 50;
             double cardOffsetY = (j / 4) * 70;
-    
+
             animateCard(cardView, 400, 300, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
                 remainingAnimations[0]--;
                 if (remainingAnimations[0] == 0) {
@@ -554,52 +554,82 @@ public class GameView implements GameViewInterface {
             }
             case 4 -> {
                 return switch (playerIndex) {
-                    case 0 -> 650;
-                    case 1 -> 650;
-                    case 2 -> 540;
-                    default -> 775;
+                    case 0 ->
+                        650;
+                    case 1 ->
+                        650;
+                    case 2 ->
+                        540;
+                    default ->
+                        775;
                 };
             }
             case 5 -> {
                 return switch (playerIndex) {
-                    case 0 -> 775;
-                    case 1 -> 540;
-                    case 2 -> 540;
-                    case 3 -> 775;
-                    default -> 650;
+                    case 0 ->
+                        775;
+                    case 1 ->
+                        540;
+                    case 2 ->
+                        540;
+                    case 3 ->
+                        775;
+                    default ->
+                        650;
                 };
             }
             case 6 -> {
                 return switch (playerIndex) {
-                    case 0 -> 650;
-                    case 1 -> 540;
-                    case 2 -> 775;
-                    case 3 -> 420;
-                    case 4 -> 650;
-                    default -> 880;
+                    case 0 ->
+                        650;
+                    case 1 ->
+                        540;
+                    case 2 ->
+                        775;
+                    case 3 ->
+                        420;
+                    case 4 ->
+                        650;
+                    default ->
+                        880;
                 };
             }
             case 7 -> {
                 return switch (playerIndex) {
-                    case 0 -> 420;
-                    case 1 -> 420;
-                    case 2 -> 650;
-                    case 3 -> 650;
-                    case 4 -> 880;
-                    case 5 -> 880;
-                    default -> 650;
+                    case 0 ->
+                        420;
+                    case 1 ->
+                        420;
+                    case 2 ->
+                        650;
+                    case 3 ->
+                        650;
+                    case 4 ->
+                        880;
+                    case 5 ->
+                        880;
+                    default ->
+                        650;
                 };
             }
             case 8 -> {
                 return switch (playerIndex) {
-                    case 0 -> 290;
-                    case 1 -> 520;
-                    case 2 -> 760;
-                    case 3 -> 1000;
-                    case 4 -> 650;
-                    case 5 -> 420;
-                    case 6 -> 650;
-                    default -> 880;
+                    case 0 ->
+                        290;
+                    case 1 ->
+                        520;
+                    case 2 ->
+                        760;
+                    case 3 ->
+                        1000;
+                    case 4 ->
+                        650;
+                    case 5 ->
+                        420;
+                    case 6 ->
+                        650;
+                    default ->
+                        880;
                 };
             }
             default -> {
@@ -643,44 +673,70 @@ public class GameView implements GameViewInterface {
             }
             case 5 -> {
                 return switch (playerIndex) {
-                    case 0 -> 590;
-                    case 1 -> 590;
-                    case 2 -> 35;
-                    case 3 -> 35;
-                    default -> 320;
+                    case 0 ->
+                        590;
+                    case 1 ->
+                        590;
+                    case 2 ->
+                        35;
+                    case 3 ->
+                        35;
+                    default ->
+                        320;
                 };
             }
             case 6 -> {
                 return switch (playerIndex) {
-                    case 0 -> 320;
-                    case 1 -> 590;
-                    case 2 -> 590;
-                    case 3 -> 35;
-                    case 4 -> 35;
-                    default -> 35;
+                    case 0 ->
+                        320;
+                    case 1 ->
+                        590;
+                    case 2 ->
+                        590;
+                    case 3 ->
+                        35;
+                    case 4 ->
+                        35;
+                    default ->
+                        35;
                 };
             }
             case 7 -> {
                 return switch (playerIndex) {
-                    case 0 -> 35;
-                    case 1 -> 590;
-                    case 2 -> 35;
-                    case 3 -> 590;
-                    case 4 -> 35;
-                    case 5 -> 590;
-                    default -> 320;
+                    case 0 ->
+                        35;
+                    case 1 ->
+                        590;
+                    case 2 ->
+                        35;
+                    case 3 ->
+                        590;
+                    case 4 ->
+                        35;
+                    case 5 ->
+                        590;
+                    default ->
+                        320;
                 };
             }
             case 8 -> {
                 return switch (playerIndex) {
-                    case 0 -> 35;
-                    case 1 -> 35;
-                    case 2 -> 35;
-                    case 3 -> 35;
-                    case 4 -> 320;
-                    case 5 -> 590;
-                    case 6 -> 590;
-                    default -> 590;
+                    case 0 ->
+                        35;
+                    case 1 ->
+                        35;
+                    case 2 ->
+                        35;
+                    case 3 ->
+                        35;
+                    case 4 ->
+                        320;
+                    case 5 ->
+                        590;
+                    case 6 ->
+                        590;
+                    default ->
+                        590;
                 };
             }
             default -> {
@@ -698,8 +754,8 @@ public class GameView implements GameViewInterface {
     @Override
     public void fadeInGameplayElements(Node node, Runnable onFinished) {
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), node);
-        fadeTransition.setFromValue(0); 
-        fadeTransition.setToValue(1); 
+        fadeTransition.setFromValue(0);
+        fadeTransition.setToValue(1);
         fadeTransition.setInterpolator(Interpolator.EASE_IN);
         fadeTransition.setOnFinished(event -> {
             if (onFinished != null) {
@@ -718,7 +774,7 @@ public class GameView implements GameViewInterface {
     public void setupBoardViews(List<Player> players) {
         cardsContainer.getChildren().clear();
         VBox mainContainer = new VBox(20);
-        mainContainer.setOpacity(0); 
+        mainContainer.setOpacity(0);
 
         for (Player player : players) {
 
@@ -757,8 +813,6 @@ public class GameView implements GameViewInterface {
      */
     private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY,
             int cardIndex, Runnable onFinished) {
-        System.out
-                .println("Animating card from (" + startX + ", " + startY + ") to (" + targetX + ", " + targetY + ")");
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
 
@@ -769,7 +823,6 @@ public class GameView implements GameViewInterface {
         transition.setInterpolator(Interpolator.EASE_BOTH);
 
         transition.setOnFinished(event -> {
-            System.out.println("Updating card position to (" + targetX + ", " + targetY + ")");
             cardView.setLayoutX(targetX);
             cardView.setLayoutY(targetY);
             cardView.setTranslateX(0);

@@ -51,16 +51,17 @@ public class AIPlayer implements Player {
      * 
      * @param score The score to add.
      */
+    @Override
     public void addScore(int score) {
         commutativeScore += score;
     }
-
 
     /**
      * Returns the commutative score of the AI player.
      * 
      * @return The commutative score of the AI player.
      */
+    @Override
     public int getCommutativeScore() {
         return commutativeScore;
     }
@@ -128,7 +129,8 @@ public class AIPlayer implements Player {
 
     /**
      * Plays a turn for the AI player in EASY difficulty mode.
-     * The AI makes random decisions between picking from the discard pile or the deck,
+     * The AI makes random decisions between picking from the discard pile or the
+     * deck,
      * and randomly chooses to exchange or discard the picked card.
      * 
      * @param game The current game instance.
@@ -176,7 +178,8 @@ public class AIPlayer implements Player {
     /**
      * Plays a turn for the AI player in MEDIUM difficulty mode.
      * The AI prefers to pick from the discard pile if the card is beneficial.
-     * Otherwise, it picks from the deck and replaces the highest-value card in its hand.
+     * Otherwise, it picks from the deck and replaces the highest-value card in its
+     * hand.
      * 
      * @param game The current game instance.
      * 
@@ -312,7 +315,8 @@ public class AIPlayer implements Player {
     }
 
     /**
-     * Finds the best card to replace in the AI player's hand to minimize the total value.
+     * Finds the best card to replace in the AI player's hand to minimize the total
+     * value.
      * 
      * @param newCard The new card to compare with existing cards.
      * @return The index of the best card to replace.

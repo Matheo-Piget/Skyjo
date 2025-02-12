@@ -14,7 +14,8 @@ import javafx.util.Duration;
  * Permet de jouer, arrêter, mettre en pause et ajuster le volume de la musique.
  * 
  * <p>
- * La classe utilise la classe {@link MediaPlayer} de JavaFX pour lire des fichiers audio.
+ * La classe utilise la classe {@link MediaPlayer} de JavaFX pour lire des
+ * fichiers audio.
  * </p>
  * 
  * @see MediaPlayer
@@ -69,9 +70,8 @@ public class MusicManager {
      */
     private void fadeIn() {
         Timeline timeline = new Timeline(
-            new KeyFrame(Duration.seconds(FADE_DURATION),
-                new KeyValue(mediaPlayer.volumeProperty(), 1.0))
-        );
+                new KeyFrame(Duration.seconds(FADE_DURATION),
+                        new KeyValue(mediaPlayer.volumeProperty(), 1.0)));
         timeline.play();
     }
 
@@ -82,9 +82,8 @@ public class MusicManager {
      */
     private void fadeOut(Runnable onFinished) {
         Timeline timeline = new Timeline(
-            new KeyFrame(Duration.seconds(FADE_DURATION),
-                new KeyValue(mediaPlayer.volumeProperty(), 0.0))
-        );
+                new KeyFrame(Duration.seconds(FADE_DURATION),
+                        new KeyValue(mediaPlayer.volumeProperty(), 0.0)));
         timeline.setOnFinished(event -> onFinished.run());
         timeline.play();
     }
@@ -112,7 +111,8 @@ public class MusicManager {
     /**
      * Indique si la musique est en cours de lecture.
      *
-     * @return {@code true} si la musique est en cours de lecture, {@code false} sinon.
+     * @return {@code true} si la musique est en cours de lecture, {@code false}
+     *         sinon.
      */
     public boolean isPlaying() {
         return mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING;

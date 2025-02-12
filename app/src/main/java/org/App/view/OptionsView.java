@@ -19,7 +19,8 @@ import javafx.stage.Stage;
 
 /**
  * Represents the options view of the application.
- * This view allows the user to select and save preferences such as theme, game mode, and volume.
+ * This view allows the user to select and save preferences such as theme, game
+ * mode, and volume.
  * 
  * @version 1.0
  * @author Piget Mathéo
@@ -36,13 +37,13 @@ public class OptionsView {
     /**
      * Constructs the options view.
      * 
-     * @param stage The primary stage of the application.
+     * @param stage        The primary stage of the application.
      * @param musicManager The music manager to control background music.
      */
     /**
      * Constructs the options view.
      * 
-     * @param stage The primary stage of the application.
+     * @param stage        The primary stage of the application.
      * @param musicManager The music manager to control background music.
      */
     public OptionsView(Stage stage, MusicManager musicManager) {
@@ -130,7 +131,8 @@ public class OptionsView {
         panel.setHgap(20);
         panel.setVgap(10);
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 10; -fx-background-radius: 10;");
+        panel.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 10; -fx-background-radius: 10;");
 
         Label panelTitle = new Label(title);
         panelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
@@ -188,7 +190,7 @@ public class OptionsView {
      * Saves the selected theme and game mode.
      * 
      * @param theme The selected theme.
-     * @param mode The selected game mode.
+     * @param mode  The selected game mode.
      */
     private void saveOptions(String theme, String mode) {
         try {
@@ -217,4 +219,3 @@ public class OptionsView {
         stage.show();
     }
 }
-

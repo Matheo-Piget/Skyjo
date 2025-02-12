@@ -7,7 +7,8 @@ import java.util.Properties;
 
 /**
  * Manages application configuration options such as theme and game mode.
- * This class is responsible for loading and saving configuration options from/to a properties file.
+ * This class is responsible for loading and saving configuration options
+ * from/to a properties file.
  * 
  * @version 1.0
  * @author Piget Mathéo
@@ -23,7 +24,8 @@ public class OptionsManager {
 
     /**
      * Loads the configuration options from the properties file.
-     * If the file is not found, an error message is printed to the standard error stream.
+     * If the file is not found, an error message is printed to the standard error
+     * stream.
      */
     private static void loadOptions() {
         try (InputStream input = OptionsManager.class.getResourceAsStream("/config.properties")) {
@@ -40,7 +42,8 @@ public class OptionsManager {
     /**
      * Retrieves the currently selected theme.
      * 
-     * @return The selected theme, or "Clair" (Light) as the default if not specified.
+     * @return The selected theme, or "Clair" (Light) as the default if not
+     *         specified.
      */
     public static String getTheme() {
         return properties.getProperty("theme", "Clair");
@@ -49,7 +52,8 @@ public class OptionsManager {
     /**
      * Retrieves the currently selected game mode.
      * 
-     * @return The selected game mode, or "Classique" (Classic) as the default if not specified.
+     * @return The selected game mode, or "Classique" (Classic) as the default if
+     *         not specified.
      */
     public static String getMode() {
         return properties.getProperty("mode", "Classique");
@@ -59,8 +63,9 @@ public class OptionsManager {
      * Saves the selected theme and game mode to the configuration file.
      * 
      * @param theme The theme to save.
-     * @param mode The game mode to save.
-     * @throws IOException If an error occurs while writing to the configuration file.
+     * @param mode  The game mode to save.
+     * @throws IOException If an error occurs while writing to the configuration
+     *                     file.
      */
     public static void saveOptions(String theme, String mode) throws IOException {
         if (theme == null || mode == null) {

@@ -9,7 +9,8 @@ import javafx.scene.layout.GridPane;
  * This class is responsible for displaying the cards in a grid layout.
  * 
  * <p>
- * The board is organized in rows and columns, with gaps between the cards for better visibility.
+ * The board is organized in rows and columns, with gaps between the cards for
+ * better visibility.
  * </p>
  * 
  * @see CardView
@@ -22,7 +23,8 @@ public class BoardView extends GridPane {
     /**
      * Constructs a new BoardView with the specified list of card views.
      *
-     * @param cardViews The list of {@link CardView} instances to display on the board.
+     * @param cardViews The list of {@link CardView} instances to display on the
+     *                  board.
      */
     public BoardView(List<CardView> cardViews) {
         int cols = cardViews.size() / 3;

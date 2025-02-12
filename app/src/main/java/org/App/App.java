@@ -8,10 +8,12 @@ import javafx.stage.Stage;
 
 /**
  * Represents the main application class for the Skyjo game.
- * This class is responsible for starting the game and handling the primary stage.
+ * This class is responsible for starting the game and handling the primary
+ * stage.
  * 
  * <p>
- * The application class is a subclass of {@link Application} and overrides the {@link Application#start(Stage)} method.
+ * The application class is a subclass of {@link Application} and overrides the
+ * {@link Application#start(Stage)} method.
  * </p>
  * 
  * @see GameMenuView
@@ -21,7 +23,7 @@ import javafx.stage.Stage;
  */
 public final class App extends Application {
 
-    public  static App INSTANCE;
+    public static App INSTANCE;
 
     /**
      * Starts the game by displaying the main menu.
@@ -41,7 +43,6 @@ public final class App extends Application {
         INSTANCE = this;
     }
 
-    
     /**
      * Returns the singleton instance of the application.
      *
@@ -54,14 +55,14 @@ public final class App extends Application {
     /**
      * Restarts the game by creating a new primary stage.
      */
-    public void restart
-    () {
+    public void restart() {
         Stage primaryStage = new Stage();
         start(primaryStage);
     }
 
     /**
-     * Launches the application by calling the {@link Application#launch(String...)} method.
+     * Launches the application by calling the {@link Application#launch(String...)}
+     * method.
      *
      * @param args The command-line arguments.
      */

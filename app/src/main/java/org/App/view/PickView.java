@@ -12,8 +12,10 @@ import javafx.util.Duration;
 
 /**
  * Represents a view for the draw pile in the game.
- * This view displays the number of remaining cards and allows the user to interact with the pile.
- * It includes animations for hover effects and handles click events to draw a card.
+ * This view displays the number of remaining cards and allows the user to
+ * interact with the pile.
+ * It includes animations for hover effects and handles click events to draw a
+ * card.
  * 
  * @version 1.0
  * @author Piget Mathéo
@@ -34,8 +36,8 @@ public class PickView extends StackPane {
         Rectangle cardBackground = new Rectangle(40, 60);
         cardBackground.setFill(Color.GRAY);
         cardBackground.setStroke(Color.BLACK);
-        cardBackground.setArcWidth(10); 
-        cardBackground.setArcHeight(10); 
+        cardBackground.setArcWidth(10);
+        cardBackground.setArcHeight(10);
 
         // Display the number of remaining cards
         Text cardCount = new Text(String.valueOf(remainingCards));

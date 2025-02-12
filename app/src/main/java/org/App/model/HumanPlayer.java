@@ -38,16 +38,17 @@ public final class HumanPlayer implements Player {
      * 
      * @param score The score to add.
      */
+    @Override
     public void addScore(int score) {
         commutativeScore += score;
     }
-
 
     /**
      * Returns the commutative score of the AI player.
      * 
      * @return The commutative score of the AI player.
      */
+    @Override
     public int getCommutativeScore() {
         return commutativeScore;
     }
