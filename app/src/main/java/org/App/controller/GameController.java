@@ -1,6 +1,7 @@
 package org.App.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,61 +62,34 @@ public final class GameController {
     /**
      * Returns the singleton instance of the GameController.
      * 
-     * @return The singleton instance of {@link GameController}.
+     * @return The singleton instance of the GameController.
      */
     public static GameController getInstance() {
         return instance;
     }
 
+    
     /**
-     * Starts the game by initializing the game state, distributing cards with
-     * animations, and setting up the board. If the current player is an AI,
-     * it automatically plays its turn after a short delay.
-     * 
-     * @see SkyjoGame#startGame()
-     * @see GameView#distributeCardsWithAnimation(List, List, Runnable)
-     * @see GameView#fadeInGameplayElements(javafx.scene.layout.Pane, Runnable)
-     * @see AIPlayer#playTurn(SkyjoGame)
+     * Starts the game by distributing the cards to the players and initializing the
      */
     public void startGame() {
         game.startGame();
-
-        // Step 1: Create CardView instances without associating them with BoardView
         List<CardView> cardViews = createCardViews();
+        view.distributeCardsWithAnimation(game.getPlayers(), cardViews, this::initializeGameBoard);
+    }
 
-        // Step 2: Distribute Cards with Animation
-        view.distributeCardsWithAnimation(game.getPlayers(), cardViews, () -> {
-            // Add a small delay before fading in the gameplay elements
-            PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
-            delay.setOnFinished(event -> {
-                // Step 3: After delay, fade in the gameplay elements
-                view.fadeInGameplayElements(view.getRootPane(), () -> {
-                    // Step 4: Setup the board and update the view
-                    view.setupBoardViews(game.getPlayers());
-                    updateView(); // Ensure UI is properly refreshed
-
-                    // Step 5: Start the game logic after the animation is complete
-                    game.revealInitialCards();
-
-                    PauseTransition pause = new PauseTransition(Duration.seconds(1));
-                    pause.setOnFinished(e -> {
-                        updateView();
-                    });
-                    pause.play();
-
-                    // Step 6: Check if the current player is an AI and play their turn
-                    if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-                        PauseTransition aiDelay = new PauseTransition(Duration.seconds(1)); // Délai de 1 seconde
-                        aiDelay.setOnFinished(aiEvent -> {
-                            aIPlayer.playTurn(game);
-                            updateView();
-                            endTurn(); // Passer au tour suivant après que l'IA a joué
-                        });
-                        aiDelay.play();
-                    }
-                });
+    /**
+     * Initializes the game board by fading in the gameplay elements and revealing
+     * 
+     */
+    private void initializeGameBoard() {
+        addDelay(0.5, () -> {
+            view.fadeInGameplayElements(view.getRootPane(), () -> {
+                view.setupBoardViews(game.getPlayers());
+                game.revealInitialCards();
+                updateViewWithDelay(1);
+                handleAITurn();
             });
-            delay.play();
         });
     }
 
@@ -145,11 +119,9 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handlePickClick() {
-        pickedCard = game.pickCard();
-        pickedCard = pickedCard.retourner();
+        pickedCard = game.pickCard().retourner();
         if (pickedCard != null) {
-            System.out.println(game.getActualPlayer().getName() + " a pioché " + pickedCard.valeur());
-            // Create a CardView for the picked card
+
             pickedCardView = new CardView(pickedCard, -1);
             view.getRootPane().getChildren().add(pickedCardView);
 
@@ -223,8 +195,7 @@ public final class GameController {
             game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
             cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
             view.getRootPane().getChildren().remove(pickedCardView); // Supprime la carte piochée
-            pickedCard = null;
-            pickedCardView = null;
+            resetPickState();
             endTurn();
         }
         if (hasDiscard && count_reveal < 1) {
@@ -235,98 +206,143 @@ public final class GameController {
         }
 
         if (count_reveal == 1) {
-            count_reveal = 0;
-            hasDiscard = false;
+            resetRevealState();
             endTurn();
         }
     }
 
     /**
-     * Ends the current player's turn and checks if the game is finished. If the game
-     * is finished, it displays the ranking. Otherwise, it proceeds to the next
-     * player's turn.
+     * Handles the action when the player clicks the "End Turn" button. It ends the
+     * player's turn and proceeds to the next player.
+     * 
+     * @see #endTurn()
+     */
+    private void resetPickState() {
+        pickedCard = null;
+        pickedCardView = null;
+    }
+
+    /**
+     * Handles the action when the player clicks the "Reveal" button. It reveals the
+     * clicked card and ends the player's turn.
+     * 
+     * @see #resetRevealState()
+     * @see #endTurn()
+     */
+    private void resetRevealState() {
+        count_reveal = 0;
+        hasDiscard = false;
+    }
+
+    /**
+     * Ends the player's turn and proceeds to the next player. It checks if the game
+     * is finished and either concludes the game or proceeds to the next turn.
      * 
      * @see SkyjoGame#checkColumns()
      * @see SkyjoGame#isFinished()
-     * @see SkyjoGame#revealAllCards()
-     * @see SkyjoGame#getRanking()
-     * @see GameView#showRanking(Map)
-     * @see SkyjoGame#nextPlayer()
+     * @see #concludeGame()
+     * @see #updateView()
+     * @see #handleAITurn()
      */
     private void endTurn() {
         game.checkColumns();
         if (game.isFinished()) {
-            game.revealAllCards();
-            Map<Player, Integer> ranking = game.getRanking();
-    
-            // Mettre à jour les scores cumulatifs
-            ranking.forEach((player, score) -> player.addScore(score));
-
-            ranking = ranking.entrySet()
-                .stream()
-                .sorted(Map.Entry.<Player, Integer>comparingByValue().reversed())
-                .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    Map.Entry::getValue,
-                    (e1, e2) -> e1,
-                    java.util.LinkedHashMap::new
-                ));
-    
-            // Afficher le classement actuel
-            view.showRanking(ranking);
-
-            
-    
-            // Vérifier si un joueur a atteint 100 points
-            if (game.hasPlayerReached100Points()) {
-
-                Map <Player, Integer> rankingg = game.getFinalRanking();
-
-                rankingg = rankingg.entrySet()
-                .stream()
-                .sorted(Map.Entry.<Player, Integer>comparingByValue().reversed())
-                .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    Map.Entry::getValue,
-                    (e1, e2) -> e1,
-                    java.util.LinkedHashMap::new
-                ));
-                
-                // Afficher le classement final et terminer la partie
-                view.showFinalRanking(rankingg);
-            } else {
-                // Réinitialiser la manche et continuer
-                PauseTransition delay = new PauseTransition(Duration.seconds(15)); // Délai de 3 secondes
-                delay.setOnFinished(event -> {
-                    game.startGame(); // Réinitialiser la manche
-                    view.setupBoardViews(game.getPlayers());
-                    game.revealInitialCards();
-                    updateView();
-                    if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-                        PauseTransition aiDelay = new PauseTransition(Duration.seconds(0.1));
-                        aiDelay.setOnFinished(aiEvent -> {
-                            aIPlayer.playTurn(game);
-                            updateView();
-                            endTurn();
-                        });
-                        aiDelay.play();
-                    }
-                });
-                delay.play();
-            }
+            concludeGame();
         } else {
-            updateView();
             game.nextPlayer();
             updateView();
-            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-                PauseTransition delay = new PauseTransition(Duration.seconds(0.1));
-                delay.setOnFinished(event -> {
-                    aIPlayer.playTurn(game);
-                    updateView();
-                    endTurn();
-                });
-                delay.play();
-            }
+            handleAITurn();
         }
+    }
+
+    /**
+     * Concludes the game by revealing all cards and displaying the final ranking.
+     * If no player has reached 100 points, it restarts the round after a short
+     * delay.
+     * 
+     * @see SkyjoGame#revealAllCards()
+     * @see SkyjoGame#getSortedRanking()
+     * @see GameView#showRanking(Map)
+     * @see SkyjoGame#hasPlayerReached100Points()
+     * @see #restartRoundWithDelay(double)
+     */
+    private void concludeGame() {
+        game.revealAllCards();
+        Map<Player, Integer> ranking = game.getRanking();
+        ranking = ranking.entrySet()
+                 .stream()
+                 .sorted(Map.Entry.<Player, Integer>comparingByValue())
+                 .collect(Collectors.toMap(
+                     Map.Entry::getKey,
+                     Map.Entry::getValue,
+                     (e1, e2) -> e1,
+                     LinkedHashMap::new
+                 ));
+        view.showRanking(ranking);
+        if (game.hasPlayerReached100Points()) {
+            view.showFinalRanking(game.getFinalRanking());
+        } else {
+            restartRoundWithDelay(15);
+        }
+    }
+
+    /**
+     * Restarts the round after a short delay.
+     * 
+     * @param seconds The delay in seconds.
+     * 
+     * @see #restartRoundWithDelay(double)
+     * @see #addDelay(double, Runnable)
+     */
+    private void restartRoundWithDelay(double seconds) {
+        addDelay(seconds, () -> {
+            game.startGame();
+            view.setupBoardViews(game.getPlayers());
+            game.revealInitialCards();
+            updateView();
+            handleAITurn();
+        });
+    }
+
+    /**
+     * Handles the AI player's turn by playing the turn after a short delay.
+     * 
+     * @see AIPlayer#playTurn(SkyjoGame)
+     * @see #addDelay(double, Runnable)
+     */
+    private void handleAITurn() {
+        if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+            addDelay(0.1, () -> {
+                aIPlayer.playTurn(game);
+                updateView();
+                endTurn();
+            });
+        }
+    }
+
+    /**
+     * Updates the game view with a delay.
+     * 
+     * @param seconds The delay in seconds.
+     * 
+     * @see #updateView()
+     * @see #addDelay(double, Runnable)
+     */
+    private void updateViewWithDelay(double seconds) {
+        addDelay(seconds, this::updateView);
+    }
+
+    /**
+     * Adds a delay before executing an action.
+     * 
+     * @param seconds The delay in seconds.
+     * @param action  The action to execute.
+     * 
+     * @see PauseTransition
+     */
+    private void addDelay(double seconds, Runnable action) {
+        PauseTransition delay = new PauseTransition(Duration.seconds(seconds));
+        delay.setOnFinished(event -> action.run());
+        delay.play();
     }
 }
