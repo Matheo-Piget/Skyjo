@@ -45,7 +45,7 @@ public class GameMenuView {
     private final VBox playerInputs;
     private final List<TextField> nameFields;
     private final List<ComboBox<Player.Difficulty>> difficultyBoxes;
-    private final MusicManager musicManager; // Ajout du MusicManager
+    private final MusicManager musicManager; 
 
     private boolean hasPressOnGenerateFieldsButton;
 
@@ -68,10 +68,8 @@ public class GameMenuView {
 
         setupMenu();
 
-        // Appliquer les options enregistrées
         applySavedOptions();
 
-        // Jouer la musique
         musicManager.play();
 
     }
@@ -96,7 +94,6 @@ public class GameMenuView {
             stage.getScene().getStylesheets().add(getClass().getResource("/lighttheme.css").toExternalForm());
         }
 
-        // Appliquer le mode de jeu si nécessaire
         if (mode.equals("Action")) {
             // Démarrer le skyjo mais en action
         }
@@ -106,20 +103,19 @@ public class GameMenuView {
      * Sets up the main menu with all its components.
      */
     private void setupMenu() {
-        // Menu principal avec un style moderne
         VBox menuContainer = new VBox(20);
         menuContainer.setPadding(new Insets(30));
         menuContainer.setAlignment(Pos.CENTER);
         menuContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
 
         Label title = new Label("Bienvenu dans Skyjo !");
-        title.getStyleClass().add("skyjo-title"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+        title.getStyleClass().add("skyjo-title"); 
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(5, Color.BLACK));
 
         Label playerCountLabel = new Label("Nombre de joueurs :");
         playerCountLabel.setTextFill(Color.WHITE);
-        playerCountLabel.getStyleClass().add("number-of-players-label"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+        playerCountLabel.getStyleClass().add("number-of-players-label"); 
 
         TextField playerCountField = new TextField("2");
         playerCountField.setPrefWidth(50);
@@ -282,13 +278,13 @@ public class GameMenuView {
             players.add(new AIPlayer("IA " + (i + 1), difficulty));
         }
 
-        GameView gameView = new GameView(stage);
+        GameViewInterface gameView = new GameView(stage);
         GameController controller = new GameController(gameView, players);
 
         // Appliquer le mode enregistré
         String mode = OptionsManager.getMode();
-        if (mode.equals("Rapide")) {
-            //controller.enableFastMode(); // Ajoute une méthode pour gérer ce mode dans GameController
+        if (mode.equals("Action")) {
+            // TODO : Démarrer le skyjo en mode action
         }
 
         stage.setScene(gameView.getScene());
@@ -308,7 +304,6 @@ public class GameMenuView {
 
         optionsView.show();
 
-        // Appliquer les nouvelles options après la fermeture du menu options
         stage.setOnCloseRequest(event -> applySavedOptions());
     }
 
@@ -320,7 +315,7 @@ public class GameMenuView {
      */
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.getStyleClass().add("button"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+        button.getStyleClass().add("button"); 
         button.setPrefSize(200, 40);
         return button;
     }
@@ -332,7 +327,7 @@ public class GameMenuView {
      */
     private void styleTextField(TextField textField) {
         textField.setPrefWidth(200);
-        textField.getStyleClass().add("text-field"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+        textField.getStyleClass().add("text-field"); 
     }
 
     /**
@@ -341,7 +336,7 @@ public class GameMenuView {
      * @param comboBox The combo box to style.
      */
     private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
-        comboBox.getStyleClass().add("combo-box"); // Assurez-vous que cette classe est bien dans votre fichier CSS
+        comboBox.getStyleClass().add("combo-box"); 
     }
 
     /**

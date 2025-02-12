@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.App.controller.GameController;
 
@@ -33,6 +35,7 @@ public final class SkyjoGame {
     private final List<Card> discard;
     private int indexActualPlayer = 0;
     private final Random random = new Random();
+    
 
     /**
      * Constructs a new SkyjoGame with the specified players.
@@ -158,7 +161,7 @@ public final class SkyjoGame {
         Map<Player, Integer> ranking = new HashMap<>();
         players.forEach(
                 player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum() + player.getCommutativeScore()));
-        return ranking;
+        return sortedRanking(ranking);
     }
 
     /**
@@ -170,7 +173,7 @@ public final class SkyjoGame {
         Map<Player, Integer> ranking = new HashMap<>();
         players.forEach(
                 player -> ranking.put(player, player.getCommutativeScore()));
-        return ranking;
+        return sortedRanking(ranking);
     }
 
     /**
@@ -207,6 +210,25 @@ public final class SkyjoGame {
      */
     public List<Card> getDiscard() {
         return List.copyOf(discard);
+    }
+
+    /**
+     * Sorts the ranking of the players based on their scores.
+     * 
+     * @param ranking The unsorted ranking of the players.
+     * @return The sorted ranking of the players.
+     * 
+     */
+    public Map<Player, Integer> sortedRanking(Map<Player, Integer> ranking) {
+        return ranking.entrySet()
+                 .stream()
+                 .sorted(Map.Entry.<Player, Integer>comparingByValue())
+                 .collect(Collectors.toMap(
+                     Map.Entry::getKey,
+                     Map.Entry::getValue,
+                     (e1, e2) -> e1,
+                     LinkedHashMap::new
+                 ));
     }
 
     /**

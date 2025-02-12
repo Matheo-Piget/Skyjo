@@ -1,10 +1,8 @@
 package org.App.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.App.model.AIPlayer;
 import org.App.model.Card;
@@ -12,6 +10,7 @@ import org.App.model.Player;
 import org.App.model.SkyjoGame;
 import org.App.view.CardView;
 import org.App.view.GameView;
+import org.App.view.GameViewInterface;
 
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -38,7 +37,7 @@ import javafx.util.Duration;
 public final class GameController {
     private static GameController instance;
     private final SkyjoGame game;
-    private final GameView view;
+    private final GameViewInterface view;
     private Card pickedCard;
     private boolean hasDiscard;
     private int count_reveal = 0;
@@ -53,7 +52,7 @@ public final class GameController {
      * @see GameView
      * @see Player
      */
-    public GameController(GameView view, List<Player> players) {
+    public GameController(GameViewInterface view, List<Player> players) {
         this.view = view;
         this.game = new SkyjoGame(players);
         instance = this;
@@ -270,37 +269,15 @@ public final class GameController {
         game.revealAllCards();
         Map<Player, Integer> ranking = game.getRanking();
         ranking.forEach((player, score) -> player.addScore(score));
-        ranking = sortedRanking(ranking);
         view.showRanking(ranking);
         
         if (game.hasPlayerReached100Points()) {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
             finalRanking.forEach((player, score) -> player.addScore(score));
-            finalRanking = sortedRanking(finalRanking);
             view.showFinalRanking(finalRanking);
         } else {
             restartRoundWithDelay(15);
         }
-    }
-
-
-    /**
-     * Sorts the ranking of the players based on their scores.
-     * 
-     * @param ranking The unsorted ranking of the players.
-     * @return The sorted ranking of the players.
-     * 
-     */
-    public Map<Player, Integer> sortedRanking(Map<Player, Integer> ranking) {
-        return ranking.entrySet()
-                 .stream()
-                 .sorted(Map.Entry.<Player, Integer>comparingByValue())
-                 .collect(Collectors.toMap(
-                     Map.Entry::getKey,
-                     Map.Entry::getValue,
-                     (e1, e2) -> e1,
-                     LinkedHashMap::new
-                 ));
     }
 
     /**

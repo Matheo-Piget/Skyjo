@@ -52,13 +52,13 @@ import javafx.util.Duration;
  * @author Mathéo Piget
  * @version 1.0
  */
-public class GameView {
+public class GameView implements GameViewInterface {
 
     private final Stage stage;
     private final VBox cardsContainer;
     private final Scene scene;
-    private Pane rootPane;
-    private MusicManager musicManager;
+    private final Pane rootPane;
+    private final MusicManager musicManager;
 
     /**
      * Constructs a new GameView with the specified stage.
@@ -76,18 +76,15 @@ public class GameView {
 
         musicManager.play();
 
-        // Apply gradient background to the root pane
         rootPane.getStyleClass().add("root");
 
         this.cardsContainer = new VBox(20);
         this.cardsContainer.setAlignment(Pos.CENTER);
         this.cardsContainer.getStyleClass().add("vbox");
 
-        // Barre de menu
         MenuBar menuBar = createMenuBar();
         menuBar.getStyleClass().add("menu-bar");
 
-        // Conteneur principal
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(new BorderPane(menuBar));
         borderPane.setCenter(rootPane);
@@ -96,7 +93,6 @@ public class GameView {
         this.scene = new Scene(borderPane, 1400, 900);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
 
-        // Redimensionner dynamiquement
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
 
@@ -110,6 +106,7 @@ public class GameView {
      *
      * @return The scene.
      */
+    @Override
     public Scene getScene() {
         return scene;
     }
@@ -117,6 +114,7 @@ public class GameView {
     /**
      * Displays the game view.
      */
+    @Override
     public void show() {
         stage.show();
     }
@@ -127,13 +125,10 @@ public class GameView {
      * @return The menu bar.
      */
     private MenuBar createMenuBar() {
-        // Créer un menu avec une icône de trois barres (hamburger icon)
         Menu gameMenu = new Menu();
-        Label menuIcon = new Label("☰"); // Icône de trois barres (Unicode)
-        menuIcon.setStyle("-fx-font-size: 18; -fx-text-fill: white;");
+        Label menuIcon = new Label("☰"); 
         gameMenu.setGraphic(menuIcon);
 
-        // Options du menu
         MenuItem startNewGame = new MenuItem("Start New Game");
         MenuItem toggleMusic = new MenuItem("Toggle Music");
         MenuItem increaseVolume = new MenuItem("Increase Volume");
@@ -195,64 +190,115 @@ public class GameView {
     }
 
     /**
-     * Displays the game interface with the current state of the players and cards.
+     * Displays the game view with the specified players, current player, remaining
+     * cards, and top discard card.
      *
-     * @param players           The list of players in the game.
+     * @param players          The list of players.
      * @param currentPlayerName The name of the current player.
-     * @param remainingCards    The number of remaining cards in the deck.
-     * @param topDiscardCard    The top card of the discard pile.
+     * @param remainingCards   The number of remaining cards.
+     * @param topDiscardCard   The top discard card.
      */
+    @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
-        // Clear previous cards
+        clearPreviousCards();
+        addCardViewsToRootPane(players);
+    
+        cardsContainer.getChildren().clear();
+    
+        VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
+        HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
+        HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
+    
+        HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
+        VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
+    
+        cardsContainer.getChildren().add(mainContainer);
+        stage.show();
+    }
+    
+    /**
+     * Clears the previous cards from the root pane.
+     */
+    private void clearPreviousCards() {
         rootPane.getChildren().clear();
+    }
 
-        // Create and add CardView objects to the rootPane
+
+    /**
+     * Adds card views to the root pane for all players.
+     *
+     * @param players The list of players.
+     */
+    private void addCardViewsToRootPane(List<Player> players) {
         for (Player player : players) {
             for (Card card : player.getCartes()) {
                 CardView cardView = new CardView(card, player.getCartes().indexOf(card));
                 rootPane.getChildren().add(cardView);
             }
         }
-
-        cardsContainer.getChildren().clear();
-
-        VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
-        HBox topPlayersContainer = new HBox(20);
-        HBox bottomPlayersContainer = new HBox(20);
-        topPlayersContainer.setAlignment(Pos.CENTER);
-        bottomPlayersContainer.setAlignment(Pos.CENTER);
-
+    }
+    
+    /**
+     * Creates a container for side players based on the current player.
+     *
+     * @param players          The list of players.
+     * @param currentPlayerName The name of the current player.
+     * @param isTop            Whether the container is for top players.
+     * @return The HBox container for side players.
+     */
+    private HBox createSidePlayersContainer(List<Player> players, String currentPlayerName, boolean isTop) {
+        HBox container = new HBox(20);
+        container.setAlignment(Pos.CENTER);
+    
         List<VBox> sidePlayers = new ArrayList<>();
         for (Player player : players) {
             if (!player.getName().equals(currentPlayerName)) {
                 sidePlayers.add(createPlayerBoard(player, false));
             }
         }
-
+    
         for (int i = 0; i < sidePlayers.size(); i++) {
-            if (i % 2 == 0) {
-                topPlayersContainer.getChildren().add(sidePlayers.get(i));
-            } else {
-                bottomPlayersContainer.getChildren().add(sidePlayers.get(i));
+            if ((isTop && i % 2 == 0) || (!isTop && i % 2 != 0)) {
+                container.getChildren().add(sidePlayers.get(i));
             }
         }
-
-        // Création de la pioche et de la défausse
+    
+        return container;
+    }
+    
+    /**
+     * Creates the center area of the game view.
+     *
+     * @param remainingCards       The number of remaining cards.
+     * @param topDiscardCard       The top discard card.
+     * @param centerPlayerContainer The container for the center player.
+     * @return The HBox container for the center area.
+     */
+    private HBox createCenterArea(int remainingCards, Card topDiscardCard, VBox centerPlayerContainer) {
         PickView pickView = new PickView(remainingCards);
         DiscardView discardView = new DiscardView(topDiscardCard);
         pickView.setPrefSize(150, 200);
         discardView.setPrefSize(150, 200);
-
-        // Conteneur pour la zone centrale : pioche - joueur - défausse
+    
         HBox centerArea = new HBox(40, pickView, centerPlayerContainer, discardView);
         centerArea.setAlignment(Pos.CENTER);
+        return centerArea;
+    }
+    
 
+    /**
+     * Creates the main container for the game view.
+     *
+     * @param topPlayersContainer    The container for top players.
+     * @param centerArea             The container for the center area.
+     * @param bottomPlayersContainer The container for bottom players.
+     * @return The main container as a VBox.
+     */
+    private VBox createMainContainer(HBox topPlayersContainer, HBox centerArea, HBox bottomPlayersContainer) {
         VBox mainContainer = new VBox(20, topPlayersContainer, centerArea, bottomPlayersContainer);
         mainContainer.setAlignment(Pos.CENTER);
         VBox.setVgrow(mainContainer, javafx.scene.layout.Priority.ALWAYS);
-
-        cardsContainer.getChildren().add(mainContainer);
-        stage.show();
+        return mainContainer;
     }
 
     /**
@@ -272,32 +318,61 @@ public class GameView {
     }
 
     /**
-     * Creates a player board for the specified player.
+     * Creates a player board with the specified player and whether they are the
+     * current player.
      *
      * @param player    The player to create the board for.
      * @param isCurrent Whether the player is the current player.
-     * @return The player board as a VBox.
+     * @return The VBox container for the player board.
      */
     private VBox createPlayerBoard(Player player, boolean isCurrent) {
-        Text playerNameText = new Text(player.getName());
-        playerNameText.setFont(Font.font("Arial", isCurrent ? 22 : 18));
-        playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
-
-        List<CardView> cardViews = new ArrayList<>();
-        for (int i = 0; i < player.getCartes().size(); i++) {
-            cardViews.add(new CardView(player.getCartes().get(i), i));
-        }
-
+        Text playerNameText = createPlayerNameText(player.getName(), isCurrent);
+        List<CardView> cardViews = createCardViewsForPlayer(player);
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
+    
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
-
+    
         return playerContainer;
     }
+    
+    /**
+     * Creates a text element for the player name.
+     *
+     * @param playerName The name of the player.
+     * @param isCurrent  Whether the player is the current player.
+     * @return The text element for the player name.
+     */
+    private Text createPlayerNameText(String playerName, boolean isCurrent) {
+        Text playerNameText = new Text(playerName);
+        playerNameText.setFont(Font.font("Arial", isCurrent ? 22 : 18));
+        playerNameText.setFill(isCurrent ? Color.GOLD : Color.WHITE);
+        return playerNameText;
+    }
+    
+    /**
+     * Creates a list of card views for the specified player.
+     *
+     * @param player The player to create card views for.
+     * @return A list of card views.
+     */
+    private List<CardView> createCardViewsForPlayer(Player player) {
+        List<CardView> cardViews = new ArrayList<>();
+        for (int i = 0; i < player.getCartes().size(); i++) {
+            cardViews.add(new CardView(player.getCartes().get(i), i));
+        }
+        return cardViews;
+    }
 
+    /**
+     * Displays the final ranking of players.
+     *
+     * @param ranking The final ranking of players as a map of players to their scores.
+     */
+    @Override
     public void showFinalRanking(Map<Player, Integer> ranking) {
         cardsContainer.getChildren().clear();
         VBox rankingContainer = new VBox(10);
@@ -332,6 +407,7 @@ public class GameView {
      *
      * @param ranking The ranking of players as a map of players to their scores.
      */
+    @Override
     public void showRanking(java.util.Map<Player, Integer> ranking) {
         Button showRankingButton = new Button("Show Ranking");
         showRankingButton.setOnAction(event -> {
@@ -366,6 +442,7 @@ public class GameView {
     /**
      * Displays the end game message.
      */
+    @Override
     public void showEndGame() {
         cardsContainer.getChildren().clear();
         Text endGameText = new Text("Fin de la partie !");
@@ -380,6 +457,7 @@ public class GameView {
      *
      * @param message The message to display.
      */
+    @Override
     public void showMessageBox(String message) {
         cardsContainer.getChildren().clear();
         Text messageText = new Text(message);
@@ -411,36 +489,49 @@ public class GameView {
      * @param cardViews  The list of card views to distribute.
      * @param onComplete A callback to execute when the animation is complete.
      */
+    @Override
     public void distributeCardsWithAnimation(List<Player> players, List<CardView> cardViews, Runnable onComplete) {
-        double startX = 400;
-        double startY = 300;
         int numberOfPlayers = players.size();
-
+    
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
-
+    
         final int[] index = { 0 };
-        final int totalCards = cardViews.size(); // Get total number of cards to distribute
-        int[] remainingAnimations = { totalCards }; // Track how many animations are remaining
-
+        final int totalCards = cardViews.size();
+        int[] remainingAnimations = { totalCards };
+    
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
             double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
-
-            for (int j = 0; j < player.getCartes().size(); j++) {
-                CardView cardView = cardViews.get(index[0]++);
-
-                double cardOffsetX = (j % 4) * 50; // Adjust X based on card index
-                double cardOffsetY = (j / 4) * 70; // Adjust Y based on card index
-
-                animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
-                    remainingAnimations[0]--; // Decrease the remaining animation count
-                    if (remainingAnimations[0] == 0) {
-                        // Once all animations are completed, execute the callback
-                        onComplete.run();
-                    }
-                });
-            }
+    
+            animateCardsForPlayer(player, cardViews, index, targetX, targetY, remainingAnimations, onComplete);
+        }
+    }
+    
+    /**
+     * Animates cards for a player.
+     *
+     * @param player             The player to animate cards for.
+     * @param cardViews          The list of card views to animate.
+     * @param index              The current index of the card views.
+     * @param targetX            The target X position for the cards.
+     * @param targetY            The target Y position for the cards.
+     * @param remainingAnimations The number of remaining animations.
+     * @param onComplete         A callback to execute when the animation is complete.
+     */
+    private void animateCardsForPlayer(Player player, List<CardView> cardViews, int[] index, double targetX, double targetY,
+                                      int[] remainingAnimations, Runnable onComplete) {
+        for (int j = 0; j < player.getCartes().size(); j++) {
+            CardView cardView = cardViews.get(index[0]++);
+            double cardOffsetX = (j % 4) * 50;
+            double cardOffsetY = (j / 4) * 70;
+    
+            animateCard(cardView, 400, 300, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
+                remainingAnimations[0]--;
+                if (remainingAnimations[0] == 0) {
+                    onComplete.run();
+                }
+            });
         }
     }
 
@@ -604,10 +695,11 @@ public class GameView {
      * @param node       The node to fade in.
      * @param onFinished A callback to execute when the animation is complete.
      */
+    @Override
     public void fadeInGameplayElements(Node node, Runnable onFinished) {
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), node);
-        fadeTransition.setFromValue(0); // Start fully transparent
-        fadeTransition.setToValue(1); // End fully opaque
+        fadeTransition.setFromValue(0); 
+        fadeTransition.setToValue(1); 
         fadeTransition.setInterpolator(Interpolator.EASE_IN);
         fadeTransition.setOnFinished(event -> {
             if (onFinished != null) {
@@ -622,10 +714,11 @@ public class GameView {
      *
      * @param players The list of players.
      */
+    @Override
     public void setupBoardViews(List<Player> players) {
         cardsContainer.getChildren().clear();
         VBox mainContainer = new VBox(20);
-        mainContainer.setOpacity(0); // Start fully transparent
+        mainContainer.setOpacity(0); 
 
         for (Player player : players) {
 
@@ -682,7 +775,6 @@ public class GameView {
             cardView.setTranslateX(0);
             cardView.setTranslateY(0);
 
-            // Execute the onFinished callback
             if (onFinished != null) {
                 onFinished.run();
             }
@@ -696,6 +788,7 @@ public class GameView {
      *
      * @return The root pane.
      */
+    @Override
     public Pane getRootPane() {
         return rootPane;
     }
