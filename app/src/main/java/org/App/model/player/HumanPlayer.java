@@ -1,7 +1,9 @@
-package org.App.model;
+package org.App.model.player;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.App.model.game.Card;
 
 /**
  * A class representing a human player in the game.

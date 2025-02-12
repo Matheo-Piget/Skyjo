@@ -1,4 +1,4 @@
-package org.App.model;
+package org.App.model.game;
 
 /**
  * The {@code CardValue} enum represents the possible values of a card in the

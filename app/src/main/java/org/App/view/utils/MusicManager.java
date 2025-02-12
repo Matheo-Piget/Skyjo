@@ -1,4 +1,4 @@
-package org.App.view;
+package org.App.view.utils;
 
 import java.io.File;
 
@@ -27,13 +27,13 @@ import javafx.util.Duration;
 
 public class MusicManager {
 
-    private MediaPlayer mediaPlayer;
-    private static final double FADE_DURATION = 1.0; // Durée du fondu en secondes
+    private final MediaPlayer mediaPlayer;
+    private static final double FADE_DURATION = 1.0;
 
     public MusicManager(String musicFilePath) {
         Media media = new Media(new File(musicFilePath).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Répète la musique en boucle
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     }
 
     /**
@@ -41,7 +41,7 @@ public class MusicManager {
      */
     public void play() {
         if (mediaPlayer != null) {
-            mediaPlayer.setVolume(0.0); // Commence avec un volume de 0
+            mediaPlayer.setVolume(0.0);
             mediaPlayer.play();
             fadeIn();
         }

@@ -1,7 +1,7 @@
-package org.App.view;
+package org.App.view.components;
 
 import org.App.controller.GameController;
-import org.App.model.Card;
+import org.App.model.game.Card;
 
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;

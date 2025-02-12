@@ -1,4 +1,7 @@
-package org.App.view;
+package org.App.view.screens;
+
+import org.App.view.utils.MusicManager;
+import org.App.view.utils.OptionsManager;
 
 import java.io.IOException;
 

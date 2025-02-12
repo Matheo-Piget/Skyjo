@@ -1,10 +1,11 @@
-package org.App.view;
+package org.App.view.screens;
 
 import java.util.List;
 import java.util.Map;
 
-import org.App.model.Card;
-import org.App.model.Player;
+import org.App.model.game.Card;
+import org.App.model.player.Player;
+import org.App.view.components.CardView;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;

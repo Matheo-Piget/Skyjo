@@ -1,4 +1,4 @@
-package org.App.model;
+package org.App.model.game;
 
 /**
  * A record representing a card in the game.

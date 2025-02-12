@@ -1,10 +1,12 @@
-package org.App.model;
+package org.App.model.player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.App.controller.GameController;
+import org.App.model.game.Card;
+import org.App.model.game.SkyjoGame;
 
 /**
  * The AIPlayer class represents an AI-controlled player in the Skyjo game.

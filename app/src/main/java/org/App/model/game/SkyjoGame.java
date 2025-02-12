@@ -1,4 +1,4 @@
-package org.App.model;
+package org.App.model.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.App.controller.GameController;
+import org.App.model.player.Player;
 
 /**
  * Represents the main game logic for the Skyjo game.

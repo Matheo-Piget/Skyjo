@@ -1,6 +1,8 @@
-package org.App.model;
+package org.App.model.player;
 
 import java.util.List;
+
+import org.App.model.game.Card;
 
 /**
  * Represents a player in the Skyjo game.

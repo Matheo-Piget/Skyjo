@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.App.model.AIPlayer;
-import org.App.model.Card;
-import org.App.model.Player;
-import org.App.model.SkyjoGame;
-import org.App.view.CardView;
-import org.App.view.GameView;
-import org.App.view.GameViewInterface;
+import org.App.model.game.Card;
+import org.App.model.game.SkyjoGame;
+import org.App.model.player.AIPlayer;
+import org.App.model.player.Player;
+import org.App.view.components.CardView;
+import org.App.view.screens.GameViewInterface;
 
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;

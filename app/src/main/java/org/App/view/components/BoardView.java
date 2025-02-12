@@ -1,4 +1,4 @@
-package org.App.view;
+package org.App.view.components;
 
 import java.util.List;
 

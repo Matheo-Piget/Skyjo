@@ -1,7 +1,7 @@
 package org.App;
 
-import org.App.view.GameMenuView;
-import org.App.view.MusicManager;
+import org.App.view.screens.GameMenuView;
+import org.App.view.utils.MusicManager;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

@@ -1,12 +1,14 @@
-package org.App.view;
+package org.App.view.screens;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.App.controller.GameController;
-import org.App.model.AIPlayer;
-import org.App.model.HumanPlayer;
-import org.App.model.Player;
+import org.App.model.player.AIPlayer;
+import org.App.model.player.HumanPlayer;
+import org.App.model.player.Player;
+import org.App.view.utils.MusicManager;
+import org.App.view.utils.OptionsManager;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
