@@ -269,7 +269,30 @@ public final class GameController {
     private void concludeGame() {
         game.revealAllCards();
         Map<Player, Integer> ranking = game.getRanking();
-        ranking = ranking.entrySet()
+        ranking.forEach((player, score) -> player.addScore(score));
+        ranking = sortedRanking(ranking);
+        view.showRanking(ranking);
+        
+        if (game.hasPlayerReached100Points()) {
+            Map<Player, Integer> finalRanking = game.getFinalRanking();
+            finalRanking.forEach((player, score) -> player.addScore(score));
+            finalRanking = sortedRanking(finalRanking);
+            view.showFinalRanking(finalRanking);
+        } else {
+            restartRoundWithDelay(15);
+        }
+    }
+
+
+    /**
+     * Sorts the ranking of the players based on their scores.
+     * 
+     * @param ranking The unsorted ranking of the players.
+     * @return The sorted ranking of the players.
+     * 
+     */
+    public Map<Player, Integer> sortedRanking(Map<Player, Integer> ranking) {
+        return ranking.entrySet()
                  .stream()
                  .sorted(Map.Entry.<Player, Integer>comparingByValue())
                  .collect(Collectors.toMap(
@@ -278,12 +301,6 @@ public final class GameController {
                      (e1, e2) -> e1,
                      LinkedHashMap::new
                  ));
-        view.showRanking(ranking);
-        if (game.hasPlayerReached100Points()) {
-            view.showFinalRanking(game.getFinalRanking());
-        } else {
-            restartRoundWithDelay(15);
-        }
     }
 
     /**
