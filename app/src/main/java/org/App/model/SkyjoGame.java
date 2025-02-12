@@ -157,7 +157,19 @@ public final class SkyjoGame {
     public Map<Player, Integer> getRanking() {
         Map<Player, Integer> ranking = new HashMap<>();
         players.forEach(
-                player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()));
+                player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum() + player.getCommutativeScore()));
+        return ranking;
+    }
+
+    /**
+     * Gets the final ranking of players based on the total value of their cards.
+     *
+     * @return A map of players to their final total card values.
+     */
+    public Map<Player, Integer> getFinalRanking() {
+        Map<Player, Integer> ranking = new HashMap<>();
+        players.forEach(
+                player -> ranking.put(player, player.getCommutativeScore()));
         return ranking;
     }
 

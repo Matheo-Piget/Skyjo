@@ -3,6 +3,7 @@ package org.App.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.App.model.AIPlayer;
 import org.App.model.Card;
@@ -260,17 +261,42 @@ public final class GameController {
     
             // Mettre à jour les scores cumulatifs
             ranking.forEach((player, score) -> player.addScore(score));
+
+            ranking = ranking.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Player, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (e1, e2) -> e1,
+                    java.util.LinkedHashMap::new
+                ));
     
             // Afficher le classement actuel
             view.showRanking(ranking);
+
+            
     
             // Vérifier si un joueur a atteint 100 points
             if (game.hasPlayerReached100Points()) {
+
+                Map <Player, Integer> rankingg = game.getFinalRanking();
+
+                rankingg = rankingg.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Player, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (e1, e2) -> e1,
+                    java.util.LinkedHashMap::new
+                ));
+                
                 // Afficher le classement final et terminer la partie
-                view.showFinalRanking(ranking);
+                view.showFinalRanking(rankingg);
             } else {
                 // Réinitialiser la manche et continuer
-                PauseTransition delay = new PauseTransition(Duration.seconds(3)); // Délai de 3 secondes
+                PauseTransition delay = new PauseTransition(Duration.seconds(15)); // Délai de 3 secondes
                 delay.setOnFinished(event -> {
                     game.startGame(); // Réinitialiser la manche
                     view.setupBoardViews(game.getPlayers());
