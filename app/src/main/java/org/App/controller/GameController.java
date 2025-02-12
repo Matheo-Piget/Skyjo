@@ -38,9 +38,6 @@ public final class GameController {
     private static GameController instance;
     private final SkyjoGame game;
     private final GameViewInterface view;
-    private Card pickedCard;
-    private boolean hasDiscard;
-    private int count_reveal = 0;
     private CardView pickedCardView;
 
     /**
@@ -67,7 +64,6 @@ public final class GameController {
         return instance;
     }
 
-    
     /**
      * Starts the game by distributing the cards to the players and initializing the
      */
@@ -118,9 +114,9 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handlePickClick() {
-        pickedCard = game.pickCard().retourner();
+        Card pickedCard = game.pickCard().retourner();
+        game.setPickedCard(pickedCard);
         if (pickedCard != null) {
-
             pickedCardView = new CardView(pickedCard, -1);
             view.getRootPane().getChildren().add(pickedCardView);
 
@@ -153,26 +149,28 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handleDiscardClick() {
-        if (pickedCard != null) {
-            game.addToDiscard(pickedCard);
+        if (game.getPickedCard() != null) {
+            game.addToDiscard(game.getPickedCard());
             view.getRootPane().getChildren().remove(pickedCardView); // Remove the card view
-            pickedCard = null;
+            game.setPickedCard(null);
             pickedCardView = null; // Reset the picked card view
-            hasDiscard = true;
+            game.setHasDiscard(true);
         } else {
-            pickedCard = game.pickDiscard();
-            pickedCard = pickedCard.retourner();
-            pickedCardView = new CardView(pickedCard, -1);
-            view.getRootPane().getChildren().add(pickedCardView);
+            Card pickedCard = game.pickDiscard();
+            game.setPickedCard(pickedCard);
+            if (pickedCard != null) {
+                pickedCard = pickedCard.retourner();
+                pickedCardView = new CardView(pickedCard, -1);
+                view.getRootPane().getChildren().add(pickedCardView);
 
-            // Set up mouse movement tracking
-            view.getScene().setOnMouseMoved(event -> {
-                if (pickedCardView != null) {
-                    pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
-                    pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
-                }
-            });
-            if (pickedCard == null) {
+                // Set up mouse movement tracking
+                view.getScene().setOnMouseMoved(event -> {
+                    if (pickedCardView != null) {
+                        pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
+                        pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
+                    }
+                });
+            } else {
                 view.showMessageBox("La défausse est vide !");
             }
         }
@@ -190,21 +188,21 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handleCardClick(CardView cardView) {
-        if (pickedCard != null) {
-            game.exchangeOrRevealCard(game.getActualPlayer(), pickedCard, cardView.getIndex());
+        if (game.getPickedCard() != null) {
+            game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard(), cardView.getIndex());
             cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
             view.getRootPane().getChildren().remove(pickedCardView); // Supprime la carte piochée
             resetPickState();
             endTurn();
         }
-        if (hasDiscard && count_reveal < 1) {
+        if (game.hasDiscard() && game.getCountReveal() < 1) {
             game.revealCard(game.getActualPlayer(), cardView.getIndex());
             cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
             updateView();
-            count_reveal++;
+            game.incrementCountReveal();
         }
 
-        if (count_reveal == 1) {
+        if (game.getCountReveal() == 1) {
             resetRevealState();
             endTurn();
         }
@@ -217,7 +215,7 @@ public final class GameController {
      * @see #endTurn()
      */
     private void resetPickState() {
-        pickedCard = null;
+        game.setPickedCard(null);
         pickedCardView = null;
     }
 
@@ -229,8 +227,8 @@ public final class GameController {
      * @see #endTurn()
      */
     private void resetRevealState() {
-        count_reveal = 0;
-        hasDiscard = false;
+        game.resetCountReveal();
+        game.setHasDiscard(false);
     }
 
     /**

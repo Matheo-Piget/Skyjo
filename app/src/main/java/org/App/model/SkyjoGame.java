@@ -35,6 +35,10 @@ public final class SkyjoGame {
     private final List<Card> discard;
     private int indexActualPlayer = 0;
     private final Random random = new Random();
+
+    private Card pickedCard;
+    private boolean hasDiscard;
+    private int countReveal;
     
 
     /**
@@ -46,6 +50,65 @@ public final class SkyjoGame {
         this.players = List.copyOf(players);
         this.pick = createPick();
         this.discard = new ArrayList<>();
+    }
+
+    /**
+     * Gets the index of the current player.
+     *
+     * @return The index of the current player.
+     */
+    public Card getPickedCard() {
+        return pickedCard;
+    }
+
+    /**
+     * Sets the picked card.
+     *
+     * @param pickedCard The picked card to set.
+     */
+    public void setPickedCard(Card pickedCard) {
+        this.pickedCard = pickedCard;
+    }
+
+    /**
+     * Gets the index of the current player.
+     *
+     * @return The index of the current player.
+     */
+    public boolean hasDiscard() {
+        return hasDiscard;
+    }
+
+    /**
+     * Sets the hasDiscard value.
+     *
+     * @param hasDiscard The hasDiscard value to set.
+     */
+    public void setHasDiscard(boolean hasDiscard) {
+        this.hasDiscard = hasDiscard;
+    }
+
+    /**
+     * Gets the index of the current player.
+     *
+     * @return The index of the current player.
+     */
+    public int getCountReveal() {
+        return countReveal;
+    }
+
+    /**
+     * Increments the count of revealed cards.
+     */
+    public void incrementCountReveal() {
+        this.countReveal++;
+    }
+
+    /**
+     * Resets the count of revealed cards.
+     */
+    public void resetCountReveal() {
+        this.countReveal = 0;
     }
 
     /**
