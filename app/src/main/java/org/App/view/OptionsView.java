@@ -76,7 +76,7 @@ public class OptionsView {
         // Game mode selection
         GridPane modePanel = createPanel("");
         ComboBox<String> modeComboBox = new ComboBox<>();
-        modeComboBox.getItems().addAll("Classique", "Rapide");
+        modeComboBox.getItems().addAll("Classique", "Action");
         modeComboBox.setValue(OptionsManager.getMode());
         modePanel.add(new Label("Select game mode:"), 0, 0);
         modePanel.add(modeComboBox, 1, 0);

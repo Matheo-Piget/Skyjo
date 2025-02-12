@@ -2,6 +2,7 @@ package org.App.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.App.App;
 import org.App.model.Card;
@@ -297,6 +298,35 @@ public class GameView {
         return playerContainer;
     }
 
+    public void showFinalRanking(Map<Player, Integer> ranking) {
+        cardsContainer.getChildren().clear();
+        VBox rankingContainer = new VBox(10);
+        rankingContainer.setAlignment(Pos.CENTER);
+
+        Text rankingTitle = new Text("Classement final :");
+        rankingTitle.setFont(Font.font("Arial", 24));
+        rankingTitle.setFill(Color.LIGHTGRAY);
+        rankingContainer.getChildren().add(rankingTitle);
+
+        ranking.forEach((player, score) -> {
+            Text playerScore = new Text(player.getName() + ": " + score + " points");
+            playerScore.setFont(Font.font("Arial", 18));
+            playerScore.setFill(Color.WHITE);
+            rankingContainer.getChildren().add(playerScore);
+        });
+
+        Button restartButton = new Button("Nouvelle partie");
+        restartButton.setOnAction(event -> {
+            // Redémarrer une nouvelle partie
+            stage.close();
+            App.getINSTANCE().restart();
+        });
+
+        rankingContainer.getChildren().add(restartButton);
+        cardsContainer.getChildren().add(rankingContainer);
+        stage.show();
+    }
+
     /**
      * Displays the ranking of players.
      *
@@ -323,8 +353,12 @@ public class GameView {
 
             cardsContainer.getChildren().add(rankingContainer);
             stage.show();
+            Button nextRound = new Button("Next Round");
+            nextRound.setOnAction(e -> {
+                cardsContainer.getChildren().clear();
+                stage.show();
+            });
         });
-
 
         cardsContainer.getChildren().add(0, showRankingButton);
     }

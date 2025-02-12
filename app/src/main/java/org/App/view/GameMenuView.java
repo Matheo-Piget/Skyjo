@@ -73,6 +73,7 @@ public class GameMenuView {
 
         // Jouer la musique
         musicManager.play();
+
     }
 
     /**
@@ -96,9 +97,8 @@ public class GameMenuView {
         }
 
         // Appliquer le mode de jeu si nécessaire
-        if (mode.equals("Rapide")) {
-            System.out.println("Mode rapide activé !");
-            // Ajouter ici des ajustements spécifiques au mode rapide
+        if (mode.equals("Action")) {
+            // Démarrer le skyjo mais en action
         }
     }
 

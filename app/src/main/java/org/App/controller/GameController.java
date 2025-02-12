@@ -1,10 +1,8 @@
 package org.App.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.App.model.AIPlayer;
 import org.App.model.Card;
@@ -259,33 +257,50 @@ public final class GameController {
         if (game.isFinished()) {
             game.revealAllCards();
             Map<Player, Integer> ranking = game.getRanking();
-            ranking = ranking.entrySet()
-                .stream()
-                .sorted(Map.Entry.<Player, Integer>comparingByValue())
-                .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    Map.Entry::getValue,
-                    (e1, e2) -> e1,
-                    LinkedHashMap::new
-                ));
+    
+            // Mettre à jour les scores cumulatifs
+            ranking.forEach((player, score) -> player.addScore(score));
+    
+            // Afficher le classement actuel
             view.showRanking(ranking);
-        } else {
-            updateView();
-            game.nextPlayer(); // Passer au joueur suivant
-            updateView();
-
-            // Vérifier si le prochain joueur est une IA
-            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-                // Ajouter un délai avant que l'IA ne joue son tour
-                PauseTransition delay = new PauseTransition(Duration.seconds(0.1)); // Délai de 1 seconde
+    
+            // Vérifier si un joueur a atteint 100 points
+            if (game.hasPlayerReached100Points()) {
+                // Afficher le classement final et terminer la partie
+                view.showFinalRanking(ranking);
+            } else {
+                // Réinitialiser la manche et continuer
+                PauseTransition delay = new PauseTransition(Duration.seconds(3)); // Délai de 3 secondes
                 delay.setOnFinished(event -> {
-                    aIPlayer.playTurn(game);
+                    game.startGame(); // Réinitialiser la manche
+                    view.setupBoardViews(game.getPlayers());
+                    game.revealInitialCards();
                     updateView();
-                    endTurn(); // Passer au tour suivant après que l'IA a joué
+                    if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+                        PauseTransition aiDelay = new PauseTransition(Duration.seconds(0.1));
+                        aiDelay.setOnFinished(aiEvent -> {
+                            aIPlayer.playTurn(game);
+                            updateView();
+                            endTurn();
+                        });
+                        aiDelay.play();
+                    }
                 });
                 delay.play();
             }
-            // Si c'est un joueur humain, ne rien faire (attendre l'interaction utilisateur)
+        } else {
+            updateView();
+            game.nextPlayer();
+            updateView();
+            if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
+                PauseTransition delay = new PauseTransition(Duration.seconds(0.1));
+                delay.setOnFinished(event -> {
+                    aIPlayer.playTurn(game);
+                    updateView();
+                    endTurn();
+                });
+                delay.play();
+            }
         }
     }
 }

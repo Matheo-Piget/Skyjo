@@ -30,6 +30,21 @@ public interface Player {
     }
 
     /**
+     * Gets the commutative score of the player.
+     * The commutative score is the sum of all the scores of the player.
+     * 
+     * @return The commutative score of the player.
+     */
+    public int getCommutativeScore();
+
+    /**
+     * Adds a score to the commutative score of the player.
+     * 
+     * @param score The score to add.
+     */
+    public void addScore(int score);
+
+    /**
      * Gets the name of the player.
      *
      * @return The name of the player.

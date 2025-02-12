@@ -20,6 +20,7 @@ import java.util.List;
 public final class HumanPlayer implements Player {
     private final String nom;
     private final List<Card> cartes;
+    private int commutativeScore = 0;
 
     /**
      * Constructs a new HumanPlayer with the specified name.
@@ -29,6 +30,26 @@ public final class HumanPlayer implements Player {
     public HumanPlayer(String nom) {
         this.nom = nom;
         this.cartes = new ArrayList<>();
+        this.commutativeScore = 0;
+    }
+
+    /**
+     * Adds a score to the commutative score of the AI player.
+     * 
+     * @param score The score to add.
+     */
+    public void addScore(int score) {
+        commutativeScore += score;
+    }
+
+
+    /**
+     * Returns the commutative score of the AI player.
+     * 
+     * @return The commutative score of the AI player.
+     */
+    public int getCommutativeScore() {
+        return commutativeScore;
     }
 
     /**

@@ -29,6 +29,7 @@ public class AIPlayer implements Player {
     private final List<Card> cartes;
     private final Difficulty difficulty;
     private final Random random = new Random();
+    private int commutativeScore = 0;
 
     /**
      * Constructs a new AIPlayer with the specified name and difficulty level.
@@ -42,6 +43,26 @@ public class AIPlayer implements Player {
         this.nom = nom;
         this.cartes = new ArrayList<>();
         this.difficulty = difficulty;
+        this.commutativeScore = 0;
+    }
+
+    /**
+     * Adds a score to the commutative score of the AI player.
+     * 
+     * @param score The score to add.
+     */
+    public void addScore(int score) {
+        commutativeScore += score;
+    }
+
+
+    /**
+     * Returns the commutative score of the AI player.
+     * 
+     * @return The commutative score of the AI player.
+     */
+    public int getCommutativeScore() {
+        return commutativeScore;
     }
 
     /**

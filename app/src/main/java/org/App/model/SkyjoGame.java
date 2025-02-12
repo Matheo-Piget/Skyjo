@@ -162,6 +162,15 @@ public final class SkyjoGame {
     }
 
     /**
+     * Checks if any player has reached 100 points.
+     *
+     * @return True if any player has reached 100 points, false otherwise.
+     */
+    public boolean hasPlayerReached100Points() {
+        return players.stream().anyMatch(player -> player.getCommutativeScore() >= 100);
+    }
+
+    /**
      * Checks if the game is finished.
      *
      * @return True if the game is finished, false otherwise.
@@ -193,12 +202,10 @@ public final class SkyjoGame {
      * and setting up the discard pile.
      */
     public void startGame() {
-        if (!pick.isEmpty())
-            pick.clear();
-        if (!discard.isEmpty())
-            discard.clear();
+        if (!pick.isEmpty()) pick.clear();
+        if (!discard.isEmpty()) discard.clear();
         players.forEach(player -> player.getCartes().clear());
-
+    
         pick = createPick(); // Créer une nouvelle pioche
         players.forEach(player -> {
             player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur
