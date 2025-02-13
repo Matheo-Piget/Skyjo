@@ -151,6 +151,7 @@ public final class SkyjoGame {
      * @return The picked card, or null if the deck is empty.
      */
     public Card pickCard() {
+        hasPickeInDiscard = false;
         return pick.isEmpty() ? null : pick.remove(0);
     }
 
