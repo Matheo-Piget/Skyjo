@@ -151,6 +151,10 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handleDiscardClick() {
+        if (game.getDiscard().isEmpty()) {
+            view.showMessageBox("La défausse est vide !");
+            return;
+        }
         if (game.getPickedCard() != null) {
             game.addToDiscard(game.getPickedCard());
             view.getRootPane().getChildren().remove(pickedCardView); // Remove the card view

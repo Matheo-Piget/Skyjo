@@ -334,7 +334,8 @@ public final class SkyjoGame {
             addToDiscard(newCard);
         } else {
             if (hasPickeInDiscard) {
-                player.getCartes().set(cardIndex, newCard.retourner());
+                Card oldcard = player.getCartes().set(cardIndex, newCard.retourner());
+                addToDiscard(oldcard);
             } else {
                 Card oldCard = player.getCartes().set(cardIndex, newCard);
                 addToDiscard(oldCard);
