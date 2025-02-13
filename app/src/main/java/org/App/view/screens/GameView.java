@@ -13,6 +13,7 @@ import org.App.view.components.DiscardView;
 import org.App.view.components.PickView;
 import org.App.view.utils.MusicManager;
 
+import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
@@ -29,6 +30,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -76,6 +81,7 @@ public class GameView implements GameViewInterface {
         stage.setMaximized(true);
 
         musicManager = new MusicManager("src/main/resources/game_music.mp3");
+        
 
         musicManager.play();
 
@@ -99,9 +105,19 @@ public class GameView implements GameViewInterface {
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
 
-        scene.setOnMouseClicked(event -> {
-            System.out.println("Scene clicked at (" + event.getX() + ", " + event.getY() + ")");
-        });
+        // Ajout d'un fond animé
+        Rectangle background = new Rectangle(scene.getWidth(), scene.getHeight());
+        background.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.DARKBLUE),
+                new Stop(1, Color.BLACK)));
+        rootPane.getChildren().add(0, background);
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(5), background);
+        fadeTransition.setFromValue(0.5);
+        fadeTransition.setToValue(1);
+        fadeTransition.setCycleCount(Animation.INDEFINITE);
+        fadeTransition.setAutoReverse(true);
+        fadeTransition.play();
     }
 
     /**

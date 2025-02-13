@@ -42,6 +42,7 @@ public final class SkyjoGame {
     private Card pickedCard;
     private boolean hasDiscard;
     private int countReveal;
+    private boolean hasPickeInDiscard;
 
     /**
      * Constructs a new SkyjoGame with the specified players.
@@ -164,6 +165,7 @@ public final class SkyjoGame {
         } else {
             Card topCard = discard.remove(discard.size() - 1);
             System.out.println("Joueur " + indexActualPlayer + " a pioché de la défausse un " + topCard.valeur());
+            hasPickeInDiscard = true;
             return topCard.retourner(); // On retourne la carte
         }
     }
@@ -176,6 +178,7 @@ public final class SkyjoGame {
     public void addToDiscard(final Card card) {
         System.out.println("Joueur " + indexActualPlayer + " a mit dans la défausse un " + card.valeur());
         discard.add(card.faceVisible() ? card : card.retourner()); // On ajoute la carte retournée si elle est cachée
+        hasPickeInDiscard = false;
     }
 
     /**
@@ -329,8 +332,12 @@ public final class SkyjoGame {
         if (cardIndex == -1) {
             addToDiscard(newCard);
         } else {
-            Card oldCard = player.getCartes().set(cardIndex, newCard);
-            addToDiscard(oldCard);
+            if (hasPickeInDiscard) {
+                player.getCartes().set(cardIndex, newCard.retourner());
+            } else {
+                Card oldCard = player.getCartes().set(cardIndex, newCard);
+                addToDiscard(oldCard);
+            }
         }
     }
 

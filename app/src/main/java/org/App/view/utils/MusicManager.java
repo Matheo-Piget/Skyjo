@@ -40,6 +40,9 @@ public class MusicManager {
      * Joue la musique de fond avec un fondu.
      */
     public void play() {
+        if (isPlaying()) {
+            return;
+        }
         if (mediaPlayer != null) {
             mediaPlayer.setVolume(0.0);
             mediaPlayer.play();

@@ -60,6 +60,7 @@ public class GameMenuView {
      */
     public GameMenuView(Stage stage, MusicManager musicManager) {
         this.stage = stage;
+        stage.setFullScreen(true);
         this.nameFields = new ArrayList<>();
         this.musicManager = musicManager;
         this.difficultyBoxes = new ArrayList<>();
@@ -68,16 +69,18 @@ public class GameMenuView {
         this.aiCountField = new TextField("1");
         this.hasPressOnGenerateFieldsButton = false;
 
-        stage.setFullScreen(true);
+        
 
         setupMenu();
+
+        musicManager.play();
 
         applySavedOptions();
 
     }
 
     /**
-     * Applies the saved options (theme and mode) to the game menu.
+     * Applies the saved options (theme, mode and volume) to the game menu.
      */
     private void applySavedOptions() {
         String theme = OptionsManager.getTheme();

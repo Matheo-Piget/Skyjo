@@ -9,6 +9,7 @@ import org.App.model.game.SkyjoGame;
 import org.App.model.player.AIPlayer;
 import org.App.model.player.Player;
 import org.App.view.components.CardView;
+import org.App.view.screens.GameView;
 import org.App.view.screens.GameViewInterface;
 
 import javafx.animation.PauseTransition;
@@ -190,22 +191,26 @@ public final class GameController {
      */
     public void handleCardClick(CardView cardView) {
         if (game.getPickedCard() != null) {
-            game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard().retourner(), cardView.getIndex());
-            cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
-            view.getRootPane().getChildren().remove(pickedCardView); // Supprime la carte piochée
-            resetPickState();
-            endTurn();
-        }
-        if (game.hasDiscard() && game.getCountReveal() < 1) {
-            game.revealCard(game.getActualPlayer(), cardView.getIndex());
-            cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
-            updateView();
-            game.incrementCountReveal();
-        }
-
-        if (game.getCountReveal() == 1) {
-            resetRevealState();
-            endTurn();
+            cardView.flipCard(() -> {
+                game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard(), cardView.getIndex());
+                view.getRootPane().getChildren().remove(pickedCardView);
+                resetPickState();
+                updateView(); // Mettre à jour la vue après l'échange
+                endTurn();
+            });
+        } else if (game.hasDiscard() && game.getCountReveal() < 1) {
+            cardView.flipCard(() -> {
+                if(cardView.isFlipped()) {
+                    return;
+                }
+                game.revealCard(game.getActualPlayer(), cardView.getIndex());
+                updateView(); // Mettre à jour la vue après avoir révélé la carte
+                game.incrementCountReveal();
+                if (game.getCountReveal() == 1) {
+                    resetRevealState();
+                    endTurn();
+                }
+            });
         }
     }
 
@@ -247,9 +252,12 @@ public final class GameController {
         if (game.isFinished()) {
             concludeGame();
         } else {
-            game.nextPlayer();
-            updateView();
-            handleAITurn();
+            // Ajouter un délai avant de passer au joueur suivant
+            addDelay(1, () -> {
+                game.nextPlayer();
+                updateView();
+                handleAITurn();
+            });
         }
     }
 
