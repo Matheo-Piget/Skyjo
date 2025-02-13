@@ -3,8 +3,6 @@ package org.App.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.App.model.game.Card;
 import org.App.model.game.SkyjoGame;
@@ -15,7 +13,6 @@ import org.App.view.screens.GameView;
 import org.App.view.screens.GameViewInterface;
 
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.util.Duration;
 
 /**
@@ -86,7 +83,7 @@ public final class GameController {
             view.fadeInGameplayElements(view.getRootPane(), () -> {
                 view.setupBoardViews(game.getPlayers());
                 game.revealInitialCards();
-                updateViewWithDelay(1);
+                updateViewWithDelay(0.3);
                 handleAITurn();
             });
         });
@@ -256,7 +253,7 @@ public final class GameController {
             concludeGame();
         } else {
             // Ajouter un délai avant de passer au joueur suivant
-            addDelay(1, () -> {
+            addDelay(0.3, () -> {
                 game.nextPlayer();
                 updateView();
                 handleAITurn();
@@ -316,15 +313,11 @@ public final class GameController {
      */
     private void handleAITurn() {
         if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(() -> {
+            addDelay(0.1, () -> {
                 aIPlayer.playTurn(game);
-                Platform.runLater(() -> {
-                    updateView();
-                    endTurn();
-                });
+                updateView();
+                endTurn();
             });
-            executor.shutdown();
         }
     }
 
