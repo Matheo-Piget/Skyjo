@@ -1,6 +1,6 @@
-/* menu.css */
 .root {
   -fx-background-color: #1e1e2f; /* Fond sombre */
+  -fx-font-family: 'Arial', sans-serif;
 }
 
 .skyjo-title {
@@ -8,11 +8,13 @@
   -fx-font-weight: bold;
   -fx-fill: #f8f8f2; /* Texte clair */
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 1);
+  -fx-alignment: center;
 }
 
 .number-of-players-label {
   -fx-font-size: 18px;
   -fx-fill: #f8f8f2; /* Texte clair */
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 2, 0, 0, 1);
 }
 
 .button {
@@ -24,10 +26,19 @@
   -fx-border-radius: 5;
   -fx-background-radius: 5;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 1);
+  -fx-cursor: hand;
+  -fx-transition: all 0.3s ease;
 }
 
 .button:hover {
   -fx-background-color: #6272a4; /* Couleur au survol */
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.button:pressed {
+  -fx-scale-x: 0.95;
+  -fx-scale-y: 0.95;
 }
 
 .text-field {
@@ -37,6 +48,12 @@
   -fx-padding: 5;
   -fx-border-radius: 5;
   -fx-background-radius: 5;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 2, 0, 0, 1);
+  -fx-transition: all 0.3s ease;
+}
+
+.text-field:focused {
+  -fx-background-color: #6272a4; /* Couleur au focus */
 }
 
 .combo-box {
@@ -46,6 +63,13 @@
   -fx-padding: 5;
   -fx-border-radius: 5;
   -fx-background-radius: 5;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 2, 0, 0, 1);
+  -fx-cursor: hand;
+  -fx-transition: all 0.3s ease;
+}
+
+.combo-box:hover {
+  -fx-background-color: #6272a4; /* Couleur au survol */
 }
 
 .combo-box .list-cell {
