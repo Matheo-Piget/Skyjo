@@ -12,6 +12,7 @@ import org.App.view.components.CardView;
 import org.App.view.components.DiscardView;
 import org.App.view.components.PickView;
 import org.App.view.utils.MusicManager;
+import org.App.view.utils.SoundManager;
 
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -163,7 +164,7 @@ public class GameView implements GameViewInterface {
 
         // Gestion des événements
         startNewGame.setOnAction(event -> {
-
+            SoundManager.dispose();
             musicManager.stop();
             stage.close();
             App.getINSTANCE().restart();

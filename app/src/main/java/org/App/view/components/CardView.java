@@ -36,7 +36,7 @@ public class CardView extends StackPane {
     private final int index;
     private final Rectangle cardBackground = new Rectangle(40, 60);
     private final Text cardValue = new Text();
-    private SoundManager flipSound = new SoundManager("src/main/resources/flip_sound.mp3");
+    
 
     public CardView(Card value, int index) {
         this.value = value;
@@ -106,7 +106,7 @@ public class CardView extends StackPane {
             }
         });
         flip.play();
-        flipSound.play();
+        SoundManager.playFlipSound();
     }
     /**
      * Scales up the card background when the mouse enters.
@@ -155,7 +155,6 @@ public class CardView extends StackPane {
     public void setValue(Card value) {
         this.value = value;
         updateCardAppearance(); // Mettre à jour l'apparence de la carte
-        flipSound.play();
     }
 
     /**
