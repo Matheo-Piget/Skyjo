@@ -164,7 +164,7 @@ public class GameMenuView {
 
         // Scene
         Scene scene = new Scene(menuContainer, 700, 500);
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }

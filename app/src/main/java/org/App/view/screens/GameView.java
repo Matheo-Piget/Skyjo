@@ -101,7 +101,7 @@ public class GameView implements GameViewInterface {
         borderPane.setBottom(cardsContainer);
 
         this.scene = new Scene(borderPane, 1400, 900);
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/game.css").toExternalForm());
 
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
