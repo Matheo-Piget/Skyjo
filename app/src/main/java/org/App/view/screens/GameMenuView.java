@@ -74,8 +74,6 @@ public class GameMenuView {
 
         applySavedOptions();
 
-        musicManager.play();
-
     }
 
     /**
@@ -84,6 +82,8 @@ public class GameMenuView {
     private void applySavedOptions() {
         String theme = OptionsManager.getTheme();
         String mode = OptionsManager.getMode();
+        double volume = OptionsManager.getVolume();
+        System.out.println("Applying saved options: theme=" + theme + ", mode=" + mode + ", volume=" + volume);
 
         // Appliquer le thème
         if (theme.equals("Sombre")) {
@@ -96,6 +96,10 @@ public class GameMenuView {
                 stage.getScene().getStylesheets().clear();
             }
             stage.getScene().getStylesheets().add(getClass().getResource("/lighttheme.css").toExternalForm());
+        }
+
+        if (volume != musicManager.getVolume()) {
+            musicManager.setVolume(volume);
         }
 
         if (mode.equals("Action")) {
