@@ -76,6 +76,7 @@ public class CardView extends StackPane {
             frontText.setFill(Color.BLACK);
         } else {
             // Face arrière
+            backText.setFont(new javafx.scene.text.Font(24));
             cardBackground.setFill(Color.BLACK);
             backText.setFill(Color.WHITE);
         }
