@@ -1,8 +1,10 @@
 package org.App.model.player;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.App.controller.GameController;
 import org.App.model.game.Card;
@@ -347,17 +349,9 @@ public class AIPlayer implements Player {
      * @return The index of the highest-value card.
      */
     private int findHighestValueCardIndex() {
-        int highestIndex = 0;
-        int highestValue = cartes.get(0).valeur().getValue();
-
-        for (int i = 1; i < cartes.size(); i++) {
-            int currentValue = cartes.get(i).valeur().getValue();
-            if (currentValue > highestValue) {
-                highestValue = currentValue;
-                highestIndex = i;
-            }
-        }
-
-        return highestIndex;
+        return IntStream.range(0, cartes.size())
+                .boxed()
+                .max(Comparator.comparingInt(i -> cartes.get(i).valeur().getValue()))
+                .orElse(0);
     }
 }

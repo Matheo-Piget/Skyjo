@@ -82,7 +82,7 @@ public class GameView implements GameViewInterface {
         stage.setFullScreen(false);
         stage.setMaximized(true);
 
-        musicManager = new MusicManager("src/main/resources/game_music.mp3");
+        musicManager = new MusicManager("src/main/resources/musics/game_music.mp3");
         
 
         musicManager.play();
@@ -102,10 +102,10 @@ public class GameView implements GameViewInterface {
         borderPane.setBottom(cardsContainer);
 
         this.scene = new Scene(borderPane, 1400, 900);
-        if (OptionsManager.getTheme().equals("sombre")) {
-            scene.getStylesheets().add("file:src/main/resources/menu.css");
+        if (OptionsManager.getTheme().equals("Sombre")) {
+            scene.getStylesheets().add("file:src/main/resources/themes/menu.css");
         } else {
-            scene.getStylesheets().add("file:src/main/resources/menu_light.css");
+            scene.getStylesheets().add("file:src/main/resources/themes/menu_light.css");
         }
 
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));

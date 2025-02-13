@@ -33,7 +33,7 @@ public final class App extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        MusicManager musicManager = new MusicManager("src/main/resources/menu_music.mp3");
+        MusicManager musicManager = new MusicManager("src/main/resources/musics/menu_music.mp3");
 
         // Passer le MusicManager à GameMenuView
         GameMenuView gameMenuView = new GameMenuView(primaryStage, musicManager);

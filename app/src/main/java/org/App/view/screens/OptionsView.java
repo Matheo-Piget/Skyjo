@@ -120,10 +120,10 @@ public class OptionsView {
 
         // Create scene
         this.scene = new Scene(root, 800, 600);
-        if (OptionsManager.getTheme().equals("sombre")) {
-            scene.getStylesheets().add(getClass().getResource("/option.css").toExternalForm());
+        if (OptionsManager.getTheme().equals("Sombre")) {
+            scene.getStylesheets().add(getClass().getResource("/themes/option.css").toExternalForm());
         } else {
-            scene.getStylesheets().add(getClass().getResource("/option_light.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/themes/option_light.css").toExternalForm());
         }
     }
 

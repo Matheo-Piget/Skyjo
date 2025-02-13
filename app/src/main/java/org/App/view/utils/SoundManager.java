@@ -20,7 +20,7 @@ import javafx.scene.media.MediaPlayer;
  * @author Piget Mathéo
  */
 public class SoundManager {
-    private static final String SOUND_PATH = "src/main/resources/";
+    private static final String SOUND_PATH = "src/main/resources/sounds/";
     private static final String SOUND_EXTENSION = ".mp3";
 
     // MediaPlayer pour le son de retournement (réutilisé)

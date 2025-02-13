@@ -93,12 +93,12 @@ public class GameMenuView {
             if (!stage.getScene().getStylesheets().isEmpty()) {
                 stage.getScene().getStylesheets().clear();
             }
-            stage.getScene().getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
+            stage.getScene().getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
         } else {
             if (!stage.getScene().getStylesheets().isEmpty()) {
                 stage.getScene().getStylesheets().clear();
             }
-            stage.getScene().getStylesheets().add(getClass().getResource("/menu_light.css").toExternalForm());
+            stage.getScene().getStylesheets().add(getClass().getResource("/themes/menu_light.css").toExternalForm());
         }
 
         if (volume != musicManager.getVolume()) {
@@ -166,11 +166,11 @@ public class GameMenuView {
 
         if (OptionsManager.getTheme().equals("Sombre")) {
             Scene scene = new Scene(menuContainer, 700, 500);
-            scene.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
             stage.setScene(scene);
         } else {
             Scene scene = new Scene(menuContainer, 700, 500);
-            scene.getStylesheets().add(getClass().getResource("/menu_light.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/themes/menu_light.css").toExternalForm());
             stage.setScene(scene);
         }
     }

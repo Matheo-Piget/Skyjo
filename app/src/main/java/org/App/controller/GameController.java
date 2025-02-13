@@ -3,6 +3,8 @@ package org.App.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.App.model.game.Card;
 import org.App.model.game.SkyjoGame;
@@ -13,6 +15,7 @@ import org.App.view.screens.GameView;
 import org.App.view.screens.GameViewInterface;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.util.Duration;
 
 /**
@@ -200,7 +203,7 @@ public final class GameController {
             });
         } else if (game.hasDiscard() && game.getCountReveal() < 1) {
             cardView.flipCard(() -> {
-                if(cardView.isFlipped()) {
+                if (cardView.isFlipped()) {
                     return;
                 }
                 game.revealCard(game.getActualPlayer(), cardView.getIndex());
@@ -313,11 +316,15 @@ public final class GameController {
      */
     private void handleAITurn() {
         if (game.getActualPlayer() instanceof AIPlayer aIPlayer) {
-            addDelay(0.1, () -> {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(() -> {
                 aIPlayer.playTurn(game);
-                updateView();
-                endTurn();
+                Platform.runLater(() -> {
+                    updateView();
+                    endTurn();
+                });
             });
+            executor.shutdown();
         }
     }
 
