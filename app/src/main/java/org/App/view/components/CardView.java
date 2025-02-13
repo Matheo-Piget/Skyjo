@@ -137,17 +137,21 @@ public class CardView extends StackPane {
      * Flips the card with a rotation animation.
      */
     public void flipCard() {
-        // Create a rotation animation to simulate flipping
-        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(2), this);
-        rotateTransition.setAxis(javafx.scene.transform.Rotate.Y_AXIS); // Rotate around the Y-axis
-        rotateTransition.setFromAngle(0); // Start at 0 degrees
-        rotateTransition.setToAngle(180); // End at 180 degrees
-
-        // Change the card's appearance halfway through the animation
+        // Crée une animation de rotation pour simuler le retournement
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(1), this);
+        rotateTransition.setAxis(javafx.scene.transform.Rotate.Y_AXIS); // Rotation autour de l'axe Y
+        rotateTransition.setFromAngle(0); // Commence à 0 degrés
+        rotateTransition.setToAngle(180); // Termine à 180 degrés
+    
+        // Change l'apparence de la carte à mi-chemin de l'animation (90 degrés)
         rotateTransition.setOnFinished(event -> {
-            updateCardAppearance(); // Update the card's appearance after flipping
+            // À mi-chemin, met à jour l'apparence de la carte
+            if (this.getRotate() >= 90) {
+                updateCardAppearance();
+            }
         });
-
+    
+        // Démarre l'animation
         rotateTransition.play();
     }
 
