@@ -12,6 +12,7 @@ import org.App.view.components.CardView;
 import org.App.view.components.DiscardView;
 import org.App.view.components.PickView;
 import org.App.view.utils.MusicManager;
+import org.App.view.utils.OptionsManager;
 import org.App.view.utils.SoundManager;
 
 import javafx.animation.Animation;
@@ -101,7 +102,11 @@ public class GameView implements GameViewInterface {
         borderPane.setBottom(cardsContainer);
 
         this.scene = new Scene(borderPane, 1400, 900);
-        scene.getStylesheets().add(getClass().getResource("/game.css").toExternalForm());
+        if (OptionsManager.getTheme().equals("sombre")) {
+            scene.getStylesheets().add("file:src/main/resources/menu.css");
+        } else {
+            scene.getStylesheets().add("file:src/main/resources/menu_light.css");
+        }
 
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
         cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));

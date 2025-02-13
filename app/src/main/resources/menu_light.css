@@ -1,0 +1,57 @@
+.root {
+    -fx-background-color: #f5f5f5; /* Fond clair */
+  }
+  
+  .skyjo-title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-fill: #333333; /* Texte sombre */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+  }
+  
+  .number-of-players-label {
+    -fx-font-size: 18px;
+    -fx-fill: #333333; /* Texte sombre */
+  }
+  
+  .button {
+    -fx-background-color: #e0e0e0; /* Boutons clairs */
+    -fx-text-fill: #333333; /* Texte sombre */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+  }
+  
+  .button:hover {
+    -fx-background-color: #bdbdbd; /* Couleur au survol */
+  }
+  
+  .text-field {
+    -fx-background-color: #e0e0e0; /* Champ de texte clair */
+    -fx-text-fill: #333333; /* Texte sombre */
+    -fx-font-size: 14px;
+    -fx-padding: 5;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+  }
+  
+  .combo-box {
+    -fx-background-color: #e0e0e0; /* Combo-box clair */
+    -fx-text-fill: #333333; /* Texte sombre */
+    -fx-font-size: 14px;
+    -fx-padding: 5;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+  }
+  
+  .combo-box .list-cell {
+    -fx-background-color: #e0e0e0; /* Fond des cellules */
+    -fx-text-fill: #333333; /* Texte sombre */
+  }
+  
+  .combo-box .list-cell:hover {
+    -fx-background-color: #bdbdbd; /* Couleur au survol */
+  }

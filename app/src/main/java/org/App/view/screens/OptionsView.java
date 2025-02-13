@@ -120,7 +120,11 @@ public class OptionsView {
 
         // Create scene
         this.scene = new Scene(root, 800, 600);
-        this.scene.getStylesheets().add(getClass().getResource("/option.css").toExternalForm());
+        if (OptionsManager.getTheme().equals("sombre")) {
+            scene.getStylesheets().add(getClass().getResource("/option.css").toExternalForm());
+        } else {
+            scene.getStylesheets().add(getClass().getResource("/option_light.css").toExternalForm());
+        }
     }
 
     /**
@@ -175,7 +179,7 @@ public class OptionsView {
                 Thread.sleep(3000);
                 javafx.application.Platform.runLater(() -> ((VBox) scene.getRoot()).getChildren().remove(confirmation));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                throw new AssertionError("Thread interrupted: " + e.getMessage());
             }
         }).start();
     }

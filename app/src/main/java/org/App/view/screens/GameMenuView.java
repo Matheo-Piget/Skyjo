@@ -98,7 +98,7 @@ public class GameMenuView {
             if (!stage.getScene().getStylesheets().isEmpty()) {
                 stage.getScene().getStylesheets().clear();
             }
-            stage.getScene().getStylesheets().add(getClass().getResource("/lighttheme.css").toExternalForm());
+            stage.getScene().getStylesheets().add(getClass().getResource("/menu_light.css").toExternalForm());
         }
 
         if (volume != musicManager.getVolume()) {
@@ -106,7 +106,7 @@ public class GameMenuView {
         }
 
         if (mode.equals("Action")) {
-            // Démarrer le skyjo mais en action
+            //TODO Démarrer le skyjo mais en action
         }
     }
 
@@ -163,10 +163,16 @@ public class GameMenuView {
                 optionsBox);
 
         // Scene
-        Scene scene = new Scene(menuContainer, 700, 500);
-        scene.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
+
+        if (OptionsManager.getTheme().equals("Sombre")) {
+            Scene scene = new Scene(menuContainer, 700, 500);
+            scene.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
+            stage.setScene(scene);
+        } else {
+            Scene scene = new Scene(menuContainer, 700, 500);
+            scene.getStylesheets().add(getClass().getResource("/menu_light.css").toExternalForm());
+            stage.setScene(scene);
+        }
     }
 
     /**
