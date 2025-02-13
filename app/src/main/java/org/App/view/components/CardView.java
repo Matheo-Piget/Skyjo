@@ -16,27 +16,14 @@ import javafx.util.Duration;
 
 /**
  * Represents the view of a card in the Skyjo game.
- * This class is responsible for displaying a card and handling its
- * interactions.
- * 
- * <p>
- * The card can be face up or face down, and its appearance changes based on its
- * value.
- * It also supports animations for flipping and scaling.
- * </p>
- * 
- * @see Card
- * @see GameController
- * 
- * @author Mathéo Piget
- * @version 1.0
+ * This class is responsible for displaying a card and handling its interactions.
  */
 public class CardView extends StackPane {
     private Card value;
     private final int index;
     private final Rectangle cardBackground = new Rectangle(40, 60);
-    private final Text cardValue = new Text();
-    
+    private final Text frontText = new Text(); // Texte pour la face avant
+    private final Text backText = new Text("?"); // Texte pour la face arrière
 
     public CardView(Card value, int index) {
         this.value = value;
@@ -46,7 +33,6 @@ public class CardView extends StackPane {
         cardBackground.setArcWidth(15);
         cardBackground.setArcHeight(15);
 
-
         // Appliquer le style de la carte
         updateCardAppearance();
 
@@ -54,8 +40,13 @@ public class CardView extends StackPane {
         cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
         cardBackground.setOnMouseExited(event -> scaleDown(cardBackground));
 
-        getChildren().addAll(cardBackground, cardValue);
-        StackPane.setAlignment(cardValue, javafx.geometry.Pos.CENTER);
+        // Ajouter les éléments à la carte
+        getChildren().addAll(cardBackground, frontText, backText);
+        StackPane.setAlignment(frontText, javafx.geometry.Pos.CENTER);
+        StackPane.setAlignment(backText, javafx.geometry.Pos.CENTER);
+
+        // Masquer la face arrière initialement
+        backText.setVisible(true);
 
         setOnMouseClicked(event -> handleClick());
     }
@@ -65,6 +56,7 @@ public class CardView extends StackPane {
      */
     private void updateCardAppearance() {
         if (value.faceVisible()) {
+            // Face avant
             switch (value.valeur()) {
                 case MOINS_DEUX, MOINS_UN -> cardBackground.setFill(Color.MAGENTA);
                 case ZERO -> cardBackground.setFill(Color.CYAN);
@@ -73,16 +65,19 @@ public class CardView extends StackPane {
                 case NEUF, DIX, ONZE, DOUZE -> cardBackground.setFill(Color.RED);
                 default -> throw new AssertionError();
             }
-            cardValue.setText(String.valueOf((int) switch (value.valeur()) {
+            frontText.setText(String.valueOf((int) switch (value.valeur()) {
                 case MOINS_DEUX -> -2;
                 case MOINS_UN -> -1;
                 default -> value.valeur().getValue();
             }));
-            cardValue.setFont(new javafx.scene.text.Font(24));
+            backText.setText("");
+            backText.setVisible(false);
+            frontText.setFont(new javafx.scene.text.Font(24));
+            frontText.setFill(Color.BLACK);
         } else {
+            // Face arrière
             cardBackground.setFill(Color.BLACK);
-            cardValue.setText("?");
-            cardValue.setFill(Color.WHITE);
+            backText.setFill(Color.WHITE);
         }
     }
 
@@ -95,23 +90,29 @@ public class CardView extends StackPane {
         flip.setFromAngle(0);
         flip.setToAngle(180);
         flip.setInterpolator(Interpolator.EASE_BOTH);
+
+        // Gestion de la visibilité des textes pendant l'animation
         flip.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.greaterThanOrEqualTo(Duration.seconds(0.25)) && newValue.lessThan(Duration.seconds(0.5))) {
-                updateCardAppearance(); // Met à jour l'apparence à 90 degrés
+            if (newValue.greaterThanOrEqualTo(Duration.seconds(0.25))) {
+                // À 90 degrés, on change l'apparence de la carte
+                updateCardAppearance();
+                frontText.setVisible(value.faceVisible());
+                backText.setVisible(!value.faceVisible());
             }
         });
+
         flip.setOnFinished(event -> {
             if (onFinished != null) {
                 onFinished.run();
             }
         });
+
         flip.play();
         SoundManager.playFlipSound();
     }
+
     /**
      * Scales up the card background when the mouse enters.
-     *
-     * @param cardBackground The rectangle representing the card background.
      */
     private void scaleUp(Rectangle cardBackground) {
         Scale scale = new Scale(1.15, 1.15, cardBackground.getWidth() / 2, cardBackground.getHeight() / 2);
@@ -120,8 +121,6 @@ public class CardView extends StackPane {
 
     /**
      * Scales down the card background when the mouse exits.
-     *
-     * @param cardBackground The rectangle representing the card background.
      */
     private void scaleDown(Rectangle cardBackground) {
         cardBackground.getTransforms().clear();
@@ -140,8 +139,6 @@ public class CardView extends StackPane {
 
     /**
      * Gets the card value.
-     *
-     * @return The card value as a {@link Card}.
      */
     public Card getValue() {
         return value;
@@ -149,18 +146,14 @@ public class CardView extends StackPane {
 
     /**
      * Sets the card value and triggers a flip animation.
-     *
-     * @param value The new card value.
      */
     public void setValue(Card value) {
         this.value = value;
-        updateCardAppearance(); // Mettre à jour l'apparence de la carte
+        updateCardAppearance();
     }
 
     /**
      * Indicates whether the card is flipped.
-     *
-     * @return {@code true} if the card is flipped, {@code false} otherwise.
      */
     public boolean isFlipped() {
         return value.faceVisible();
@@ -168,8 +161,6 @@ public class CardView extends StackPane {
 
     /**
      * Gets the index of the card in the player's hand.
-     *
-     * @return The index of the card.
      */
     public int getIndex() {
         return index;
