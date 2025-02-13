@@ -1,9 +1,9 @@
 package org.App.view.screens;
 
+import java.io.IOException;
+
 import org.App.view.utils.MusicManager;
 import org.App.view.utils.OptionsManager;
-
-import java.io.IOException;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -100,7 +100,7 @@ public class OptionsView {
         // Buttons
         Button saveButton = createStyledButton("Save");
         saveButton.setOnAction(e -> {
-            saveOptions(themeComboBox.getValue(), modeComboBox.getValue());
+            saveOptions(themeComboBox.getValue(), modeComboBox.getValue(), volumeSlider.getValue());
             showConfirmation("Options saved successfully!");
         });
 
@@ -120,7 +120,7 @@ public class OptionsView {
 
         // Create scene
         this.scene = new Scene(root, 800, 600);
-        this.scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        this.scene.getStylesheets().add(getClass().getResource("/option.css").toExternalForm());
     }
 
     /**
@@ -195,9 +195,9 @@ public class OptionsView {
      * @param theme The selected theme.
      * @param mode  The selected game mode.
      */
-    private void saveOptions(String theme, String mode) {
+    private void saveOptions(String theme, String mode, double volume) {
         try {
-            OptionsManager.saveOptions(theme, mode);
+            OptionsManager.saveOptions(theme, mode, volume);
         } catch (IOException e) {
             System.err.println("Error saving options: " + e.getMessage());
         }

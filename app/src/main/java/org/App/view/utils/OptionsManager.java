@@ -60,6 +60,15 @@ public class OptionsManager {
     }
 
     /**
+     * Retrieves the currently selected volume level.
+     * 
+     * @return The selected volume level, or 0.5 as the default if not specified.
+     */
+    public static double getVolume() {
+        return properties.getProperty("volume") != null ? Double.parseDouble(properties.getProperty("volume")) : 0.5;
+    }
+
+    /**
      * Saves the selected theme and game mode to the configuration file.
      * 
      * @param theme The theme to save.
@@ -67,13 +76,14 @@ public class OptionsManager {
      * @throws IOException If an error occurs while writing to the configuration
      *                     file.
      */
-    public static void saveOptions(String theme, String mode) throws IOException {
+    public static void saveOptions(String theme, String mode, double volume) throws IOException {
         if (theme == null || mode == null) {
             throw new IllegalArgumentException("Theme and mode cannot be null.");
         }
 
         properties.setProperty("theme", theme);
         properties.setProperty("mode", mode);
+        properties.setProperty("volume", String.valueOf(volume));
 
         try (FileOutputStream output = new FileOutputStream(FILE_PATH)) {
             properties.store(output, "Skyjo Game Configuration");

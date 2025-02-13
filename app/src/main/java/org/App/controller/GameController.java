@@ -190,7 +190,7 @@ public final class GameController {
      */
     public void handleCardClick(CardView cardView) {
         if (game.getPickedCard() != null) {
-            game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard(), cardView.getIndex());
+            game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard().retourner(), cardView.getIndex());
             cardView.setValue(cardView.getValue().retourner()); // Retourne la carte
             view.getRootPane().getChildren().remove(pickedCardView); // Supprime la carte piochée
             resetPickState();

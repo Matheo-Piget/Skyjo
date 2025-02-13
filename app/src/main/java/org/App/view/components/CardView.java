@@ -159,7 +159,6 @@ public class CardView extends StackPane {
      * Handles the click event on the card.
      */
     private void handleClick() {
-        System.out.println("Carte cliquée, index = " + getIndex());
         if (GameController.getInstance() == null) {
             System.out.println("GameController est null !");
         } else {
