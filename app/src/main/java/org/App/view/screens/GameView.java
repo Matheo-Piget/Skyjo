@@ -226,7 +226,7 @@ public class GameView implements GameViewInterface {
      */
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
-        clearPreviousCards();
+        clearPreviousCards();//supprimer cette ligne pour voir toutes les cartes
         addCardViewsToRootPane(players);
 
         cardsContainer.getChildren().clear();
