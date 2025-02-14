@@ -43,6 +43,7 @@ public final class SkyjoGame {
     private boolean hasDiscard;
     private int countReveal;
     private boolean hasPickeInDiscard;
+    private Player firstPlayerToReavealAllCards;
 
     /**
      * Constructs a new SkyjoGame with the specified players.
@@ -204,6 +205,16 @@ public final class SkyjoGame {
      * @return True if any player has revealed all their cards, false otherwise.
      */
     private boolean hasPlayerRevealedAllCards() {
+
+        for (Player player : players) {
+            if (player.getCartes().stream().allMatch(Card::faceVisible)) {
+                if (firstPlayerToReavealAllCards == null) {
+                    firstPlayerToReavealAllCards = player;
+                    return true;
+                }
+            }
+        }
+
         return players.stream().anyMatch(player -> player.getCartes().stream().allMatch(Card::faceVisible));
     }
 
@@ -231,6 +242,15 @@ public final class SkyjoGame {
         players.forEach(
                 player -> ranking.put(player, player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()
                         + player.getCommutativeScore()));
+
+        if (firstPlayerToReavealAllCards != null) {
+            int minScore = Collections.min(ranking.values());
+            int firstPlayerScore = ranking.get(firstPlayerToReavealAllCards);
+            if (firstPlayerScore != minScore) {
+                ranking.put(firstPlayerToReavealAllCards, firstPlayerScore * 2);
+            }
+        }
+
         return sortedRanking(ranking);
     }
 
@@ -305,6 +325,7 @@ public final class SkyjoGame {
      * and setting up the discard pile.
      */
     public void startGame() {
+        firstPlayerToReavealAllCards = null;
         if (!pick.isEmpty())
             pick.clear();
         if (!discard.isEmpty())
