@@ -6,9 +6,14 @@
 .skyjo-title {
   -fx-font-size: 36px;
   -fx-font-weight: bold;
-  -fx-fill: #f8f8f2; /* Texte clair */
+  -fx-fill: linear-gradient(to right, #ff79c6, #bd93f9); /* Dégradé de couleurs */
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 1);
   -fx-alignment: center;
+  -fx-padding: 10;
+  -fx-border-color: #ff79c6;
+  -fx-border-width: 2px;
+  -fx-border-radius: 10;
+  -fx-background-radius: 10;
 }
 
 .number-of-players-label {
@@ -67,6 +72,8 @@
   -fx-cursor: hand;
   -fx-transition: all 0.3s ease;
 }
+
+
 
 .combo-box:hover {
   -fx-background-color: #6272a4; /* Couleur au survol */

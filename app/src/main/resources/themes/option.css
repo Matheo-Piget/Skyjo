@@ -24,6 +24,8 @@
     -fx-transition: all 0.3s ease;
 }
 
+
+
 .button:hover {
     -fx-background-color: #6272a4; /* Couleur au survol */
     -fx-scale-x: 1.05;

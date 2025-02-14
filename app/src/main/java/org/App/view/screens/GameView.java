@@ -83,9 +83,10 @@ public class GameView implements GameViewInterface {
         stage.setMaximized(true);
 
         musicManager = new MusicManager("src/main/resources/musics/game_music.mp3");
-        
 
-        musicManager.play();
+        if (OptionsManager.getVolume() != 0) {
+            musicManager.play();
+        }
 
         rootPane.getStyleClass().add("root");
 
