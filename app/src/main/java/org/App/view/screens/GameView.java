@@ -3,6 +3,7 @@ package org.App.view.screens;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.App.App;
 import org.App.model.game.Card;
@@ -549,12 +550,17 @@ public class GameView implements GameViewInterface {
     private void animateCardsForPlayer(Player player, List<CardView> cardViews, int[] index, double targetX,
             double targetY,
             int[] remainingAnimations, Runnable onComplete) {
+
+        Random random = new Random();
         for (int j = 0; j < player.getCartes().size(); j++) {
             CardView cardView = cardViews.get(index[0]++);
             double cardOffsetX = (j % 4) * 50;
             double cardOffsetY = (j / 4) * 70;
 
-            animateCard(cardView, 400, 300, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
+            int startX = random.nextInt(100, (int) getScene().getWidth() - 100);
+            int startY = random.nextInt(100,(int)getScene().getHeight() - 100);
+
+            animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
                 remainingAnimations[0]--;
                 if (remainingAnimations[0] == 0) {
                     onComplete.run();
@@ -750,21 +756,21 @@ public class GameView implements GameViewInterface {
             case 8 -> {
                 return switch (playerIndex) {
                     case 0 ->
-                        35;
+                        95;
                     case 1 ->
-                        35;
+                        95;
                     case 2 ->
-                        35;
+                        95;
                     case 3 ->
-                        35;
+                        95;
                     case 4 ->
-                        320;
+                        375;
                     case 5 ->
-                        590;
+                        620;
                     case 6 ->
-                        590;
+                        620;
                     default ->
-                        590;
+                        620;
                 };
             }
             default -> {

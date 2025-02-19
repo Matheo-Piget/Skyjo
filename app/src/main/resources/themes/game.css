@@ -12,6 +12,23 @@
   -fx-alignment: center;
 }
 
+.menu-item{
+  -fx-font-size: 24px;
+  -fx-fill: #f8f8f2;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 4, 0, 0, 1);
+  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
+  -fx-padding: 10 20;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+}
+
+.menu-bar {
+  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
+  -fx-padding: 10;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+}
+
 .button {
   -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
   -fx-text-fill: #f8f8f2;

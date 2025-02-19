@@ -75,6 +75,8 @@ public class GameMenuView {
 
         applySavedOptions();
 
+        musicManager.play();
+
     }
 
     /**

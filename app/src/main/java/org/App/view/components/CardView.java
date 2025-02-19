@@ -6,6 +6,7 @@ import org.App.view.utils.SoundManager;
 
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -16,7 +17,8 @@ import javafx.util.Duration;
 
 /**
  * Represents the view of a card in the Skyjo game.
- * This class is responsible for displaying a card and handling its interactions.
+ * This class is responsible for displaying a card and handling its
+ * interactions.
  */
 public class CardView extends StackPane {
     private Card value;
@@ -52,9 +54,17 @@ public class CardView extends StackPane {
     }
 
     /**
-     * Met à jour l'apparence de la carte en fonction de son état (face visible ou non).
+     * Met à jour l'apparence de la carte en fonction de son état (face visible ou
+     * non).
      */
     private void updateCardAppearance() {
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(5.0);
+        dropShadow.setOffsetX(3.0);
+        dropShadow.setOffsetY(3.0);
+        dropShadow.setColor(Color.color(0, 0, 0, 0.6));
+
+        cardBackground.setEffect(dropShadow);
         if (value.faceVisible()) {
             // Face avant
             switch (value.valeur()) {

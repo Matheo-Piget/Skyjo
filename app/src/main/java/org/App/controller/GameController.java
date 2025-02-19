@@ -70,6 +70,7 @@ public final class GameController {
      */
     public void startGame() {
         game.startGame();
+
         List<CardView> cardViews = createCardViews();
         view.distributeCardsWithAnimation(game.getPlayers(), cardViews, this::initializeGameBoard);
     }
