@@ -227,7 +227,7 @@ public class GameView implements GameViewInterface {
      */
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
-        clearPreviousCards();//supprimer cette ligne pour voir toutes les cartes
+        clearPreviousCards();// supprimer cette ligne pour voir toutes les cartes
         addCardViewsToRootPane(players);
 
         cardsContainer.getChildren().clear();
@@ -516,23 +516,53 @@ public class GameView implements GameViewInterface {
      * @param cardViews  The list of card views to distribute.
      * @param onComplete A callback to execute when the animation is complete.
      */
+
     @Override
     public void distributeCardsWithAnimation(List<Player> players, List<CardView> cardViews, Runnable onComplete) {
-        int numberOfPlayers = players.size();
-
         rootPane.getChildren().clear();
         rootPane.getChildren().addAll(cardViews);
 
         final int[] index = { 0 };
-        final int totalCards = cardViews.size();
-        int[] remainingAnimations = { totalCards };
+        Random random = new Random();
+        List<CardAnimationTask> tasks = new ArrayList<>();
 
+        // Pour chaque joueur, créer une tâche d'animation pour chaque carte.
         for (Player player : players) {
-            double targetX = getPlayerXPosition(players.indexOf(player), numberOfPlayers);
-            double targetY = getPlayerYPosition(players.indexOf(player), numberOfPlayers);
+            double targetX = getPlayerXPosition(players.indexOf(player), players.size());
+            double targetY = getPlayerYPosition(players.indexOf(player), players.size());
 
-            animateCardsForPlayer(player, cardViews, index, targetX, targetY, remainingAnimations, onComplete);
+            for (int j = 0; j < player.getCartes().size(); j++) {
+                CardView cardView = cardViews.get(index[0]++);
+                // Ajout d'un décalage aléatoire
+                double cardOffsetX = random.nextInt(75, 150);
+                double cardOffsetY = random.nextInt(75, 150);
+
+                int startX = 200;
+                int startY = 500;
+                final int cardIndex = j;
+
+                // Ajoute la tâche qui, une fois terminée, appellera onFinished.
+                tasks.add(onFinished -> {
+                    animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, cardIndex, onFinished);
+                });
+            }
         }
+
+        // Exécute les tâches d'animation une par une de manière séquentielle.
+        animateTasksSequentially(tasks, onComplete);
+    }
+
+    /**
+     * Exécute récursivement les tâches d'animation de carte de manière
+     * séquentielle.
+     */
+    private void animateTasksSequentially(List<CardAnimationTask> tasks, Runnable onComplete) {
+        if (tasks.isEmpty()) {
+            onComplete.run();
+            return;
+        }
+        CardAnimationTask task = tasks.remove(0);
+        task.run(() -> animateTasksSequentially(tasks, onComplete));
     }
 
     /**
@@ -554,11 +584,11 @@ public class GameView implements GameViewInterface {
         Random random = new Random();
         for (int j = 0; j < player.getCartes().size(); j++) {
             CardView cardView = cardViews.get(index[0]++);
-            double cardOffsetX = (j % 4) * 50;
-            double cardOffsetY = (j / 4) * 70;
+            double cardOffsetX = random.nextInt(75, 150);
+            double cardOffsetY = random.nextInt(75, 150);
 
-            int startX = random.nextInt(100, (int) getScene().getWidth() - 100);
-            int startY = random.nextInt(100,(int)getScene().getHeight() - 100);
+            int startX = 200;
+            int startY = 500;
 
             animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
                 remainingAnimations[0]--;
@@ -850,10 +880,9 @@ public class GameView implements GameViewInterface {
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
 
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(4), cardView);
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(0.2), cardView);
         transition.setToX(targetX - startX);
         transition.setToY(targetY - startY);
-        transition.setDelay(Duration.millis(Math.abs(100 * (targetX - startX) / 200) + (cardIndex * 100)));
         transition.setInterpolator(Interpolator.EASE_BOTH);
 
         transition.setOnFinished(event -> {
