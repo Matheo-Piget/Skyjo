@@ -231,8 +231,6 @@ public class GameView implements GameViewInterface {
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
 
-        cardsContainer.getChildren().clear();
-
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
         HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
@@ -240,7 +238,17 @@ public class GameView implements GameViewInterface {
         HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
 
-        cardsContainer.getChildren().add(mainContainer);
+        List<CardView> cardViews = getAllCardViews();
+
+        BoardView centerbBoardView = centerPlayerContainer.getChildren().stream()
+                .filter(node -> node instanceof BoardView)
+                .map(node -> (BoardView) node)
+                .findFirst()
+                .orElse(null);
+
+        animateTransitionToBoard(cardViews, centerbBoardView, () -> cardsContainer.getChildren().add(mainContainer));
+
+        
         stage.show();
     }
 
@@ -951,6 +959,9 @@ public class GameView implements GameViewInterface {
 
             // Récupérer le nœud cible dans le BoardView (les cartes sont ajoutées dans le
             // même ordre)
+            if (i >= boardView.getChildren().size()) {
+                break;
+            }
             Node targetNode = boardView.getChildren().get(i);
 
             // Convertir les coordonnées locales du nœud cible en coordonnées de la scène
