@@ -281,7 +281,7 @@ public final class SkyjoGame {
      * @return True if the game is finished, false otherwise.
      */
     public boolean isFinished() {
-        return hasPlayerRevealedAllCards() || pick.isEmpty();
+        return hasPlayerRevealedAllCards();
     }
 
     /**
@@ -424,6 +424,28 @@ public final class SkyjoGame {
 
         if (columnRemoved) {
             GameController.getInstance().updateView();
+        }
+    }
+
+    /**
+     * Checks if the deck is empty and shuffles the discard pile if it is.
+     */
+    public void pickEmpty() {
+        if (pick.isEmpty()) {
+            List<Card> newPick = new ArrayList<>(discard);
+            
+            Collections.shuffle(newPick);
+            pick = newPick;
+
+            discard.clear();
+
+            Card firstCard = pick.remove(0).retourner();
+
+            if (!firstCard.faceVisible()) {
+                discard.add(firstCard.retourner());
+            } else {
+                discard.add(firstCard);
+            }
         }
     }
 

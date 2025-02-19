@@ -116,7 +116,13 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handlePickClick() {
-        Card pickedCard = game.pickCard().retourner();
+        Card pickedCard = game.pickCard();
+
+        if (!pickedCard.faceVisible()){
+            pickedCard = pickedCard.retourner();
+        }
+
+
         game.setPickedCard(pickedCard);
         if (pickedCard != null) {
             pickedCardView = new CardView(pickedCard, -1);
@@ -253,6 +259,9 @@ public final class GameController {
      */
     private void endTurn() {
         game.checkColumns();
+        if (game.getPick().isEmpty()){
+            game.pickEmpty();
+        }
         if (game.isFinished()) {
             concludeGame();
         } else {
