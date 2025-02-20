@@ -23,7 +23,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -359,10 +358,17 @@ public class GameView implements GameViewInterface {
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
 
+
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
+
+        if (isCurrent) {
+            playerContainer.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: gold; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
+        } else {
+            playerContainer.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
+        }
 
         return playerContainer;
     }
@@ -943,76 +949,5 @@ public class GameView implements GameViewInterface {
         return rootPane;
     }
 
-    /**
-     * Anime la transition des cartes distribuées vers leur position finale dans le
-     * BoardView.
-     *
-     * @param cardViews  La liste des CardView à animer.
-     * @param boardView  Le BoardView contenant les positions finales des cartes.
-     * @param onComplete Callback exécuté à la fin de l'animation.
-     */
-    private void animateTransitionToBoard(List<CardView> cardViews, BoardView boardView, Runnable onComplete) {
-        // Forcer la mise à jour du layout du BoardView pour obtenir les positions
-        // finales
-        boardView.applyCss();
-        boardView.layout();
-
-        // Créer une transition parallèle pour animer toutes les cartes en même temps
-        ParallelTransition allTransitions = new ParallelTransition();
-
-        // Pour chaque carte, calculer la position cible dans le BoardView
-        for (int i = 0; i < cardViews.size(); i++) {
-            CardView cv = cardViews.get(i);
-
-            // Récupérer le nœud cible dans le BoardView (les cartes sont ajoutées dans le
-            // même ordre)
-            if (i >= boardView.getChildren().size()) {
-                break;
-            }
-            Node targetNode = boardView.getChildren().get(i);
-
-            // Convertir les coordonnées locales du nœud cible en coordonnées de la scène
-            Bounds targetBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
-            Bounds currentBounds = cv.localToScene(cv.getBoundsInLocal());
-
-            double currentX = currentBounds.getMinX();
-            double currentY = currentBounds.getMinY();
-            double targetX = targetBounds.getMinX();
-            double targetY = targetBounds.getMinY();
-
-            // Créer une animation de translation pour déplacer la carte vers sa position
-            // finale
-            TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), cv);
-            translateTransition.setFromX(0);
-            translateTransition.setFromY(0);
-            translateTransition.setToX(targetX - currentX);
-            translateTransition.setToY(targetY - currentY);
-            translateTransition.setInterpolator(Interpolator.EASE_OUT);
-
-            // Ajouter une rotation pour un effet visuel supplémentaire
-            RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.5), cv);
-            rotateTransition.setFromAngle(0);
-            rotateTransition.setToAngle(360); // Rotation complète
-            rotateTransition.setInterpolator(Interpolator.LINEAR);
-
-            // Combiner les animations de translation et de rotation
-            ParallelTransition cardTransition = new ParallelTransition(translateTransition, rotateTransition);
-            allTransitions.getChildren().add(cardTransition);
-        }
-
-        // Exécuter la transition parallèle
-        allTransitions.setOnFinished(e -> {
-            // Réinitialiser les translations et rotations après l'animation
-            for (CardView cv : cardViews) {
-                cv.setTranslateX(0);
-                cv.setTranslateY(0);
-                cv.setRotate(0);
-            }
-            if (onComplete != null) {
-                onComplete.run();
-            }
-        });
-
-        allTransitions.play();
-    }
+    
 }
