@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.App.App;
 import org.App.model.game.Card;
+import org.App.model.game.CardValue;
 import org.App.model.player.Player;
 import org.App.view.components.BoardView;
 import org.App.view.components.CardView;
@@ -231,6 +232,9 @@ public class GameView implements GameViewInterface {
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
 
+        clearPreviousCards();
+        cardsContainer.getChildren().clear();
+
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
         HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
@@ -238,17 +242,7 @@ public class GameView implements GameViewInterface {
         HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
 
-        List<CardView> cardViews = getAllCardViews();
-
-        BoardView centerbBoardView = centerPlayerContainer.getChildren().stream()
-                .filter(node -> node instanceof BoardView)
-                .map(node -> (BoardView) node)
-                .findFirst()
-                .orElse(null);
-
-        animateTransitionToBoard(cardViews, centerbBoardView, () -> cardsContainer.getChildren().add(mainContainer));
-
-        
+        cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
 
@@ -535,6 +529,20 @@ public class GameView implements GameViewInterface {
         Random random = new Random();
         List<CardAnimationTask> tasks = new ArrayList<>();
 
+        CardView distribView = new CardView(new Card(CardValue.CINQ, false), 0);
+
+        switch (players.size()) {
+            case 2 -> {
+                distribView.setLayoutX(550);
+                distribView.setLayoutY(600);
+            }
+            default -> {
+                distribView.setLayoutX(550);
+                distribView.setLayoutY(320);
+            }
+        }
+        rootPane.getChildren().add(distribView);
+
         // Pour chaque joueur, créer une tâche d'animation pour chaque carte.
         for (Player player : players) {
             double targetX = getPlayerXPosition(players.indexOf(player), players.size());
@@ -561,7 +569,6 @@ public class GameView implements GameViewInterface {
         // Exécute les tâches d'animation une par une de manière séquentielle.
         animateTasksSequentially(tasks, onComplete);
 
-        
     }
 
     /**
