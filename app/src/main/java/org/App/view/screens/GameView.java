@@ -243,6 +243,7 @@ public class GameView implements GameViewInterface {
 
         HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
+
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
@@ -944,8 +945,10 @@ public class GameView implements GameViewInterface {
 
         // Rotation (la carte effectue une rotation pendant son trajet)
         RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.2), cardView);
+        Random random = new Random();
+        double randomAngle = 270 + random.nextDouble() * 90; // angle aléatoire entre 270 et 360 degrés
         rotateTransition.setFromAngle(0);
-        rotateTransition.setToAngle(360); // vous pouvez ajuster l'angle pour obtenir l'effet désiré
+        rotateTransition.setToAngle(randomAngle);
         rotateTransition.setInterpolator(Interpolator.EASE_OUT);
 
         // Rassemble les deux animations pour qu'elles s'exécutent en même temps
@@ -957,7 +960,6 @@ public class GameView implements GameViewInterface {
             cardView.setLayoutY(targetY);
             cardView.setTranslateX(0);
             cardView.setTranslateY(0);
-            cardView.setRotate(0); // ou laissez la rotation finale selon l'effet souhaité
 
             if (onFinished != null) {
                 onFinished.run();
