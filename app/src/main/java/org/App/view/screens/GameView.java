@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.App.App;
+import org.App.controller.GameController;
 import org.App.model.game.Card;
 import org.App.model.game.CardValue;
 import org.App.model.player.Player;
@@ -32,6 +33,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -232,7 +234,6 @@ public class GameView implements GameViewInterface {
      */
     @Override
     public void showPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard) {
-
         clearPreviousCards();
         cardsContainer.getChildren().clear();
 
@@ -242,7 +243,6 @@ public class GameView implements GameViewInterface {
 
         HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
-
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
     }
@@ -360,16 +360,20 @@ public class GameView implements GameViewInterface {
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
 
-
         VBox playerContainer = new VBox(5, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
         playerContainer.setPrefSize(200, 300);
         playerContainer.setMaxSize(200, 300);
 
         if (isCurrent) {
-            playerContainer.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: gold; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
+            // Effet visuel pour le joueur actuel
+            playerContainer.setStyle(
+                    "-fx-background-color: #1E1E1E; -fx-border-color: gold; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
+            DropShadow shadow = new DropShadow(10, Color.GOLD);
+            playerContainer.setEffect(shadow);
         } else {
-            playerContainer.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
+            playerContainer.setStyle(
+                    "-fx-background-color: #1E1E1E; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
         }
 
         return playerContainer;
@@ -446,35 +450,36 @@ public class GameView implements GameViewInterface {
      *                scores.
      */
     @Override
-    public void showRanking(java.util.Map<Player, Integer> ranking) {
-        Button showRankingButton = new Button("Show Ranking");
-        showRankingButton.setOnAction(event -> {
-            cardsContainer.getChildren().clear();
-            VBox rankingContainer = new VBox(10);
-            rankingContainer.setAlignment(Pos.CENTER);
+    public void showRanking(Map<Player, Integer> ranking) {
+        cardsContainer.getChildren().clear();
+        VBox rankingContainer = new VBox(10);
+        rankingContainer.setAlignment(Pos.CENTER);
 
-            Text rankingTitle = new Text("Classement des joueurs:");
-            rankingTitle.setFont(Font.font("Arial", 24));
-            rankingTitle.setFill(Color.LIGHTGRAY);
-            rankingContainer.getChildren().add(rankingTitle);
+        Text rankingTitle = new Text("Classement des joueurs:");
+        rankingTitle.setFont(Font.font("Arial", 24));
+        rankingTitle.setFill(Color.LIGHTGRAY);
+        rankingContainer.getChildren().add(rankingTitle);
 
-            ranking.forEach((player, score) -> {
-                Text playerScore = new Text(player.getName() + ": " + score);
-                playerScore.setFont(Font.font("Arial", 18));
-                playerScore.setFill(Color.WHITE);
-                rankingContainer.getChildren().add(playerScore);
-            });
+        ranking.forEach((player, score) -> {
+            HBox playerScoreBox = new HBox(10);
+            playerScoreBox.setAlignment(Pos.CENTER_LEFT);
 
-            cardsContainer.getChildren().add(rankingContainer);
-            stage.show();
-            Button nextRound = new Button("Next Round");
-            nextRound.setOnAction(e -> {
-                cardsContainer.getChildren().clear();
-                stage.show();
-            });
+            // Icône pour le joueur
+            Rectangle playerIcon = new Rectangle(20, 20);
+            playerIcon.setFill(Color.GOLD); // Couleur personnalisée pour chaque joueur
+            playerIcon.setArcWidth(10);
+            playerIcon.setArcHeight(10);
+
+            Text playerScore = new Text(player.getName() + ": " + score);
+            playerScore.setFont(Font.font("Arial", 18));
+            playerScore.setFill(Color.WHITE);
+
+            playerScoreBox.getChildren().addAll(playerIcon, playerScore);
+            rankingContainer.getChildren().add(playerScoreBox);
         });
 
-        cardsContainer.getChildren().add(0, showRankingButton);
+        cardsContainer.getChildren().add(rankingContainer);
+        stage.show();
     }
 
     /**
@@ -498,10 +503,19 @@ public class GameView implements GameViewInterface {
     @Override
     public void showMessageBox(String message) {
         cardsContainer.getChildren().clear();
+        VBox messageBox = new VBox(10);
+        messageBox.setAlignment(Pos.CENTER);
+
         Text messageText = new Text(message);
         messageText.setFont(Font.font("Arial", 24));
         messageText.setFill(Color.WHITE);
-        cardsContainer.getChildren().add(messageText);
+
+        Button closeButton = new Button("Fermer");
+        closeButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 16px;");
+        closeButton.setOnAction(event -> cardsContainer.getChildren().clear());
+
+        messageBox.getChildren().addAll(messageText, closeButton);
+        cardsContainer.getChildren().add(messageBox);
         stage.show();
     }
 
@@ -562,7 +576,6 @@ public class GameView implements GameViewInterface {
                 // Ajout d'un décalage aléatoire
                 double cardOffsetX = random.nextInt(75, 150);
                 double cardOffsetY = random.nextInt(75, 150);
-
 
                 int startX;
                 int startY;
@@ -964,5 +977,4 @@ public class GameView implements GameViewInterface {
         return rootPane;
     }
 
-    
 }
