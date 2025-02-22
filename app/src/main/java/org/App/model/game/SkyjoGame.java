@@ -44,6 +44,7 @@ public final class SkyjoGame {
     private int countReveal;
     private boolean hasPickeInDiscard;
     private Player firstPlayerToReavealAllCards;
+    private boolean isFinalRound = false;
 
     /**
      * Constructs a new SkyjoGame with the specified players.
@@ -90,6 +91,24 @@ public final class SkyjoGame {
      */
     public void setHasDiscard(boolean hasDiscard) {
         this.hasDiscard = hasDiscard;
+    }
+
+    /*
+     * Gets boolean is finalRound
+     * 
+     * @return boolean is finalRound
+     */
+    public boolean isFinalRound() {
+        return isFinalRound;
+    }
+
+    /**
+     * Sets the isFinalRound value.
+     *
+     * @param isFinalRound The isFinalRound value to set.
+     */
+    public void setFinalRound(boolean isFinalRound) {
+        this.isFinalRound = isFinalRound;
     }
 
     /**
@@ -281,7 +300,11 @@ public final class SkyjoGame {
      * @return True if the game is finished, false otherwise.
      */
     public boolean isFinished() {
-        return hasPlayerRevealedAllCards();
+        if (hasPlayerRevealedAllCards() && !isFinalRound) {
+            isFinalRound = true; // Activer le dernier tour
+            return false; // La partie n'est pas encore terminée
+        }
+        return isFinalRound && indexActualPlayer == players.size() - 1; 
     }
 
     /**

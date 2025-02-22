@@ -261,13 +261,24 @@ public final class GameController {
      */
     private void endTurn() {
         game.checkColumns();
-        if (game.getPick().isEmpty()){
+        if (game.getPick().isEmpty()) {
             game.pickEmpty();
         }
+    
         if (game.isFinished()) {
-            concludeGame();
+            if (game.isFinalRound()) {
+                concludeGame(); // Conclure la partie après le dernier tour
+            } else {
+                // Activer le dernier tour et passer au joueur suivant
+                game.setFinalRound(true);
+                addDelay(0.3, () -> {
+                    game.nextPlayer();
+                    updateView();
+                    handleAITurn();
+                });
+            }
         } else {
-            // Ajouter un délai avant de passer au joueur suivant
+            // Passer au joueur suivant normalement
             addDelay(0.3, () -> {
                 game.nextPlayer();
                 updateView();
@@ -292,7 +303,7 @@ public final class GameController {
         Map<Player, Integer> ranking = game.getRanking();
         ranking.forEach((player, score) -> player.addScore(score));
         view.showRanking(ranking);
-
+    
         if (game.hasPlayerReached100Points()) {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
             finalRanking.forEach((player, score) -> player.addScore(score));
