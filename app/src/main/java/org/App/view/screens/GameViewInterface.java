@@ -33,4 +33,6 @@ public interface GameViewInterface {
     Pane getRootPane();
 
     void show();
+
+    List<CardView> getAllCardViews();
 }

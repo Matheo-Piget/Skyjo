@@ -83,8 +83,9 @@ public final class GameController {
         addDelay(0.5, () -> {
             view.fadeInGameplayElements(view.getRootPane(), () -> {
                 view.setupBoardViews(game.getPlayers());
+                updateViewWithDelay(0.5);
                 game.revealInitialCards();
-                updateViewWithDelay(0.3);
+                updateView();
                 handleAITurn();
             });
         });

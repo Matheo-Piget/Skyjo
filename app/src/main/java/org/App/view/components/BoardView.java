@@ -41,4 +41,8 @@ public class BoardView extends GridPane {
         this.setMaxSize(75, 60);
         this.setPrefSize(75, 60);
     }
+
+    public CardView getCardViewAtIndex(int index) {
+        return (CardView) this.getChildren().get(index);
+    }
 }

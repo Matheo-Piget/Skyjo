@@ -6,6 +6,7 @@ import org.App.view.utils.SoundManager;
 
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -14,6 +15,8 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.util.Duration;
+
+
 
 /**
  * Represents the view of a card in the Skyjo game.
@@ -51,6 +54,19 @@ public class CardView extends StackPane {
         backText.setVisible(true);
 
         setOnMouseClicked(event -> handleClick());
+    }
+
+    /**
+     * Animates the card with a shaking effect.
+     */
+    private void shake(CardView cardView) {
+        TranslateTransition shakeTransition = new TranslateTransition(Duration.millis(100), cardView);
+        shakeTransition.setFromX(0);
+        shakeTransition.setToX(10);
+        shakeTransition.setAutoReverse(true);
+        shakeTransition.setCycleCount(4);
+        shakeTransition.setInterpolator(Interpolator.EASE_BOTH);
+        shakeTransition.play();
     }
 
     /**

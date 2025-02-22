@@ -291,6 +291,8 @@ public class GameMenuView {
 
         for (int i = 0; i < difficultyBoxes.size(); i++) {
             ComboBox<Player.Difficulty> difficultyBox = difficultyBoxes.get(i);
+            difficultyBox.setMaxSize(150, 40);
+            difficultyBox.setMinSize(150, 40);
             Player.Difficulty difficulty = difficultyBox.getValue();
             players.add(new AIPlayer("IA " + (i + 1), difficulty));
         }

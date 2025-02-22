@@ -23,6 +23,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -176,6 +177,7 @@ public class GameView implements GameViewInterface {
         startNewGame.setOnAction(event -> {
             SoundManager.dispose();
             musicManager.stop();
+            scene.getStylesheets().clear();
             stage.close();
             App.getINSTANCE().restart();
         });
@@ -508,6 +510,7 @@ public class GameView implements GameViewInterface {
      *
      * @return A list of all card views.
      */
+    @Override
     public List<CardView> getAllCardViews() {
         List<CardView> cardViews = new ArrayList<>();
         for (Node node : rootPane.getChildren()) {
@@ -544,7 +547,7 @@ public class GameView implements GameViewInterface {
             }
             default -> {
                 distribView.setLayoutX(550);
-                distribView.setLayoutY(320);
+                distribView.setLayoutY(400);
             }
         }
         rootPane.getChildren().add(distribView);
@@ -560,8 +563,20 @@ public class GameView implements GameViewInterface {
                 double cardOffsetX = random.nextInt(75, 150);
                 double cardOffsetY = random.nextInt(75, 150);
 
-                int startX = 200;
-                int startY = 500;
+
+                int startX;
+                int startY;
+
+                switch (players.size()) {
+                    case 2 -> {
+                        startX = 525;
+                        startY = 580;
+                    }
+                    default -> {
+                        startX = 525;
+                        startY = 410;
+                    }
+                }
                 final int cardIndex = j;
 
                 // Ajoute la tâche qui, une fois terminée, appellera onFinished.
@@ -918,7 +933,7 @@ public class GameView implements GameViewInterface {
         RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.2), cardView);
         rotateTransition.setFromAngle(0);
         rotateTransition.setToAngle(360); // vous pouvez ajuster l'angle pour obtenir l'effet désiré
-        rotateTransition.setInterpolator(Interpolator.LINEAR);
+        rotateTransition.setInterpolator(Interpolator.EASE_OUT);
 
         // Rassemble les deux animations pour qu'elles s'exécutent en même temps
         ParallelTransition parallelTransition = new ParallelTransition(translateTransition, rotateTransition);
