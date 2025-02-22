@@ -7,7 +7,7 @@ import java.util.List;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-/*
+/**
  * Manages the playback of sound effects in the application.
  * 
  * <p>
@@ -15,9 +15,11 @@ import javafx.scene.media.MediaPlayer;
  * It uses JavaFX's MediaPlayer class to play sounds in the application.
  * </p>
  * 
+ * Use the default constructor to create an instance of SoundManager.
  * 
  * @version 1.0
  * @author Piget Mathéo
+ * 
  */
 public class SoundManager {
     private static final String SOUND_PATH = "src/main/resources/sounds/";
