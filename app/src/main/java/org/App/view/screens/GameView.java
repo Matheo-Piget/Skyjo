@@ -898,34 +898,31 @@ public class GameView implements GameViewInterface {
             int cardIndex, Runnable onFinished) {
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
-        cardView.setRotate(0); // remettre la rotation à zéro
+        cardView.setRotate(0);
 
-        // Translation de la carte (avec décélération)
-        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.2), cardView);
+        // Translation de la carte avec une interpolation plus fluide
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), cardView);
         translateTransition.setFromX(0);
         translateTransition.setFromY(0);
         translateTransition.setToX(targetX - startX);
         translateTransition.setToY(targetY - startY);
         translateTransition.setInterpolator(Interpolator.EASE_OUT);
 
-        // Rotation (la carte effectue une rotation pendant son trajet)
-        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.2), cardView);
+        // Rotation de la carte avec un angle aléatoire
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.5), cardView);
         Random random = new Random();
-        double randomAngle = 310 + random.nextDouble() * 90; // angle aléatoire entre 270 et 360 degrés
+        double randomAngle = 360 * random.nextDouble(); // Rotation aléatoire entre 0 et 360 degrés
         rotateTransition.setFromAngle(0);
         rotateTransition.setToAngle(randomAngle);
         rotateTransition.setInterpolator(Interpolator.EASE_OUT);
 
-        // Rassemble les deux animations pour qu'elles s'exécutent en même temps
+        // Combinaison des animations
         ParallelTransition parallelTransition = new ParallelTransition(translateTransition, rotateTransition);
         parallelTransition.setOnFinished(event -> {
-            // Remettre à zéro les translations appliquées et positionner la carte
-            // exactement à la cible
             cardView.setLayoutX(targetX);
             cardView.setLayoutY(targetY);
             cardView.setTranslateX(0);
             cardView.setTranslateY(0);
-
             if (onFinished != null) {
                 onFinished.run();
             }

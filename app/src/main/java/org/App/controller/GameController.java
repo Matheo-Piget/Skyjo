@@ -12,6 +12,7 @@ import org.App.view.components.CardView;
 import org.App.view.screens.GameView;
 import org.App.view.screens.GameViewInterface;
 
+import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -275,24 +276,59 @@ public final class GameController {
 
         if (game.isFinished()) {
             if (game.isFinalRound()) {
-                concludeGame(); // Conclure la partie après le dernier tour
+                concludeGame();
             } else {
-                // Activer le dernier tour et passer au joueur suivant
                 game.setFinalRound(true);
                 addDelay(0.3, () -> {
-                    game.nextPlayer();
-                    updateView();
-                    handleAITurn();
+                    fadeOutCurrentPlayer(() -> {
+                        game.nextPlayer();
+                        fadeInNextPlayer(() -> {
+                            updateView();
+                            handleAITurn();
+                        });
+                    });
                 });
             }
         } else {
-            // Passer au joueur suivant normalement
             addDelay(0.3, () -> {
-                game.nextPlayer();
-                updateView();
-                handleAITurn();
+                fadeOutCurrentPlayer(() -> {
+                    game.nextPlayer();
+                    fadeInNextPlayer(() -> {
+                        updateView();
+                        handleAITurn();
+                    });
+                });
             });
         }
+    }
+
+    /**
+     * Fades out the current player's view and executes the provided action when
+     * finished.
+     * 
+     * @param onFinished The action to execute after
+     *                   fading out the current player's view.
+     */
+    private void fadeOutCurrentPlayer(Runnable onFinished) {
+        FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), view.getRootPane());
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(event -> onFinished.run());
+        fadeOut.play();
+    }
+
+    /**
+     * Fades in the next player's view and executes the provided action when
+     * finished.
+     * 
+     * @param onFinished The action to execute after fading in the next player's view.
+     */
+    private void fadeInNextPlayer(Runnable onFinished) {
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), view.getRootPane());
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+        fadeIn.setOnFinished(event -> onFinished.run());
+        fadeIn.play();
     }
 
     /**
@@ -393,13 +429,14 @@ public final class GameController {
     private void animateInitialFlips(Runnable onFinished) {
         List<CardView> allCardViews = view.getAllCardViews();
         List<CardView> toFlip = new ArrayList<>();
-    
+
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < player.getCartes().size(); i++) {
                 Card card = player.getCartes().get(i);
                 if (card.faceVisible()) {
                     for (CardView cardView : allCardViews) {
-                        if (cardView.getCardId() == card.id() && cardView.getIndex() == i && cardView.getPlayerId() == player.getId()) {
+                        if (cardView.getCardId() == card.id() && cardView.getIndex() == i
+                                && cardView.getPlayerId() == player.getId()) {
                             toFlip.add(cardView);
                             break;
                         }
@@ -409,7 +446,6 @@ public final class GameController {
         }
         animateCardFlipsSequentially(toFlip, onFinished);
     }
-    
 
     /**
      * Animates the flip for each CardView in the provided list sequentially.
