@@ -50,6 +50,7 @@ public class GameMenuView {
     private final List<TextField> nameFields;
     private final List<ComboBox<Player.Difficulty>> difficultyBoxes;
     private final MusicManager musicManager;
+    private int idplayer = 0;
 
     private boolean hasPressOnGenerateFieldsButton;
 
@@ -286,7 +287,7 @@ public class GameMenuView {
         musicManager.stop();
         List<Player> players = new ArrayList<>();
         for (TextField nameField : nameFields) {
-            players.add(new HumanPlayer(nameField.getText()));
+            players.add(new HumanPlayer(idplayer++, nameField.getText()));
         }
 
         for (int i = 0; i < difficultyBoxes.size(); i++) {
@@ -294,7 +295,7 @@ public class GameMenuView {
             difficultyBox.setMaxSize(150, 40);
             difficultyBox.setMinSize(150, 40);
             Player.Difficulty difficulty = difficultyBox.getValue();
-            players.add(new AIPlayer("IA " + (i + 1), difficulty));
+            players.add(new AIPlayer(idplayer++, "IA " + (i + 1), difficulty));
         }
 
         GameViewInterface gameView = new GameView(stage);

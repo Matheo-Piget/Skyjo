@@ -388,7 +388,7 @@ public class GameView implements GameViewInterface {
     private List<CardView> createCardViewsForPlayer(Player player) {
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
-            cardViews.add(new CardView(player.getCartes().get(i), i));
+            cardViews.add(new CardView(player.getCartes().get(i), i, player.getId()));
         }
         return cardViews;
     }
@@ -878,7 +878,7 @@ public class GameView implements GameViewInterface {
     private List<CardView> createPlayerCardViews(Player player) {
         List<CardView> cardViews = new ArrayList<>();
         for (int i = 0; i < player.getCartes().size(); i++) {
-            cardViews.add(new CardView(player.getCartes().get(i), i));
+            cardViews.add(new CardView(player.getCartes().get(i), i, player.getId()));
         }
         return cardViews;
     }
@@ -980,7 +980,8 @@ public class GameView implements GameViewInterface {
      *
      * @param allCardViews The list of all card views.
      * @param card         The card to find the view for.
-     * @return The card view associated with the specified card, or null if not found.
+     * @return The card view associated with the specified card, or null if not
+     *         found.
      */
     @Override
     public CardView findCardViewByCard(List<CardView> allCardViews, Card card) {

@@ -33,6 +33,13 @@ public interface Player {
     }
 
     /**
+     * Gets the unique identifier of the player.
+     * 
+     * @return The unique identifier of the player.
+     */
+    int getId();
+
+    /**
      * Gets the commutative score of the player.
      * The commutative score is the sum of all the scores of the player.
      * 

@@ -84,13 +84,15 @@ public final class GameController {
             view.fadeInGameplayElements(view.getRootPane(), () -> {
                 view.firstShowPlaying(game.getPlayers(), game.getActualPlayer().getName(),
                         game.getPick().size(), game.getTopDiscard());
-                addDelay(2, () -> {
+                addDelay(1, () -> {
                     // Update the model: reveal the designated cards
                     game.revealInitialCards();
                     // Animate the flips for the corresponding CardViews
                     animateInitialFlips(() -> {
                         // After the flips are complete, update the view and proceed normally.
                         updateView();
+                        game.setIndexActualPlayer(game.getStartingPlayerIndex());
+                        updateViewWithDelay(2);
                         handleAITurn();
                     });
                 });
@@ -111,7 +113,7 @@ public final class GameController {
         List<CardView> cardViews = new ArrayList<>();
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < player.getCartes().size(); i++) {
-                cardViews.add(new CardView(player.getCartes().get(i), i));
+                cardViews.add(new CardView(player.getCartes().get(i), i, player.getId()));
             }
         }
         return cardViews;
@@ -133,7 +135,7 @@ public final class GameController {
 
         game.setPickedCard(pickedCard);
         if (pickedCard != null) {
-            pickedCardView = new CardView(pickedCard, -1);
+            pickedCardView = new CardView(pickedCard, -1, -1);
             view.getRootPane().getChildren().add(pickedCardView);
 
             // Set up mouse movement tracking
@@ -180,7 +182,7 @@ public final class GameController {
             game.setPickedCard(pickedCard);
             if (pickedCard != null) {
                 pickedCard = pickedCard.retourner();
-                pickedCardView = new CardView(pickedCard, -1);
+                pickedCardView = new CardView(pickedCard, -1, -1);
                 view.getRootPane().getChildren().add(pickedCardView);
 
                 // Set up mouse movement tracking
@@ -397,7 +399,7 @@ public final class GameController {
                 Card card = player.getCartes().get(i);
                 if (card.faceVisible()) {
                     for (CardView cardView : allCardViews) {
-                        if (cardView.getCardId() == card.id()) {
+                        if (cardView.getCardId() == card.id() && cardView.getIndex() == i && cardView.getPlayerId() == player.getId()) {
                             toFlip.add(cardView);
                             break;
                         }
@@ -407,6 +409,7 @@ public final class GameController {
         }
         animateCardFlipsSequentially(toFlip, onFinished);
     }
+    
 
     /**
      * Animates the flip for each CardView in the provided list sequentially.

@@ -20,6 +20,7 @@ import org.App.model.game.Card;
  * @version 1.0
  */
 public final class HumanPlayer implements Player {
+    private final int id;
     private final String nom;
     private final List<Card> cartes;
     private int commutativeScore = 0;
@@ -29,10 +30,21 @@ public final class HumanPlayer implements Player {
      *
      * @param nom The name of the human player.
      */
-    public HumanPlayer(String nom) {
+    public HumanPlayer(int id, String nom) {
+        this.id = id;
         this.nom = nom;
         this.cartes = new ArrayList<>();
         this.commutativeScore = 0;
+    }
+
+    /**
+     * Returns the unique identifier of the human player.
+     * 
+     * @return The unique identifier of the human player.
+     */
+    @Override
+    public int getId() {
+        return id;
     }
 
     /**

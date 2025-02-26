@@ -58,7 +58,7 @@ public class DiscardView extends StackPane {
     private void updateView() {
         getChildren().clear();
         if (topCard != null) {
-            CardView cardView = new CardView(topCard, -1);
+            CardView cardView = new CardView(topCard, -1, -1);
             cardView.setMouseTransparent(true); // Disable interactions to prevent multiple clicks
             getChildren().add(cardView);
         }

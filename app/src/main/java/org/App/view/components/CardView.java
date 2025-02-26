@@ -24,6 +24,7 @@ import javafx.util.Duration;
  * interactions.
  */
 public class CardView extends StackPane {
+    private final int playerId;
     private final int cardId;
     private Card value;
     private final int index;
@@ -31,7 +32,9 @@ public class CardView extends StackPane {
     private final Text frontText = new Text(); // Texte pour la face avant
     private final Text backText = new Text("?"); // Texte pour la face arrière
 
-    public CardView(Card value, int index) {
+    public CardView(Card value, int index ,int playerId) {
+
+        this.playerId = playerId;
         this.value = value;
         this.index = index;
         this.cardId = value.id();
@@ -56,6 +59,13 @@ public class CardView extends StackPane {
         backText.setVisible(true);
 
         setOnMouseClicked(event -> handleClick());
+    }
+
+    /**
+     * Gets the ID of the player who owns the card.
+     */
+    public int getPlayerId() {
+        return playerId;
     }
 
     /**

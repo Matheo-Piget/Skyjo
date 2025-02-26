@@ -29,6 +29,7 @@ import org.App.model.game.SkyjoGame;
  * @version 1.0
  */
 public class AIPlayer implements Player {
+    private final int id;
     private final String nom;
     private final List<Card> cartes;
     private final Difficulty difficulty;
@@ -43,7 +44,8 @@ public class AIPlayer implements Player {
      * 
      * @see Difficulty
      */
-    public AIPlayer(String nom, Difficulty difficulty) {
+    public AIPlayer(int id, String nom, Difficulty difficulty) {
+        this.id = id;
         this.nom = nom;
         this.cartes = new ArrayList<>();
         this.difficulty = difficulty;
@@ -257,6 +259,17 @@ public class AIPlayer implements Player {
                 GameController.getInstance().updateView();
             }
         }
+    }
+
+
+    /**
+     * Returns the unique identifier of the human player.
+     * 
+     * @return The unique identifier of the human player.
+     */
+    @Override
+    public int getId() {
+        return id;
     }
 
     /**

@@ -33,6 +33,7 @@ import org.App.model.player.Player;
  * @version 1.0
  */
 public final class SkyjoGame {
+    private int startingPlayerIndex = 0;
     private final List<Player> players;
     private List<Card> pick;
     private final List<Card> discard;
@@ -55,6 +56,26 @@ public final class SkyjoGame {
         this.players = List.copyOf(players);
         this.pick = createPick();
         this.discard = new ArrayList<>();
+    }
+
+
+    /**
+     * Gets the index of the starting player.
+     *
+     * @return The index of the starting player.
+     */
+    public int getStartingPlayerIndex() {
+        return startingPlayerIndex;
+    }
+
+
+    /**
+     * Gets the index of the current player.
+     *
+     * @return The index of the current player.
+     */
+    public void setIndexActualPlayer(int indexActualPlayer) {
+        this.indexActualPlayer = indexActualPlayer;
     }
 
     /**
@@ -477,7 +498,7 @@ public final class SkyjoGame {
      */
     public void revealInitialCards() {
         int highestTotal = -1;
-        int startingPlayerIndex = 0;
+        
 
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
@@ -498,7 +519,6 @@ public final class SkyjoGame {
                 startingPlayerIndex = i;
             }
         }
-        indexActualPlayer = startingPlayerIndex;
     }
 
     /**
