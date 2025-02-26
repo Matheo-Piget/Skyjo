@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
 
 import org.App.App;
-import org.App.controller.GameController;
 import org.App.model.game.Card;
-import org.App.model.game.CardValue;
 import org.App.model.player.Player;
 import org.App.view.components.BoardView;
 import org.App.view.components.CardView;
@@ -25,7 +22,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -518,9 +514,8 @@ public class GameView implements GameViewInterface {
     private void collectCardViews(Node node, List<CardView> cardViews) {
         if (node instanceof CardView) {
             cardViews.add((CardView) node);
-        }
-        if (node instanceof javafx.scene.Parent) {
-            for (Node child : ((javafx.scene.Parent) node).getChildrenUnmodifiable()) {
+        } else if (node instanceof Pane) {
+            for (Node child : ((Pane) node).getChildren()) {
                 collectCardViews(child, cardViews);
             }
         }
@@ -536,7 +531,7 @@ public class GameView implements GameViewInterface {
 
         List<CardView> cardViews = new ArrayList<>();
 
-        collectCardViews(rootPane, cardViews);
+        collectCardViews(cardsContainer, cardViews);
 
         System.out.println(cardViews.size());
 
@@ -974,6 +969,23 @@ public class GameView implements GameViewInterface {
         List<CardView> cardViews = getAllCardViews();
         for (CardView cardView : cardViews) {
             if (cardView.getIndex() == index) {
+                return cardView;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a card view by its associated card.
+     *
+     * @param allCardViews The list of all card views.
+     * @param card         The card to find the view for.
+     * @return The card view associated with the specified card, or null if not found.
+     */
+    @Override
+    public CardView findCardViewByCard(List<CardView> allCardViews, Card card) {
+        for (CardView cardView : allCardViews) {
+            if (cardView.getValue() == card) {
                 return cardView;
             }
         }

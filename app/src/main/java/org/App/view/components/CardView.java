@@ -24,6 +24,7 @@ import javafx.util.Duration;
  * interactions.
  */
 public class CardView extends StackPane {
+    private final int cardId;
     private Card value;
     private final int index;
     private final Rectangle cardBackground = new Rectangle(40, 60);
@@ -33,6 +34,7 @@ public class CardView extends StackPane {
     public CardView(Card value, int index) {
         this.value = value;
         this.index = index;
+        this.cardId = value.id();
 
         cardBackground.setStroke(Color.WHITE);
         cardBackground.setArcWidth(15);
@@ -54,6 +56,13 @@ public class CardView extends StackPane {
         backText.setVisible(true);
 
         setOnMouseClicked(event -> handleClick());
+    }
+
+    /**
+     * Gets the ID of the card.
+     */
+    public int getCardId() {
+        return cardId;
     }
 
     /**

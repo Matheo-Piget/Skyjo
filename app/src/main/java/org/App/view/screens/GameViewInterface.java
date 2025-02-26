@@ -40,4 +40,6 @@ public interface GameViewInterface {
 
     CardView getCardViewByIndex(int index);
 
+    CardView findCardViewByCard(List<CardView> cardViews, Card card);
+
 }

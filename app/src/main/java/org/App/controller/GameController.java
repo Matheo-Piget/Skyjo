@@ -385,20 +385,19 @@ public final class GameController {
      * (via revealInitialCards), this method finds the CardViews that still show
      * their back
      * and animates a flip for each to reveal the correct card.
+     * 
+     * @param onFinished The action to execute after all flips are completed.
      */
     private void animateInitialFlips(Runnable onFinished) {
-        // Retrieve all CardViews currently displayed in the view.
         List<CardView> allCardViews = view.getAllCardViews();
         List<CardView> toFlip = new ArrayList<>();
-
-        
+    
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < player.getCartes().size(); i++) {
                 Card card = player.getCartes().get(i);
-                if (!card.faceVisible()) {
-                    // Find the corresponding CardView in the view.
+                if (card.faceVisible()) {
                     for (CardView cardView : allCardViews) {
-                        if (cardView.getValue() == card) {
+                        if (cardView.getCardId() == card.id()) {
                             toFlip.add(cardView);
                             break;
                         }
@@ -411,6 +410,9 @@ public final class GameController {
 
     /**
      * Animates the flip for each CardView in the provided list sequentially.
+     * 
+     * @param cardViews  The list of CardViews to flip.
+     * @param onFinished The action to execute after all flips are completed.
      */
     private void animateCardFlipsSequentially(List<CardView> cardViews, Runnable onFinished) {
         if (cardViews.isEmpty()) {

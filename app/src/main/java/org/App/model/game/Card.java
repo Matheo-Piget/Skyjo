@@ -17,7 +17,20 @@ package org.App.model.game;
  * @author Mathéo Piget
  * @version 1.0
  */
-public record Card(CardValue valeur, boolean faceVisible) implements ICard {
+public record Card(CardValue valeur, boolean faceVisible, int id) implements ICard {
+
+    private static int cardId = 0;
+
+    /**
+     * Constructor for the Card class.
+     *
+     * @param valeur       The value of the card.
+     * @param faceVisible  The visibility state of the card.
+     * @param id           The unique identifier for the card.
+     */
+    public Card(CardValue valeur, boolean faceVisible) {
+        this(valeur, faceVisible, cardId++);
+    }
 
     /**
      * Flips the card to change its visibility state.
@@ -26,6 +39,6 @@ public record Card(CardValue valeur, boolean faceVisible) implements ICard {
      */
     @Override
     public Card retourner() {
-        return new Card(valeur, !faceVisible);
+        return new Card(valeur, !faceVisible, id);
     }
 }
