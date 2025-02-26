@@ -138,29 +138,37 @@ public class CardView extends StackPane {
      * Anime le retournement de la carte.
      */
     public void flipCard(Runnable onFinished) {
-        RotateTransition flip = new RotateTransition(Duration.seconds(0.5), this);
-        flip.setAxis(Rotate.Y_AXIS);
-        flip.setFromAngle(0);
-        flip.setToAngle(180);
-        flip.setInterpolator(Interpolator.EASE_BOTH);
-
-        // Gestion de la visibilité des textes pendant l'animation
-        flip.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.greaterThanOrEqualTo(Duration.seconds(0.25))) {
-                // À 90 degrés, on change l'apparence de la carte
-                updateCardAppearance();
-                frontText.setVisible(value.faceVisible());
-                backText.setVisible(!value.faceVisible());
-            }
+        // Première étape : rotation de 0 à 90 degrés
+        RotateTransition firstHalf = new RotateTransition(Duration.seconds(0.25), this);
+        firstHalf.setAxis(Rotate.Y_AXIS);
+        firstHalf.setFromAngle(0);
+        firstHalf.setToAngle(90);
+        firstHalf.setInterpolator(Interpolator.EASE_IN);
+        
+        // Deuxième étape : rotation de 90 à 180 degrés
+        RotateTransition secondHalf = new RotateTransition(Duration.seconds(0.25), this);
+        secondHalf.setAxis(Rotate.Y_AXIS);
+        secondHalf.setFromAngle(90);
+        secondHalf.setToAngle(180);
+        secondHalf.setInterpolator(Interpolator.EASE_OUT);
+        
+        firstHalf.setOnFinished(event -> {
+            // Au point médian, on met à jour l'apparence de la carte :
+            updateCardAppearance();
+            frontText.setVisible(value.faceVisible());
+            backText.setVisible(!value.faceVisible());
+            
+            // Lance la seconde moitié de l'animation
+            secondHalf.play();
         });
-
-        flip.setOnFinished(event -> {
+        
+        secondHalf.setOnFinished(event -> {
             if (onFinished != null) {
                 onFinished.run();
             }
         });
-
-        flip.play();
+        
+        firstHalf.play();
         SoundManager.playFlipSound();
     }
 
