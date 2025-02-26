@@ -246,28 +246,17 @@ public class GameView implements GameViewInterface {
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
 
         cardsContainer.getChildren().add(mainContainer);
+
         stage.show();
+
+        System.out.println(getAllCardViews().size());
     }
 
     /**
      * Clears the previous cards from the root pane.
      */
     private void clearPreviousCards() {
-        rootPane.getChildren().clear();
-    }
-
-    /**
-     * Adds card views to the root pane for all players.
-     *
-     * @param players The list of players.
-     */
-    private void addCardViewsToRootPane(List<Player> players) {
-        for (Player player : players) {
-            for (Card card : player.getCartes()) {
-                CardView cardView = new CardView(card, player.getCartes().indexOf(card));
-                rootPane.getChildren().add(cardView);
-            }
-        }
+        rootPane.getChildren().removeIf(node -> node instanceof CardView);
     }
 
     /**
@@ -368,7 +357,6 @@ public class GameView implements GameViewInterface {
         playerContainer.setMaxSize(200, 300);
 
         if (isCurrent) {
-            // Effet visuel pour le joueur actuel
             playerContainer.setStyle(
                     "-fx-background-color: #1E1E1E; -fx-border-color: gold; -fx-border-width: 3px; -fx-background-radius: 10px; -fx-border-radius: 10px; -fx-padding: 10px;");
             DropShadow shadow = new DropShadow(10, Color.GOLD);
@@ -545,10 +533,8 @@ public class GameView implements GameViewInterface {
      */
     @Override
     public List<CardView> getAllCardViews() {
-        
-        List<CardView> cardViews = new ArrayList<>();
 
-        
+        List<CardView> cardViews = new ArrayList<>();
 
         collectCardViews(rootPane, cardViews);
 
@@ -567,26 +553,15 @@ public class GameView implements GameViewInterface {
 
     @Override
     public void distributeCardsWithAnimation(List<Player> players, List<CardView> cardViews, Runnable onComplete) {
-        rootPane.getChildren().clear();
+        // Supprimer toutes les CardView non désirées
+        rootPane.getChildren().removeIf(node -> node instanceof CardView);
+
+        // Ajouter les nouvelles CardView
         rootPane.getChildren().addAll(cardViews);
 
         final int[] index = { 0 };
         Random random = new Random();
         List<CardAnimationTask> tasks = new ArrayList<>();
-
-        CardView distribView = new CardView(new Card(CardValue.CINQ, false), 0);
-
-        switch (players.size()) {
-            case 2 -> {
-                distribView.setLayoutX(550);
-                distribView.setLayoutY(600);
-            }
-            default -> {
-                distribView.setLayoutX(550);
-                distribView.setLayoutY(400);
-            }
-        }
-        rootPane.getChildren().add(distribView);
 
         // Pour chaque joueur, créer une tâche d'animation pour chaque carte.
         for (Player player : players) {
@@ -614,6 +589,14 @@ public class GameView implements GameViewInterface {
                 }
                 final int cardIndex = j;
 
+                // Réinitialiser la CardView
+                cardView.setLayoutX(startX);
+                cardView.setLayoutY(startY);
+                cardView.setRotate(0);
+                cardView.setTranslateX(0);
+                cardView.setTranslateY(0);
+                cardView.setVisible(true);
+
                 // Ajoute la tâche qui, une fois terminée, appellera onFinished.
                 tasks.add(onFinished -> {
                     animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, cardIndex,
@@ -624,7 +607,7 @@ public class GameView implements GameViewInterface {
 
         // Exécute les tâches d'animation une par une de manière séquentielle.
         animateTasksSequentially(tasks, onComplete);
-
+        cardsContainer.getChildren().clear();
     }
 
     /**
@@ -955,7 +938,7 @@ public class GameView implements GameViewInterface {
 
         parallelTransition.play();
     }
-    
+
     /**
      * Displays the first game view with the specified players, current player,
      * remaining cards, and top discard card.
@@ -968,10 +951,8 @@ public class GameView implements GameViewInterface {
     @Override
     public void firstShowPlaying(List<Player> players, String currentPlayerName, int remainingCards,
             Card topDiscardCard) {
-        
         clearPreviousCards();
         cardsContainer.getChildren().clear();
-        addCardViewsToRootPane(players);
         VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
         HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
         HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
@@ -979,12 +960,15 @@ public class GameView implements GameViewInterface {
         VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
         cardsContainer.getChildren().add(mainContainer);
         stage.show();
-        
-        
-
     }
 
-
+    /**
+     * Gets a card view by its index.
+     *
+     * @param index The index of the card view.
+     * @return The card view with the specified index, or null if not found.
+     */
+    @Override
     public CardView getCardViewByIndex(int index) {
 
         List<CardView> cardViews = getAllCardViews();
