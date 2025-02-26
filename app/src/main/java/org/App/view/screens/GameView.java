@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 
 import org.App.App;
 import org.App.controller.GameController;
@@ -521,18 +522,38 @@ public class GameView implements GameViewInterface {
     }
 
     /**
+     * Recursively collects all card views from the root pane.
+     *
+     * @param node      The current node to check.
+     * @param cardViews The list to collect card views.
+     */
+    private void collectCardViews(Node node, List<CardView> cardViews) {
+        if (node instanceof CardView) {
+            cardViews.add((CardView) node);
+        }
+        if (node instanceof javafx.scene.Parent) {
+            for (Node child : ((javafx.scene.Parent) node).getChildrenUnmodifiable()) {
+                collectCardViews(child, cardViews);
+            }
+        }
+    }
+
+    /**
      * Gets all the card views in the root pane.
      *
      * @return A list of all card views.
      */
     @Override
     public List<CardView> getAllCardViews() {
+        
         List<CardView> cardViews = new ArrayList<>();
-        for (Node node : rootPane.getChildren()) {
-            if (node instanceof CardView cardView) {
-                cardViews.add(cardView);
-            }
-        }
+
+        
+
+        collectCardViews(rootPane, cardViews);
+
+        System.out.println(cardViews.size());
+
         return cardViews;
     }
 
@@ -617,40 +638,6 @@ public class GameView implements GameViewInterface {
         }
         CardAnimationTask task = tasks.remove(0);
         task.run(() -> animateTasksSequentially(tasks, onComplete));
-    }
-
-    /**
-     * Animates cards for a player.
-     *
-     * @param player              The player to animate cards for.
-     * @param cardViews           The list of card views to animate.
-     * @param index               The current index of the card views.
-     * @param targetX             The target X position for the cards.
-     * @param targetY             The target Y position for the cards.
-     * @param remainingAnimations The number of remaining animations.
-     * @param onComplete          A callback to execute when the animation is
-     *                            complete.
-     */
-    private void animateCardsForPlayer(Player player, List<CardView> cardViews, int[] index, double targetX,
-            double targetY,
-            int[] remainingAnimations, Runnable onComplete) {
-
-        Random random = new Random();
-        for (int j = 0; j < player.getCartes().size(); j++) {
-            CardView cardView = cardViews.get(index[0]++);
-            double cardOffsetX = random.nextInt(75, 150);
-            double cardOffsetY = random.nextInt(75, 150);
-
-            int startX = 200;
-            int startY = 500;
-
-            animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, j, () -> {
-                remainingAnimations[0]--;
-                if (remainingAnimations[0] == 0) {
-                    onComplete.run();
-                }
-            });
-        }
     }
 
     /**
@@ -946,7 +933,7 @@ public class GameView implements GameViewInterface {
         // Rotation (la carte effectue une rotation pendant son trajet)
         RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.2), cardView);
         Random random = new Random();
-        double randomAngle = 270 + random.nextDouble() * 90; // angle aléatoire entre 270 et 360 degrés
+        double randomAngle = 310 + random.nextDouble() * 90; // angle aléatoire entre 270 et 360 degrés
         rotateTransition.setFromAngle(0);
         rotateTransition.setToAngle(randomAngle);
         rotateTransition.setInterpolator(Interpolator.EASE_OUT);
@@ -967,6 +954,46 @@ public class GameView implements GameViewInterface {
         });
 
         parallelTransition.play();
+    }
+    
+    /**
+     * Displays the first game view with the specified players, current player,
+     * remaining cards, and top discard card.
+     *
+     * @param players           The list of players.
+     * @param currentPlayerName The name of the current player.
+     * @param remainingCards    The number of remaining cards.
+     * @param topDiscardCard    The top discard card.
+     */
+    @Override
+    public void firstShowPlaying(List<Player> players, String currentPlayerName, int remainingCards,
+            Card topDiscardCard) {
+        
+        clearPreviousCards();
+        cardsContainer.getChildren().clear();
+        addCardViewsToRootPane(players);
+        VBox centerPlayerContainer = createPlayerBoard(getPlayerByName(players, currentPlayerName), true);
+        HBox topPlayersContainer = createSidePlayersContainer(players, currentPlayerName, true);
+        HBox bottomPlayersContainer = createSidePlayersContainer(players, currentPlayerName, false);
+        HBox centerArea = createCenterArea(remainingCards, topDiscardCard, centerPlayerContainer);
+        VBox mainContainer = createMainContainer(topPlayersContainer, centerArea, bottomPlayersContainer);
+        cardsContainer.getChildren().add(mainContainer);
+        stage.show();
+        
+        
+
+    }
+
+
+    public CardView getCardViewByIndex(int index) {
+
+        List<CardView> cardViews = getAllCardViews();
+        for (CardView cardView : cardViews) {
+            if (cardView.getIndex() == index) {
+                return cardView;
+            }
+        }
+        return null;
     }
 
     /**

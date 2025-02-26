@@ -35,4 +35,9 @@ public interface GameViewInterface {
     void show();
 
     List<CardView> getAllCardViews();
+
+    void firstShowPlaying(List<Player> players, String currentPlayerName, int remainingCards, Card topDiscardCard);
+
+    CardView getCardViewByIndex(int index);
+
 }

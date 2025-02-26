@@ -57,6 +57,13 @@ public class CardView extends StackPane {
     }
 
     /**
+     * Indicates whether the back of the card is visible.
+     */
+    public boolean isBackVisible() {
+        return backText.isVisible();
+    }
+
+    /**
      * Animates the card with a shaking effect.
      */
     private void shake(CardView cardView) {

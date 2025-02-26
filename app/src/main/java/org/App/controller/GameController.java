@@ -82,11 +82,18 @@ public final class GameController {
     private void initializeGameBoard() {
         addDelay(0.5, () -> {
             view.fadeInGameplayElements(view.getRootPane(), () -> {
-                view.setupBoardViews(game.getPlayers());
-                updateViewWithDelay(0.5);
-                game.revealInitialCards();
-                updateView();
-                handleAITurn();
+                view.firstShowPlaying(game.getPlayers(), game.getActualPlayer().getName(),
+                        game.getPick().size(), game.getTopDiscard());
+                addDelay(2, () -> {
+                    // Update the model: reveal the designated cards
+                    game.revealInitialCards();
+                    // Animate the flips for the corresponding CardViews
+                    animateInitialFlips(() -> {
+                        // After the flips are complete, update the view and proceed normally.
+                        updateView();
+                        handleAITurn();
+                    });
+                });
             });
         });
     }
@@ -120,10 +127,9 @@ public final class GameController {
     public void handlePickClick() {
         Card pickedCard = game.pickCard();
 
-        if (!pickedCard.faceVisible()){
+        if (!pickedCard.faceVisible()) {
             pickedCard = pickedCard.retourner();
         }
-
 
         game.setPickedCard(pickedCard);
         if (pickedCard != null) {
@@ -264,7 +270,7 @@ public final class GameController {
         if (game.getPick().isEmpty()) {
             game.pickEmpty();
         }
-    
+
         if (game.isFinished()) {
             if (game.isFinalRound()) {
                 concludeGame(); // Conclure la partie après le dernier tour
@@ -303,7 +309,7 @@ public final class GameController {
         Map<Player, Integer> ranking = game.getRanking();
         ranking.forEach((player, score) -> player.addScore(score));
         view.showRanking(ranking);
-    
+
         if (game.hasPlayerReached100Points()) {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
             finalRanking.forEach((player, score) -> player.addScore(score));
@@ -371,5 +377,51 @@ public final class GameController {
         PauseTransition delay = new PauseTransition(Duration.seconds(seconds));
         delay.setOnFinished(event -> action.run());
         delay.play();
+    }
+
+    /**
+     * Called after the distribution phase. Once the game model has updated the
+     * cards
+     * (via revealInitialCards), this method finds the CardViews that still show
+     * their back
+     * and animates a flip for each to reveal the correct card.
+     */
+    private void animateInitialFlips(Runnable onFinished) {
+        // Retrieve all CardViews currently displayed in the view.
+        List<CardView> allCardViews = view.getAllCardViews();
+        List<CardView> toFlip = new ArrayList<>();
+
+        
+        for (Player player : game.getPlayers()) {
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                Card card = player.getCartes().get(i);
+                if (!card.faceVisible()) {
+                    // Find the corresponding CardView in the view.
+                    for (CardView cardView : allCardViews) {
+                        if (cardView.getValue() == card) {
+                            toFlip.add(cardView);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        animateCardFlipsSequentially(toFlip, onFinished);
+    }
+
+    /**
+     * Animates the flip for each CardView in the provided list sequentially.
+     */
+    private void animateCardFlipsSequentially(List<CardView> cardViews, Runnable onFinished) {
+        if (cardViews.isEmpty()) {
+            onFinished.run();
+            return;
+        }
+        CardView cv = cardViews.remove(0);
+        cv.flipCard(() -> {
+            PauseTransition delay = new PauseTransition(Duration.seconds(0.1));
+            delay.setOnFinished(event -> animateCardFlipsSequentially(cardViews, onFinished));
+            delay.play();
+        });
     }
 }
