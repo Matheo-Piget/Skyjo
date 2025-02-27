@@ -62,15 +62,12 @@ public class OptionsView {
         // Title
         Label title = new Label();
         title.setText("Options");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
-        title.setTextFill(Color.WHITE);
-        title.setEffect(new DropShadow(10, Color.BLACK));
         title.setId("options-title");
 
         // Theme selection
         GridPane themePanel = createPanel("");
         Label themeLabel = new Label("Select theme:");
-        themeLabel.setTextFill(Color.WHITE);
+        themeLabel.getStyleClass().add("label");
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Clair", "Sombre");
         themeComboBox.setValue(OptionsManager.getTheme());
@@ -88,7 +85,7 @@ public class OptionsView {
         // Volume control
         GridPane volumePanel = createPanel("");
         Label volumeLabel = new Label("Adjust volume:");
-        volumeLabel.setTextFill(Color.WHITE);
+        volumeLabel.getStyleClass().add("label");
         Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             musicManager.setVolume(newVal.doubleValue());
@@ -138,9 +135,7 @@ public class OptionsView {
         panel.setHgap(20);
         panel.setVgap(10);
         panel.setPadding(new Insets(20));
-        panel.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 10; -fx-background-radius: 10;");
-
+        panel.getStyleClass().add("panel");
         Label panelTitle = new Label(title);
         panelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         panelTitle.setTextFill(Color.WHITE);

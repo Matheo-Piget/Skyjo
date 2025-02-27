@@ -35,10 +35,34 @@
   -fx-transition: all 0.3s ease;
 }
 
-.button:hover {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #515a77);
-  -fx-scale-x: 1.1;
-  -fx-scale-y: 1.1;
+.button-primary {
+  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+}
+
+.button-primary:hover {
+  -fx-background-color: linear-gradient(to bottom, #5a7994, #4a6984);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.button-secondary {
+  -fx-background-color: linear-gradient(to bottom, #3a506b, #2c3e50);
+}
+
+.button-secondary:hover {
+  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.button-danger {
+  -fx-background-color: linear-gradient(to bottom, #6b4f4f, #5b4545);
+}
+
+.button-danger:hover {
+  -fx-background-color: linear-gradient(to bottom, #7b5f5f, #6b4f4f);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
 }
 
 .button:pressed {
@@ -58,7 +82,7 @@
 }
 
 .text-field:focused {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #4e5d75);
+  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
 }
 
 .combo-box {
@@ -74,7 +98,7 @@
 }
 
 .combo-box:hover {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #4e5d75);
+  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
 }
 
 .combo-box .list-cell {
@@ -83,5 +107,5 @@
 }
 
 .combo-box .list-cell:hover {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #4e5d75);
+  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
 }

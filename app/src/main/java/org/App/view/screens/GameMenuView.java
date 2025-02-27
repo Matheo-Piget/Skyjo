@@ -71,8 +71,6 @@ public class GameMenuView {
         this.aiCountField = new TextField("1");
         this.hasPressOnGenerateFieldsButton = false;
 
-        
-
         setupMenu();
 
         applySavedOptions();
@@ -108,7 +106,7 @@ public class GameMenuView {
         }
 
         if (mode.equals("Action")) {
-            //TODO Démarrer le skyjo mais en action
+            // TODO Démarrer le skyjo mais en action
         }
     }
 
@@ -134,23 +132,24 @@ public class GameMenuView {
         playerCountField.setPrefWidth(50);
         playerCountField.setMaxWidth(200);
 
-        Button generateFieldsButton = createStyledButton("Configurer joueurs");
+        Button generateFieldsButton = createStyledButton("Générer", "button-secondary");
+
         generateFieldsButton.setOnAction(e -> {
             hasPressOnGenerateFieldsButton = true;
             generatePlayerFields(playerCountField);
         });
 
-        Button startButton = createStyledButton("Démarrer la partie");
+        Button startButton = createStyledButton("Start", "button-primary");
         startButton.setOnAction(e -> {
             if (hasPressOnGenerateFieldsButton) {
                 startGame();
             }
         });
 
-        Button optionsButton = createStyledButton("Options");
+        Button optionsButton = createStyledButton("Options", "button-secondary");
         optionsButton.setOnAction(e -> openOptionsMenu());
 
-        Button quitButton = createStyledButton("Quitter");
+        Button quitButton = createStyledButton("Quitter", "button-danger");
         quitButton.setOnAction(e -> stage.close());
 
         // Agencement du menu
@@ -220,7 +219,7 @@ public class GameMenuView {
             aiCountField.setMaxWidth(240);
             styleTextField(aiCountField);
 
-            Button confirmAIButton = createStyledButton("Ajouter IA");
+            Button confirmAIButton = createStyledButton("Ajouter IA", "button-secondary");
             confirmAIButton.setOnAction(e -> {
                 clearAIFields();
                 generateAIFields();
@@ -344,12 +343,13 @@ public class GameMenuView {
      * @param text The text to display on the button.
      * @return The styled button.
      */
-    private Button createStyledButton(String text) {
+    private Button createStyledButton(String text, String styleClass) {
         Button button = new Button(text);
-        button.getStyleClass().add("button");
+        button.getStyleClass().addAll("button", styleClass);
         button.setPrefSize(200, 40);
         return button;
     }
+    
 
     /**
      * Applies a style to the specified text field.

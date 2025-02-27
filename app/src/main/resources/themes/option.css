@@ -32,7 +32,7 @@
 }
 
 .button:hover {
-    -fx-background-color: linear-gradient(to bottom, #6272a4, #4e5d75);
+    -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
