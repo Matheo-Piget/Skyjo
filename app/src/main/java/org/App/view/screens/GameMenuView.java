@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -259,14 +260,19 @@ public class GameMenuView {
             return;
         }
 
+        GridPane aiGrid = new GridPane();
+        aiGrid.setHgap(20);
+        aiGrid.setVgap(10);
+        int columns = 2;
+
         for (int i = 1; i <= numAI; i++) {
             ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
             difficultyBox.getItems().addAll(Player.Difficulty.values());
             difficultyBox.setValue(Player.Difficulty.MEDIUM);
             difficultyBox.setPrefWidth(150);
             difficultyBox.setMaxWidth(150);
-            difficultyBox.setMaxHeight(40);
             difficultyBox.setPrefHeight(40);
+            difficultyBox.setMaxHeight(40);
             styleComboBox(difficultyBox);
             difficultyBoxes.add(difficultyBox);
 
@@ -275,8 +281,13 @@ public class GameMenuView {
 
             HBox aiBox = new HBox(10, lab, difficultyBox);
             aiBox.setAlignment(Pos.CENTER);
-            playerInputs.getChildren().add(aiBox);
+
+            int row = (i - 1) / columns;
+            int col = (i - 1) % columns;
+            aiGrid.add(aiBox, col, row);
         }
+        aiGrid.setAlignment(Pos.CENTER);
+        playerInputs.getChildren().add(aiGrid);
     }
 
     /**
