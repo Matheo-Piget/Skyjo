@@ -144,13 +144,16 @@ public class CardView extends StackPane {
         firstHalf.setFromAngle(0);
         firstHalf.setToAngle(90);
         firstHalf.setInterpolator(Interpolator.EASE_IN);
-        
-        // La deuxième étape sera créée après la mise à jour de la référence
+    
+        // Inverser le texte pendant la rotation
+        frontText.setScaleX(-1);
+    
         firstHalf.setOnFinished(event -> {
             // Actualise la référence de la carte avec la nouvelle instance retournée
             setValue(value.retourner());
             // Met à jour l'apparence de la carte après la mise à jour
             updateCardAppearance();
+    
             // Lance la deuxième étape de l'animation : rotation de 90 à 180 degrés
             RotateTransition secondHalf = new RotateTransition(Duration.seconds(0.25), this);
             secondHalf.setAxis(Rotate.Y_AXIS);
@@ -164,8 +167,9 @@ public class CardView extends StackPane {
             });
             secondHalf.play();
         });
-        
+    
         firstHalf.play();
+        
         SoundManager.playFlipSound();
     }
 

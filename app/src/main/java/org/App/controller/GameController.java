@@ -221,9 +221,6 @@ public final class GameController {
             });
         } else if (game.hasDiscard() && game.getCountReveal() < 1) {
             cardView.flipCard(() -> {
-                if (cardView.isFlipped()) {
-                    return;
-                }
                 game.revealCard(game.getActualPlayer(), cardView.getIndex());
                 updateView(); // Mettre à jour la vue après avoir révélé la carte
                 game.incrementCountReveal();
@@ -280,24 +277,16 @@ public final class GameController {
             } else {
                 game.setFinalRound(true);
                 addDelay(0.2, () -> {
-                    fadeOutCurrentPlayer(() -> {
-                        game.nextPlayer();
-                        fadeInNextPlayer(() -> {
-                            updateView();
-                            handleAITurn();
-                        });
-                    });
+                    game.nextPlayer();
+                    updateView();
+                    handleAITurn();
                 });
             }
         } else {
             addDelay(0.2, () -> {
-                fadeOutCurrentPlayer(() -> {
-                    game.nextPlayer();
-                    fadeInNextPlayer(() -> {
-                        updateView();
-                        handleAITurn();
-                    });
-                });
+                game.nextPlayer();
+                updateView();
+                handleAITurn();
             });
         }
     }
@@ -321,7 +310,8 @@ public final class GameController {
      * Fades in the next player's view and executes the provided action when
      * finished.
      * 
-     * @param onFinished The action to execute after fading in the next player's view.
+     * @param onFinished The action to execute after fading in the next player's
+     *                   view.
      */
     private void fadeInNextPlayer(Runnable onFinished) {
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), view.getRootPane());
