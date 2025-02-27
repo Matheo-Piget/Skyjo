@@ -901,7 +901,7 @@ public class GameView implements GameViewInterface {
         cardView.setRotate(0);
 
         // Translation de la carte avec une interpolation plus fluide
-        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), cardView);
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.2), cardView);
         translateTransition.setFromX(0);
         translateTransition.setFromY(0);
         translateTransition.setToX(targetX - startX);
@@ -909,7 +909,7 @@ public class GameView implements GameViewInterface {
         translateTransition.setInterpolator(Interpolator.EASE_OUT);
 
         // Rotation de la carte avec un angle aléatoire
-        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.5), cardView);
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.2), cardView);
         Random random = new Random();
         double randomAngle = 360 * random.nextDouble(); // Rotation aléatoire entre 0 et 360 degrés
         rotateTransition.setFromAngle(0);

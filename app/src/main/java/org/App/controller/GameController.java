@@ -279,7 +279,7 @@ public final class GameController {
                 concludeGame();
             } else {
                 game.setFinalRound(true);
-                addDelay(0.3, () -> {
+                addDelay(0.2, () -> {
                     fadeOutCurrentPlayer(() -> {
                         game.nextPlayer();
                         fadeInNextPlayer(() -> {
@@ -290,7 +290,7 @@ public final class GameController {
                 });
             }
         } else {
-            addDelay(0.3, () -> {
+            addDelay(0.2, () -> {
                 fadeOutCurrentPlayer(() -> {
                     game.nextPlayer();
                     fadeInNextPlayer(() -> {

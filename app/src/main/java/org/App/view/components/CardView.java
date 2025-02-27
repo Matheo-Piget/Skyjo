@@ -145,27 +145,24 @@ public class CardView extends StackPane {
         firstHalf.setToAngle(90);
         firstHalf.setInterpolator(Interpolator.EASE_IN);
         
-        // Deuxième étape : rotation de 90 à 180 degrés
-        RotateTransition secondHalf = new RotateTransition(Duration.seconds(0.25), this);
-        secondHalf.setAxis(Rotate.Y_AXIS);
-        secondHalf.setFromAngle(90);
-        secondHalf.setToAngle(180);
-        secondHalf.setInterpolator(Interpolator.EASE_OUT);
-        
+        // La deuxième étape sera créée après la mise à jour de la référence
         firstHalf.setOnFinished(event -> {
-            // Au point médian, on met à jour l'apparence de la carte :
+            // Actualise la référence de la carte avec la nouvelle instance retournée
+            setValue(value.retourner());
+            // Met à jour l'apparence de la carte après la mise à jour
             updateCardAppearance();
-            frontText.setVisible(value.faceVisible());
-            backText.setVisible(!value.faceVisible());
-            
-            // Lance la seconde moitié de l'animation
+            // Lance la deuxième étape de l'animation : rotation de 90 à 180 degrés
+            RotateTransition secondHalf = new RotateTransition(Duration.seconds(0.25), this);
+            secondHalf.setAxis(Rotate.Y_AXIS);
+            secondHalf.setFromAngle(90);
+            secondHalf.setToAngle(180);
+            secondHalf.setInterpolator(Interpolator.EASE_OUT);
+            secondHalf.setOnFinished(e -> {
+                if (onFinished != null) {
+                    onFinished.run();
+                }
+            });
             secondHalf.play();
-        });
-        
-        secondHalf.setOnFinished(event -> {
-            if (onFinished != null) {
-                onFinished.run();
-            }
         });
         
         firstHalf.play();
