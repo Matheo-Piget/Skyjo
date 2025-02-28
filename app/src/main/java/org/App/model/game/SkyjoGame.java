@@ -376,6 +376,9 @@ public final class SkyjoGame {
             discard.clear();
         players.forEach(player -> player.getCartes().clear());
 
+        pick.clear();
+        discard.clear();
+
         pick = createPick(); // Créer une nouvelle pioche
         players.forEach(player -> {
             player.getCartes().addAll(pick.subList(0, 12)); // Donner 12 cartes à chaque joueur

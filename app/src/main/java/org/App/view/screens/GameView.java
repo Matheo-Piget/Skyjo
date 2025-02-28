@@ -37,6 +37,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -384,30 +385,51 @@ public class GameView implements GameViewInterface {
     @Override
     public void showFinalRanking(Map<Player, Integer> ranking) {
         cardsContainer.getChildren().clear();
-        VBox rankingContainer = new VBox(10);
+        VBox rankingContainer = new VBox(20);
         rankingContainer.setAlignment(Pos.CENTER);
+        rankingContainer.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-padding: 20; -fx-border-radius: 15;");
 
         Text rankingTitle = new Text("Classement final :");
-        rankingTitle.setFont(Font.font("Arial", 24));
-        rankingTitle.setFill(Color.LIGHTGRAY);
+        rankingTitle.setFont(Font.font("Roboto", FontWeight.BOLD, 30));
+        rankingTitle.setFill(Color.web("#ff79c6"));
+        rankingTitle.setEffect(new DropShadow(5, Color.BLACK));
         rankingContainer.getChildren().add(rankingTitle);
 
         ranking.forEach((player, score) -> {
+            HBox playerScoreBox = new HBox(15);
+            playerScoreBox.setAlignment(Pos.CENTER_LEFT);
+
+            Rectangle playerIcon = new Rectangle(25, 25);
+            playerIcon.setFill(Color.web("#bd93f9"));
+            playerIcon.setArcWidth(10);
+            playerIcon.setArcHeight(10);
+            playerIcon.setEffect(new DropShadow(3, Color.BLACK));
+
             Text playerScore = new Text(player.getName() + ": " + score + " points");
-            playerScore.setFont(Font.font("Arial", 18));
+            playerScore.setFont(Font.font("Roboto", 20));
             playerScore.setFill(Color.WHITE);
-            rankingContainer.getChildren().add(playerScore);
+
+            playerScoreBox.getChildren().addAll(playerIcon, playerScore);
+            rankingContainer.getChildren().add(playerScoreBox);
         });
 
         Button restartButton = new Button("Nouvelle partie");
+        restartButton.setStyle(
+                "-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10 20; -fx-border-radius: 10;");
         restartButton.setOnAction(event -> {
-            // Redémarrer une nouvelle partie
             stage.close();
             App.getINSTANCE().restart();
         });
+        restartButton.setEffect(new DropShadow(5, Color.BLACK));
 
         rankingContainer.getChildren().add(restartButton);
         cardsContainer.getChildren().add(rankingContainer);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), rankingContainer);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+
         stage.show();
     }
 
@@ -420,33 +442,42 @@ public class GameView implements GameViewInterface {
     @Override
     public void showRanking(Map<Player, Integer> ranking) {
         cardsContainer.getChildren().clear();
-        VBox rankingContainer = new VBox(10);
+        VBox rankingContainer = new VBox(20);
         rankingContainer.setAlignment(Pos.CENTER);
+        rankingContainer.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-padding: 20; -fx-border-radius: 15;");
 
         Text rankingTitle = new Text("Classement des joueurs:");
-        rankingTitle.setFont(Font.font("Arial", 24));
-        rankingTitle.setFill(Color.LIGHTGRAY);
+        rankingTitle.setFont(Font.font("Roboto", FontWeight.BOLD, 30));
+        rankingTitle.setFill(Color.web("#ff79c6"));
+        rankingTitle.setEffect(new DropShadow(5, Color.BLACK));
         rankingContainer.getChildren().add(rankingTitle);
 
         ranking.forEach((player, score) -> {
-            HBox playerScoreBox = new HBox(10);
+            HBox playerScoreBox = new HBox(15);
             playerScoreBox.setAlignment(Pos.CENTER_LEFT);
 
-            // Icône pour le joueur
-            Rectangle playerIcon = new Rectangle(20, 20);
-            playerIcon.setFill(Color.GOLD); // Couleur personnalisée pour chaque joueur
+            Rectangle playerIcon = new Rectangle(25, 25);
+            playerIcon.setFill(Color.web("#bd93f9"));
             playerIcon.setArcWidth(10);
             playerIcon.setArcHeight(10);
+            playerIcon.setEffect(new DropShadow(3, Color.BLACK));
 
             Text playerScore = new Text(player.getName() + ": " + score);
-            playerScore.setFont(Font.font("Arial", 18));
+            playerScore.setFont(Font.font("Roboto", 20));
             playerScore.setFill(Color.WHITE);
 
             playerScoreBox.getChildren().addAll(playerIcon, playerScore);
             rankingContainer.getChildren().add(playerScoreBox);
         });
 
+        rankingContainer.setAlignment(Pos.CENTER);
         cardsContainer.getChildren().add(rankingContainer);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), rankingContainer);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+
         stage.show();
     }
 
