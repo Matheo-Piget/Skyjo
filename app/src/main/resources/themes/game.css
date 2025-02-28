@@ -1,15 +1,31 @@
-.root {
+.root1{
   -fx-background-color: linear-gradient(to bottom, #2c3e50, #1a252f);
   -fx-font-family: 'Arial', sans-serif;
   -fx-background-size: cover;
   -fx-background-repeat: no-repeat;
+  -fx-background-position: center;
+  -fx-animation: background-pan 20s linear infinite;
+}
+
+@keyframes background-pan {
+  0% {
+    -fx-background-position: 0% 50%;
+  }
+  50% {
+    -fx-background-position: 100% 50%;
+  }
+  100% {
+    -fx-background-position: 0% 50%;
+  }
 }
 
 .vbox {
-  -fx-background-color: transparent;
+  -fx-background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent for better blending */
   -fx-padding: 40;
   -fx-spacing: 30;
   -fx-alignment: center;
+  -fx-border-radius: 15px;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
 }
 
 .menu-item {

@@ -17,9 +17,12 @@
 }
 
 .number-of-players-label {
-  -fx-font-size: 24px;
-  -fx-fill: #f8f8f2;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 4, 0, 0, 2);
+  -fx-font-size: 26px;
+  -fx-font-family: 'Arial', sans-serif;
+  -fx-fill: linear-gradient(to right, #f8f8f2, #dcdcdc);
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 6, 0, 0, 3);
+  -fx-font-weight: bold;
+  -fx-padding: 10;
 }
 
 .button {
