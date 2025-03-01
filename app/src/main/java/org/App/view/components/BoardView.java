@@ -30,6 +30,9 @@ public class BoardView extends GridPane {
         int cols = cardViews.size() / 3;
 
         for (int i = 0; i < cardViews.size(); i++) {
+            if (cols == 0) {
+                cols = 1;
+            }
             int row = i / cols;
             int col = i % cols;
             this.add(cardViews.get(i), col, row);
