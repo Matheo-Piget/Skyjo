@@ -336,7 +336,7 @@ public final class GameController {
         game.revealAllCards();
         Map<Player, Integer> ranking = game.getRanking();
         ranking.forEach((player, score) -> player.addScore(score));
-        view.showRanking(ranking);
+        addDelay(2, () -> view.showRanking(ranking));
 
         if (game.hasPlayerReached100Points()) {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
