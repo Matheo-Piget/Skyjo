@@ -85,6 +85,7 @@ public class CardView extends StackPane {
     /**
      * Animates the card with a shaking effect.
      */
+    @SuppressWarnings("unused")
     private void shake(CardView cardView) {
         TranslateTransition shakeTransition = new TranslateTransition(Duration.millis(100), cardView);
         shakeTransition.setFromX(0);

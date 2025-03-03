@@ -546,11 +546,14 @@ public class GameView implements GameViewInterface {
      * @param cardViews The list to collect card views.
      */
     private void collectCardViews(Node node, List<CardView> cardViews) {
-        if (node instanceof CardView) {
-            cardViews.add((CardView) node);
-        } else if (node instanceof Pane) {
-            for (Node child : ((Pane) node).getChildren()) {
-                collectCardViews(child, cardViews);
+        switch (node) {
+            case CardView cardView -> cardViews.add(cardView);
+            case Pane pane -> {
+                for (Node child : pane.getChildren()) {
+                    collectCardViews(child, cardViews);
+                }
+            }
+            default -> {
             }
         }
     }
@@ -616,7 +619,6 @@ public class GameView implements GameViewInterface {
                         startY = 410;
                     }
                 }
-                final int cardIndex = j;
 
                 // Réinitialiser la CardView
                 cardView.setLayoutX(startX);
@@ -628,7 +630,7 @@ public class GameView implements GameViewInterface {
 
                 // Ajoute la tâche qui, une fois terminée, appellera onFinished.
                 tasks.add(onFinished -> {
-                    animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY, cardIndex,
+                    animateCard(cardView, startX, startY, targetX + cardOffsetX, targetY + cardOffsetY,
                             onFinished);
                 });
             }
@@ -928,8 +930,7 @@ public class GameView implements GameViewInterface {
      * @param cardIndex  The index of the card.
      * @param onFinished A callback to execute when the animation is complete.
      */
-    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY,
-            int cardIndex, Runnable onFinished) {
+    private void animateCard(CardView cardView, double startX, double startY, double targetX, double targetY, Runnable onFinished) {
         cardView.setLayoutX(startX);
         cardView.setLayoutY(startY);
         cardView.setRotate(0);

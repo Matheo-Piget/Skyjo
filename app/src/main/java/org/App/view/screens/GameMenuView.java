@@ -104,10 +104,6 @@ public class GameMenuView {
         if (volume != musicManager.getVolume()) {
             musicManager.setVolume(volume);
         }
-
-        if (mode.equals("Action")) {
-            // TODO Démarrer le skyjo mais en action
-        }
     }
 
     /**
@@ -310,12 +306,6 @@ public class GameMenuView {
 
         GameViewInterface gameView = new GameView(stage);
         GameController controller = new GameController(gameView, players);
-
-        // Appliquer le mode enregistré
-        String mode = OptionsManager.getMode();
-        if (mode.equals("Action")) {
-            // TODO : Démarrer le skyjo en mode action
-        }
 
         stage.setScene(gameView.getScene());
         stage.setFullScreen(true);

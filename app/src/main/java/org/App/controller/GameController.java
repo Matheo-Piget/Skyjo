@@ -302,6 +302,7 @@ public final class GameController {
      * @param onFinished The action to execute after
      *                   fading out the current player's view.
      */
+    @SuppressWarnings("unused")
     private void fadeOutCurrentPlayer(Runnable onFinished) {
         FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), view.getRootPane());
         fadeOut.setFromValue(1.0);
@@ -317,6 +318,7 @@ public final class GameController {
      * @param onFinished The action to execute after fading in the next player's
      *                   view.
      */
+    @SuppressWarnings("unused")
     private void fadeInNextPlayer(Runnable onFinished) {
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), view.getRootPane());
         fadeIn.setFromValue(0.0);
