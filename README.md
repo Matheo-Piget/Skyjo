@@ -26,11 +26,11 @@ Skyjo is a popular card game where players aim to have the lowest score by manag
 
 The project is organized into several modules, each responsible for different aspects of the game:
 
--🎮 **Game Logic**: Contains the core game mechanics and rules.
--🤖 **AI**: Implements the artificial intelligence for computer-controlled players.
--🖥️ **UI**: Manages the user interface and animations.
+- 🎮 **Game Logic**: Contains the core game mechanics and rules.
+- 🤖 **AI**: Implements the artificial intelligence for computer-controlled players.
+- 🖥️ **UI**: Manages the user interface and animations.
 - 🎵**Sound**: Handles sound effects and background music.
--⚙️ **Options**: Provides customizable settings for themes, game modes, and volume.
+- ⚙️ **Options**: Provides customizable settings for themes, game modes, and volume.
 - 🏆**Rankings**: Calculates and displays the final game rankings.
 
 ## Technologies Used

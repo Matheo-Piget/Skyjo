@@ -376,6 +376,16 @@ public class GameView implements GameViewInterface {
         return cardViews;
     }
 
+
+    /**
+     * Clears all elements from the game view.
+     */
+    @Override
+    public void clearAll() {
+        rootPane.getChildren().clear();
+        cardsContainer.getChildren().clear();
+    }
+
     /**
      * Displays the final ranking of players.
      *

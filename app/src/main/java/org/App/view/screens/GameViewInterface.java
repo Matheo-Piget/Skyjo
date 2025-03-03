@@ -42,4 +42,6 @@ public interface GameViewInterface {
 
     CardView findCardViewByCard(List<CardView> cardViews, Card card);
 
+    void clearAll();
+
 }

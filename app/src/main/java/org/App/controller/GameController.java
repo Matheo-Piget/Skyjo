@@ -71,7 +71,6 @@ public final class GameController {
      */
     public void startGame() {
         game.startGame();
-
         List<CardView> cardViews = createCardViews();
         view.distributeCardsWithAnimation(game.getPlayers(), cardViews, this::initializeGameBoard);
     }
@@ -343,7 +342,7 @@ public final class GameController {
             finalRanking.forEach((player, score) -> player.addScore(score));
             view.showFinalRanking(finalRanking);
         } else {
-            restartRoundWithDelay(15);
+            restartRoundWithDelay(5);
         }
     }
 
@@ -357,11 +356,8 @@ public final class GameController {
      */
     private void restartRoundWithDelay(double seconds) {
         addDelay(seconds, () -> {
-            game.startGame();
-            view.setupBoardViews(game.getPlayers());
-            game.revealInitialCards();
-            updateView();
-            handleAITurn();
+            view.clearAll();
+            startGame();
         });
     }
 
