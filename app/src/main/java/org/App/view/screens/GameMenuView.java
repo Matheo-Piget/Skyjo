@@ -45,7 +45,6 @@ import javafx.stage.Stage;
  * @version 1.0
  */
 public class GameMenuView {
-    private final TextField aiCountField;
     private final Stage stage;
     private final VBox playerInputs;
     private final List<TextField> nameFields;
@@ -68,7 +67,6 @@ public class GameMenuView {
         this.difficultyBoxes = new ArrayList<>();
         this.playerInputs = new VBox(10);
         this.playerInputs.setAlignment(Pos.CENTER);
-        this.aiCountField = new TextField("1");
         this.hasPressOnGenerateFieldsButton = false;
 
         setupMenu();
@@ -107,6 +105,90 @@ public class GameMenuView {
     }
 
     /**
+     * Generates input fields for the specified number of players and AI.
+     *
+     * @param playerCountField The text field containing the number of players.
+     * @param aiCountField     The text field containing the number of AI players.
+     */
+    private void generatePlayerFields(TextField playerCountField, TextField aiCountField) {
+        playerInputs.getChildren().clear();
+        nameFields.clear();
+        difficultyBoxes.clear();
+
+        int numPlayers;
+        int numAI;
+        try {
+            numPlayers = Integer.parseInt(playerCountField.getText());
+            numAI = Integer.parseInt(aiCountField.getText());
+            if (numPlayers < 1 || numPlayers + numAI > 8 || numAI < 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            Label errorLabel = new Label("Veuillez entrer un nombre valide de joueurs et d'IA (total max 8).");
+            errorLabel.setTextFill(Color.RED);
+            playerInputs.getChildren().add(errorLabel);
+            return;
+        }
+
+        // Ajouter les champs pour les joueurs humains
+        for (int i = 1; i <= numPlayers; i++) {
+            TextField nameField = new TextField("Joueur " + i);
+            nameField.setPromptText("Nom du Joueur " + i);
+            styleTextField(nameField);
+            nameField.setPrefWidth(200);
+            nameField.setMaxWidth(200);
+            nameFields.add(nameField);
+            playerInputs.getChildren().add(nameField);
+        }
+
+        // Ajouter les champs pour les IA
+        if (numAI > 0) {
+            GridPane aiGrid = new GridPane();
+            aiGrid.setHgap(20);
+            aiGrid.setVgap(10);
+            int columns;
+
+            columns = switch (numAI) {
+                case 1 -> 1;
+                case 2 -> 2;
+                case 3 -> 3;
+                case 4 -> 2;
+                case 5 -> 3;
+                case 6 -> 3;
+                case 7 -> 4;
+                default -> 4;
+            };
+
+            for (int i = 1; i <= numAI; i++) {
+                ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
+                difficultyBox.getItems().addAll(Player.Difficulty.values());
+                difficultyBox.setValue(Player.Difficulty.MEDIUM);
+                difficultyBox.setPrefWidth(150);
+                difficultyBox.setMaxWidth(150);
+                difficultyBox.setPrefHeight(40);
+                difficultyBox.setMaxHeight(40);
+                styleComboBox(difficultyBox);
+                difficultyBoxes.add(difficultyBox);
+
+                Label lab = new Label("IA " + i + " :");
+                lab.setTextFill(Color.WHITE);
+                lab.setStyle("-fx-font-size: 16px;");
+                lab.setEffect(new DropShadow(5, Color.BLACK));
+                
+
+                HBox aiBox = new HBox(10, lab, difficultyBox);
+                aiBox.setAlignment(Pos.CENTER);
+
+                int row = (i - 1) / columns;
+                int col = (i - 1) % columns;
+                aiGrid.add(aiBox, col, row);
+            }
+            aiGrid.setAlignment(Pos.CENTER);
+            playerInputs.getChildren().add(aiGrid);
+        }
+    }
+
+    /**
      * Sets up the main menu with all its components.
      */
     private void setupMenu() {
@@ -120,7 +202,7 @@ public class GameMenuView {
         title.setTextFill(Color.WHITE);
         title.setEffect(new DropShadow(5, Color.BLACK));
 
-        Label playerCountLabel = new Label("Nombre de joueurs :");
+        Label playerCountLabel = new Label("Nombre de joueurs humains :");
         playerCountLabel.setTextFill(Color.WHITE);
         playerCountLabel.getStyleClass().add("number-of-players-label");
 
@@ -128,11 +210,18 @@ public class GameMenuView {
         playerCountField.setPrefWidth(50);
         playerCountField.setMaxWidth(200);
 
-        Button generateFieldsButton = createStyledButton("Générer", "button-secondary");
+        Label aiCountLabel = new Label("Nombre d'IA :");
+        aiCountLabel.setTextFill(Color.WHITE);
+        aiCountLabel.getStyleClass().add("number-of-players-label");
 
+        TextField aiCountField = new TextField("1");
+        aiCountField.setPrefWidth(50);
+        aiCountField.setMaxWidth(200);
+
+        Button generateFieldsButton = createStyledButton("Générer", "button-secondary");
         generateFieldsButton.setOnAction(e -> {
             hasPressOnGenerateFieldsButton = true;
-            generatePlayerFields(playerCountField);
+            generatePlayerFields(playerCountField, aiCountField);
         });
 
         Button startButton = createStyledButton("Start", "button-primary");
@@ -156,11 +245,10 @@ public class GameMenuView {
         optionsBox.setAlignment(Pos.CENTER);
         optionsBox.setPadding(new Insets(20));
 
-        menuContainer.getChildren().addAll(title, playerCountLabel, playerCountField, buttonBox, playerInputs,
-                optionsBox);
+        menuContainer.getChildren().addAll(title, playerCountLabel, playerCountField, aiCountLabel, aiCountField,
+                buttonBox, playerInputs, optionsBox);
 
         // Scene
-
         if (OptionsManager.getTheme().equals("Sombre")) {
             Scene scene = new Scene(menuContainer, 700, 500);
             scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
@@ -170,119 +258,6 @@ public class GameMenuView {
             scene.getStylesheets().add(getClass().getResource("/themes/menu_light.css").toExternalForm());
             stage.setScene(scene);
         }
-    }
-
-    /**
-     * Generates input fields for the specified number of players.
-     *
-     * @param playerCountField The text field containing the number of players.
-     */
-    private void generatePlayerFields(TextField playerCountField) {
-        playerInputs.getChildren().clear();
-        nameFields.clear();
-        difficultyBoxes.clear();
-
-        int numPlayers;
-        try {
-            numPlayers = Integer.parseInt(playerCountField.getText());
-            if (numPlayers < 1 || numPlayers > 8) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            Label errorLabel = new Label("Veuillez entrer un nombre entre 1 et 8.");
-            errorLabel.setTextFill(Color.RED);
-            playerInputs.getChildren().add(errorLabel);
-            return;
-        }
-
-        // Ajouter les champs pour les joueurs humains
-        for (int i = 1; i <= numPlayers; i++) {
-            TextField nameField = new TextField("Joueur " + i);
-            nameField.setPromptText("Nom du Joueur " + i);
-            styleTextField(nameField);
-            nameField.setPrefWidth(200);
-            nameField.setMaxWidth(200);
-            nameFields.add(nameField);
-            playerInputs.getChildren().add(nameField);
-        }
-
-        // Si un seul joueur humain, ajouter les champs pour les IA
-        if (numPlayers == 1) {
-            Label aiLabel = new Label("Nombre d'IA :");
-            aiLabel.setTextFill(Color.WHITE);
-
-            aiCountField.setPrefWidth(35);
-            aiCountField.setMaxWidth(240);
-            styleTextField(aiCountField);
-
-            Button confirmAIButton = createStyledButton("Ajouter IA", "button-secondary");
-            confirmAIButton.setOnAction(e -> {
-                clearAIFields();
-                generateAIFields();
-            });
-
-            HBox aiSelectionBox = new HBox(10, aiLabel, aiCountField, confirmAIButton);
-            aiSelectionBox.setAlignment(Pos.CENTER);
-            playerInputs.getChildren().add(aiSelectionBox);
-        }
-    }
-
-    /**
-     * Clears the AI input fields.
-     */
-    private void clearAIFields() {
-        playerInputs.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("IA"));
-        playerInputs.getChildren().removeAll(difficultyBoxes);
-        difficultyBoxes.clear();
-    }
-
-    /**
-     * Generates input fields for AI players.
-     */
-    private void generateAIFields() {
-        playerInputs.getChildren().remove(aiCountField);
-
-        int numAI;
-        try {
-            numAI = Integer.parseInt(aiCountField.getText());
-            if (numAI < 1 || numAI > 7) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            Label errorLabel = new Label("Veuillez entrer un nombre entre 1 et 7.");
-            errorLabel.setTextFill(Color.RED);
-            playerInputs.getChildren().add(errorLabel);
-            return;
-        }
-
-        GridPane aiGrid = new GridPane();
-        aiGrid.setHgap(20);
-        aiGrid.setVgap(10);
-        int columns = 2;
-
-        for (int i = 1; i <= numAI; i++) {
-            ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
-            difficultyBox.getItems().addAll(Player.Difficulty.values());
-            difficultyBox.setValue(Player.Difficulty.MEDIUM);
-            difficultyBox.setPrefWidth(150);
-            difficultyBox.setMaxWidth(150);
-            difficultyBox.setPrefHeight(40);
-            difficultyBox.setMaxHeight(40);
-            styleComboBox(difficultyBox);
-            difficultyBoxes.add(difficultyBox);
-
-            Label lab = new Label("IA " + i + " :");
-            lab.setTextFill(Color.WHITE);
-
-            HBox aiBox = new HBox(10, lab, difficultyBox);
-            aiBox.setAlignment(Pos.CENTER);
-
-            int row = (i - 1) / columns;
-            int col = (i - 1) % columns;
-            aiGrid.add(aiBox, col, row);
-        }
-        aiGrid.setAlignment(Pos.CENTER);
-        playerInputs.getChildren().add(aiGrid);
     }
 
     /**
@@ -339,7 +314,6 @@ public class GameMenuView {
         button.setPrefSize(200, 40);
         return button;
     }
-    
 
     /**
      * Applies a style to the specified text field.
