@@ -13,7 +13,7 @@ dependencies {
     // Add JavaFX dependencies
     implementation("org.openjfx:javafx-controls:21")
     implementation("org.openjfx:javafx-fxml:21")
-    implementation("org.openjfx:javafx-media:21") // Ajoutez cette ligne
+    implementation("org.openjfx:javafx-media:21")
 
     // JUnit dependencies for testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
@@ -28,7 +28,7 @@ java {
 
 javafx {
     version = "21"
-    modules = listOf("javafx.controls", "javafx.fxml", "javafx.media") // Ajoutez javafx.media ici
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.media") 
 }
 
 tasks.test {

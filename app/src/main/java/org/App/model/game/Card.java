@@ -13,6 +13,7 @@ package org.App.model.game;
  * 
  * @param valeur      The value of the card.
  * @param faceVisible The visibility state of the card.
+ * @param id         The unique identifier of the card.
  * 
  * @author Mathéo Piget
  * @version 1.0
@@ -26,7 +27,6 @@ public record Card(CardValue valeur, boolean faceVisible, int id) implements ICa
      *
      * @param valeur       The value of the card.
      * @param faceVisible  The visibility state of the card.
-     * @param id           The unique identifier for the card.
      */
     public Card(CardValue valeur, boolean faceVisible) {
         this(valeur, faceVisible, cardId++);

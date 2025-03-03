@@ -70,9 +70,8 @@ public final class SkyjoGame {
 
 
     /**
-     * Gets the index of the current player.
-     *
-     * @return The index of the current player.
+     * Set the index of the current player.
+     * @param indexActualPlayer The index of the current player.
      */
     public void setIndexActualPlayer(int indexActualPlayer) {
         this.indexActualPlayer = indexActualPlayer;

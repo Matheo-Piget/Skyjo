@@ -27,8 +27,19 @@ public interface Player {
      */
     public enum Difficulty {
 
+        /**
+         * Easy difficulty level.
+         */
         EASY,
+
+        /**
+         * Medium difficulty level.
+         */
         MEDIUM,
+
+        /**
+         * Hard difficulty level.
+         */
         HARD
     }
 

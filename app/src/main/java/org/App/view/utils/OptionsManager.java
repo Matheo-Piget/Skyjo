@@ -10,6 +10,13 @@ import java.util.Properties;
  * This class is responsible for loading and saving configuration options
  * from/to a properties file.
  * 
+ * 
+ * <p>
+ * This class provides methods to retrieve the current theme, game mode,
+ * and volume level. It also allows saving new options to the configuration
+ * file.
+ * </p>
+ * 
  * @version 1.0
  * @author Piget Mathéo
  * @see Properties
@@ -73,8 +80,8 @@ public class OptionsManager {
      * 
      * @param theme The theme to save.
      * @param mode  The game mode to save.
-     * @throws IOException If an error occurs while writing to the configuration
-     *                     file.
+     * @param volume The volume level to save.
+     * @throws IllegalArgumentException If the theme or mode is null.*
      */
     public static void saveOptions(String theme, String mode, double volume) throws IOException {
         if (theme == null || mode == null) {

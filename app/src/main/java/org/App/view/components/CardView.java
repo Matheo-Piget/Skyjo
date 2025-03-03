@@ -16,12 +16,18 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 
-
-
 /**
  * Represents the view of a card in the Skyjo game.
  * This class is responsible for displaying a card and handling its
  * interactions.
+ * 
+ * <p>
+ * The card view supports flipping animations and hover effects.
+ * </p>
+ * 
+ * @see Card
+ * @author Mathéo Piget
+ * @version 1.0
  */
 public class CardView extends StackPane {
     private final int playerId;
@@ -32,7 +38,7 @@ public class CardView extends StackPane {
     private final Text frontText = new Text(); // Texte pour la face avant
     private final Text backText = new Text("?"); // Texte pour la face arrière
 
-    public CardView(Card value, int index ,int playerId) {
+    public CardView(Card value, int index, int playerId) {
 
         this.playerId = playerId;
         this.value = value;
@@ -63,6 +69,8 @@ public class CardView extends StackPane {
 
     /**
      * Gets the ID of the player who owns the card.
+     * 
+     * @return The ID of the player.
      */
     public int getPlayerId() {
         return playerId;
@@ -70,6 +78,8 @@ public class CardView extends StackPane {
 
     /**
      * Gets the ID of the card.
+     * 
+     * @return The ID of the card.
      */
     public int getCardId() {
         return cardId;
@@ -77,6 +87,8 @@ public class CardView extends StackPane {
 
     /**
      * Indicates whether the back of the card is visible.
+     * 
+     * @return True if the back is visible, false otherwise.
      */
     public boolean isBackVisible() {
         return backText.isVisible();
@@ -136,7 +148,9 @@ public class CardView extends StackPane {
     }
 
     /**
-     * Anime le retournement de la carte.
+     * Animate the card flipping.
+     * 
+     * @param onFinished Runnable to execute after the animation is finished.
      */
     public void flipCard(Runnable onFinished) {
         // Première étape : rotation de 0 à 90 degrés
@@ -145,16 +159,16 @@ public class CardView extends StackPane {
         firstHalf.setFromAngle(0);
         firstHalf.setToAngle(90);
         firstHalf.setInterpolator(Interpolator.EASE_IN);
-    
+
         // Inverser le texte pendant la rotation
         frontText.setScaleX(-1);
-    
+
         firstHalf.setOnFinished(event -> {
             // Actualise la référence de la carte avec la nouvelle instance retournée
             setValue(value.retourner());
             // Met à jour l'apparence de la carte après la mise à jour
             updateCardAppearance();
-    
+
             // Lance la deuxième étape de l'animation : rotation de 90 à 180 degrés
             RotateTransition secondHalf = new RotateTransition(Duration.seconds(0.25), this);
             secondHalf.setAxis(Rotate.Y_AXIS);
@@ -168,14 +182,16 @@ public class CardView extends StackPane {
             });
             secondHalf.play();
         });
-    
+
         firstHalf.play();
-        
+
         SoundManager.playFlipSound();
     }
 
     /**
      * Scales up the card background when the mouse enters.
+     * 
+     * @param cardBackground The card background to scale up.
      */
     private void scaleUp(Rectangle cardBackground) {
         Scale scale = new Scale(1.15, 1.15, cardBackground.getWidth() / 2, cardBackground.getHeight() / 2);
@@ -184,6 +200,8 @@ public class CardView extends StackPane {
 
     /**
      * Scales down the card background when the mouse exits.
+     * 
+     * @param cardBackground The card background to scale down.
      */
     private void scaleDown(Rectangle cardBackground) {
         cardBackground.getTransforms().clear();
@@ -202,6 +220,8 @@ public class CardView extends StackPane {
 
     /**
      * Gets the card value.
+     * 
+     * @return The card value.
      */
     public Card getValue() {
         return value;
@@ -209,6 +229,8 @@ public class CardView extends StackPane {
 
     /**
      * Sets the card value and triggers a flip animation.
+     * 
+     * @param value The new card value.
      */
     public void setValue(Card value) {
         this.value = value;
@@ -217,6 +239,8 @@ public class CardView extends StackPane {
 
     /**
      * Indicates whether the card is flipped.
+     * 
+     * @return True if the card is flipped, false otherwise.
      */
     public boolean isFlipped() {
         return value.faceVisible();
@@ -224,6 +248,8 @@ public class CardView extends StackPane {
 
     /**
      * Gets the index of the card in the player's hand.
+     * 
+     * @return The index of the card.
      */
     public int getIndex() {
         return index;

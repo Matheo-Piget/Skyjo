@@ -37,8 +37,10 @@ public class AIPlayer implements Player {
     /**
      * Constructs a new AIPlayer with the specified name and difficulty level.
      * 
+     * @param id         The unique identifier of the AI player.
      * @param nom        The name of the AI player.
      * @param difficulty The difficulty level of the AI player.
+     * 
      * 
      * @see Difficulty
      */
