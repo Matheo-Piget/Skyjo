@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.App.App;
+import org.App.controller.GameController;
 import org.App.model.game.Card;
 import org.App.model.player.Player;
 import org.App.view.components.BoardView;
@@ -479,6 +480,16 @@ public class GameView implements GameViewInterface {
             playerScoreBox.getChildren().addAll(playerIcon, playerScore);
             rankingContainer.getChildren().add(playerScoreBox);
         });
+
+
+        Button nextButton = new Button("Next Round");
+
+        nextButton.getStyleClass().add("button");
+        nextButton.setOnAction(event -> {
+            GameController.getInstance().restartRoundWithDelay(1);
+        });
+        nextButton.setEffect(new DropShadow(5, Color.BLACK));
+        rankingContainer.getChildren().add(nextButton);
 
         rankingContainer.setAlignment(Pos.CENTER);
         cardsContainer.getChildren().add(rankingContainer);

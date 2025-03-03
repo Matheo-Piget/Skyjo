@@ -346,8 +346,6 @@ public final class GameController {
             Map<Player, Integer> finalRanking = game.getFinalRanking();
             finalRanking.forEach((player, score) -> player.addScore(score));
             view.showFinalRanking(finalRanking);
-        } else {
-            restartRoundWithDelay(5);
         }
     }
 
@@ -359,7 +357,7 @@ public final class GameController {
      * @see #restartRoundWithDelay(double)
      * @see #addDelay(double, Runnable)
      */
-    private void restartRoundWithDelay(double seconds) {
+    public void restartRoundWithDelay(double seconds) {
         addDelay(seconds, () -> {
             view.clearAll();
             startGame();
