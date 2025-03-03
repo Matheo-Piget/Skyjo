@@ -409,6 +409,7 @@ public final class SkyjoGame {
                 addToDiscard(oldCard);
             }
         }
+        GameController.getInstance().updateView();
     }
 
     /**

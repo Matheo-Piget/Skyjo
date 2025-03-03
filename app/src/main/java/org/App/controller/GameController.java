@@ -127,6 +127,11 @@ public final class GameController {
      * @see Card#retourner()
      */
     public void handlePickClick() {
+
+        if (game.getPickedCard() != null) {
+            return;
+        }
+
         Card pickedCard = game.pickCard();
 
         if (!pickedCard.faceVisible()) {

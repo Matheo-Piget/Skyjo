@@ -1,10 +1,8 @@
 package org.App.model.player;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 import org.App.controller.GameController;
 import org.App.model.game.Card;
@@ -204,7 +202,6 @@ public class AIPlayer implements Player {
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
                 // Obligation d'échanger cette carte avec une carte du plateau
-                pickedCard = pickedCard.retourner();
                 replaceCard(game, pickedCard);
                 GameController.getInstance().updateView();
             }
@@ -260,7 +257,6 @@ public class AIPlayer implements Player {
             }
         }
     }
-
 
     /**
      * Returns the unique identifier of the human player.
@@ -362,9 +358,10 @@ public class AIPlayer implements Player {
      * @return The index of the highest-value card.
      */
     private int findHighestValueCardIndex() {
-        return IntStream.range(0, cartes.size())
-                .boxed()
-                .max(Comparator.comparingInt(i -> cartes.get(i).valeur().getValue()))
-                .orElse(0);
+        return java.util.stream.IntStream.range(0, cartes.size())
+            .filter(i -> cartes.get(i).faceVisible())
+            .boxed()
+            .max(java.util.Comparator.comparing(i -> cartes.get(i).valeur().getValue()))
+            .orElse(-1);
     }
 }
