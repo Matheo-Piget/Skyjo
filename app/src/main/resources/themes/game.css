@@ -1,5 +1,5 @@
-.root1{
-  -fx-background-color: linear-gradient(to bottom, #2c3e50, #1a252f);
+.root {
+  -fx-background-color: linear-gradient(to bottom, #2a475e, #353b48);
   -fx-font-family: 'Arial', sans-serif;
   -fx-background-size: cover;
   -fx-background-repeat: no-repeat;
@@ -21,33 +21,36 @@
 
 .vbox {
   -fx-background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent for better blending */
-  -fx-padding: 40;
-  -fx-spacing: 30;
+  -fx-padding: 10;
+  -fx-spacing: 10;
   -fx-alignment: center;
   -fx-border-radius: 15px;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
 }
 
-.menu-item {
-  -fx-font-size: 26px;
-  -fx-fill: #f8f8f2;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 2);
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-padding: 12 24;
-  -fx-border-radius: 8;
-  -fx-background-radius: 8;
+/* Styles pour la barre de menu */
+.menu-bar {
+  -fx-background-color: linear-gradient(to bottom, #2a475e, #1c2a38);
+  -fx-padding: 10;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
 }
 
-.menu-bar {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-padding: 12;
-  -fx-border-radius: 8;
-  -fx-background-radius: 8;
+/* Styles pour les menus */
+.menu {
+  -fx-text-fill: #f0f0f0;
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-padding: 10 20;
+  -fx-background-color: transparent;
+  -fx-cursor: hand;
+  -fx-transition: all 0.3s ease;
 }
 
 .button {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-text-fill: #f8f8f2;
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
+  -fx-text-fill: #f0f0f0;
   -fx-font-size: 18px;
   -fx-font-weight: bold;
   -fx-padding: 15 30;
@@ -59,7 +62,7 @@
 }
 
 .button:hover {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #515a77);
+  -fx-background-color: linear-gradient(to bottom, #6b889d, #525b71);
   -fx-scale-x: 1.1;
   -fx-scale-y: 1.1;
 }
@@ -71,7 +74,7 @@
 
 .card {
   -fx-background-color: linear-gradient(to bottom, #3a3f51, #2e3345);
-  -fx-border-color: #f8f8f2;
+  -fx-border-color: #f0f0f0;
   -fx-border-width: 3;
   -fx-border-radius: 12;
   -fx-background-radius: 12;
@@ -81,7 +84,7 @@
 }
 
 .card:hover {
-  -fx-background-color: linear-gradient(to bottom, #6272a4, #515a77);
+  -fx-background-color: linear-gradient(to bottom, #6b889d, #525b71);
   -fx-scale-x: 1.07;
   -fx-scale-y: 1.07;
 }
@@ -94,21 +97,21 @@
 .player-name {
   -fx-font-size: 22px;
   -fx-font-weight: bold;
-  -fx-fill: linear-gradient(to right, #ff79c6, #bd93f9);
+  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 6, 0, 0, 3);
 }
 
 .ranking-title {
   -fx-font-size: 36px;
   -fx-font-weight: bold;
-  -fx-fill: linear-gradient(to right, #ff79c6, #bd93f9);
+  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 8, 0, 0, 2);
   -fx-font-family: 'Roboto', sans-serif;
 }
 
 .message-box {
   -fx-font-size: 32px;
-  -fx-fill: linear-gradient(to right, #ff79c6, #bd93f9);
+  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 8, 0, 0, 2);
   -fx-alignment: center;
   -fx-font-family: 'Roboto', sans-serif;
@@ -116,7 +119,7 @@
 
 .ranking-item {
   -fx-font-size: 22px;
-  -fx-fill: #f8f8f2;
+  -fx-fill: #f0f0f0;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 2);
 }
 
@@ -133,4 +136,14 @@
 
 .card-flip {
   -fx-animation: card-flip 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { -fx-scale-x: 1; -fx-scale-y: 1; }
+  50% { -fx-scale-x: 1.05; -fx-scale-y: 1.05; }
+  100% { -fx-scale-x: 1; -fx-scale-y: 1; }
+}
+
+.menu:hover, .menu-item:hover {
+  -fx-animation: pulse 0.5s ease-in-out;
 }

@@ -1,16 +1,16 @@
 .root {
-  -fx-background-color: linear-gradient(to bottom, #2c3e50, #1e252f);
+  -fx-background-color: linear-gradient(to bottom, #2a475e, #353b48);
   -fx-font-family: 'Arial', sans-serif;
 }
 
 .skyjo-title {
   -fx-font-size: 48px;
   -fx-font-weight: bold;
-  -fx-fill: linear-gradient(to right, #ff79c6, #bd93f9);
+  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 8, 0, 0, 3);
   -fx-alignment: center;
   -fx-padding: 20;
-  -fx-border-color: #ff79c6;
+  -fx-border-color: #e69a8d;
   -fx-border-width: 4px;
   -fx-border-radius: 15;
   -fx-background-radius: 15;
@@ -19,15 +19,15 @@
 .number-of-players-label {
   -fx-font-size: 26px;
   -fx-font-family: 'Arial', sans-serif;
-  -fx-fill: linear-gradient(to right, #f8f8f2, #dcdcdc);
+  -fx-fill: linear-gradient(to right, #f0f0f0, #dcdcdc);
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 6, 0, 0, 3);
   -fx-font-weight: bold;
   -fx-padding: 10;
 }
 
 .button {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-text-fill: #f8f8f2;
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
+  -fx-text-fill: #f0f0f0;
   -fx-font-size: 18px;
   -fx-font-weight: bold;
   -fx-padding: 15 30;
@@ -39,31 +39,31 @@
 }
 
 .button-primary {
-  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+  -fx-background-color: linear-gradient(to bottom, #525b71, #353b48);
 }
 
 .button-primary:hover {
-  -fx-background-color: linear-gradient(to bottom, #5a7994, #4a6984);
+  -fx-background-color: linear-gradient(to bottom, #6b889d, #525b71);
   -fx-scale-x: 1.05;
   -fx-scale-y: 1.05;
 }
 
 .button-secondary {
-  -fx-background-color: linear-gradient(to bottom, #3a506b, #2c3e50);
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
 }
 
 .button-secondary:hover {
-  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+  -fx-background-color: linear-gradient(to bottom, #525b71, #353b48);
   -fx-scale-x: 1.05;
   -fx-scale-y: 1.05;
 }
 
 .button-danger {
-  -fx-background-color: linear-gradient(to bottom, #6b4f4f, #5b4545);
+  -fx-background-color: linear-gradient(to bottom, #7a5dc7, #6b4f4f);
 }
 
 .button-danger:hover {
-  -fx-background-color: linear-gradient(to bottom, #7b5f5f, #6b4f4f);
+  -fx-background-color: linear-gradient(to bottom, #e69a8d, #7a5dc7);
   -fx-scale-x: 1.05;
   -fx-scale-y: 1.05;
 }
@@ -74,8 +74,8 @@
 }
 
 .text-field {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-text-fill: #f8f8f2;
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
+  -fx-text-fill: #f0f0f0;
   -fx-font-size: 18px;
   -fx-padding: 10;
   -fx-border-radius: 10;
@@ -85,12 +85,12 @@
 }
 
 .text-field:focused {
-  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+  -fx-background-color: linear-gradient(to bottom, #525b71, #353b48);
 }
 
 .combo-box {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-text-fill: #f8f8f2;
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
+  -fx-text-fill: #f0f0f0;
   -fx-font-size: 16px;
   -fx-padding: 5;
   -fx-border-radius: 10;
@@ -98,15 +98,15 @@
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 2);
 }
 
-.combo-box:{
-  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+.combo-box:focused {
+  -fx-background-color: linear-gradient(to bottom, #525b71, #353b48);
 }
 
 .combo-box .list-cell {
-  -fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);
-  -fx-text-fill: #f8f8f2;
+  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
+  -fx-text-fill: #f0f0f0;
 }
 
 .combo-box .list-cell:hover {
-  -fx-background-color: linear-gradient(to bottom, #4a6984, #3a506b);
+  -fx-background-color: linear-gradient(to bottom, #525b71, #353b48);
 }

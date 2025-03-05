@@ -131,22 +131,50 @@ public class GameMenuView {
         }
 
         // Ajouter les champs pour les joueurs humains
+        GridPane playerGrid = new GridPane();
+        playerGrid.setHgap(20);
+        playerGrid.setVgap(10);
+        int columns = switch (numPlayers) {
+            case 1 -> 1;
+            case 2 -> 2;
+            case 3 -> 3;
+            case 4 -> 2;
+            case 5 -> 3;
+            case 6 -> 3;
+            case 7 -> 4;
+            default -> 4;
+        };
+
         for (int i = 1; i <= numPlayers; i++) {
             TextField nameField = new TextField("Joueur " + i);
-            nameField.setPromptText("Nom du Joueur " + i);
-            styleTextField(nameField);
             nameField.setPrefWidth(200);
             nameField.setMaxWidth(200);
+            styleTextField(nameField);
             nameFields.add(nameField);
-            playerInputs.getChildren().add(nameField);
+
+            Label lab = new Label("Joueur " + i + " :");
+            lab.setTextFill(Color.WHITE);
+            lab.setStyle("-fx-font-size: 16px;");
+            lab.setEffect(new DropShadow(5, Color.BLACK));
+
+            HBox playerBox = new HBox(10, lab, nameField);
+            playerBox.setAlignment(Pos.CENTER);
+
+            int row = (i - 1) / columns;
+            int col = (i - 1) % columns;
+            playerGrid.add(playerBox, col, row);
         }
+
+        playerGrid.setAlignment(Pos.CENTER);
+        playerInputs.getChildren().add(playerGrid);
+
+        
 
         // Ajouter les champs pour les IA
         if (numAI > 0) {
             GridPane aiGrid = new GridPane();
             aiGrid.setHgap(20);
             aiGrid.setVgap(10);
-            int columns;
 
             columns = switch (numAI) {
                 case 1 -> 1;

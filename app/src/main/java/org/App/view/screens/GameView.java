@@ -26,7 +26,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -90,9 +89,7 @@ public class GameView implements GameViewInterface {
             musicManager.play();
         }
 
-        rootPane.getStyleClass().add("root1");
-
-        this.cardsContainer = new VBox(20);
+        this.cardsContainer = new VBox(0);
         this.cardsContainer.setAlignment(Pos.CENTER);
         this.cardsContainer.getStyleClass().add("vbox");
 
@@ -100,15 +97,15 @@ public class GameView implements GameViewInterface {
         menuBar.getStyleClass().add("menu-bar");
 
         BorderPane borderPane = new BorderPane();
-        borderPane.setTop(new BorderPane(menuBar));
+        borderPane.setTop(menuBar);
         borderPane.setCenter(rootPane);
         borderPane.setBottom(cardsContainer);
 
         this.scene = new Scene(borderPane, 1400, 900);
         if (OptionsManager.getTheme().equals("Sombre")) {
-            scene.getStylesheets().add("file:src/main/resources/themes/menu.css");
+            scene.getStylesheets().add("file:src/main/resources/themes/game.css");
         } else {
-            scene.getStylesheets().add("file:src/main/resources/themes/menu_light.css");
+            scene.getStylesheets().add("file:src/main/resources/themes/game_light.css");
         }
 
         cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
@@ -139,23 +136,24 @@ public class GameView implements GameViewInterface {
      * @return The menu bar.
      */
     private MenuBar createMenuBar() {
-        Menu gameMenu = new Menu();
-        Label menuIcon = new Label("☰");
-        gameMenu.setGraphic(menuIcon);
-
-        MenuItem startNewGame = new MenuItem("Start New Game");
-        MenuItem toggleMusic = new MenuItem("Toggle Music");
-        MenuItem increaseVolume = new MenuItem("Increase Volume");
-        MenuItem decreaseVolume = new MenuItem("Decrease Volume");
-        MenuItem exitGame = new MenuItem("Exit");
-
+        // Création du menu principal
+        Menu gameMenu = new Menu("☰");
+        gameMenu.getStyleClass().add("menu");
+    
+        // Création des éléments du menu
+        MenuItem startNewGame = new MenuItem("Nouvelle Partie");
+        MenuItem toggleMusic = new MenuItem("Activer/Désactiver la Musique");
+        MenuItem increaseVolume = new MenuItem("Augmenter le Volume");
+        MenuItem decreaseVolume = new MenuItem("Diminuer le Volume");
+        MenuItem exitGame = new MenuItem("Quitter");
+    
         // Appliquer des styles aux éléments du menu
         startNewGame.getStyleClass().add("menu-item");
         toggleMusic.getStyleClass().add("menu-item");
         increaseVolume.getStyleClass().add("menu-item");
         decreaseVolume.getStyleClass().add("menu-item");
         exitGame.getStyleClass().add("menu-item");
-
+    
         // Gestion des événements
         startNewGame.setOnAction(event -> {
             SoundManager.dispose();
@@ -164,43 +162,43 @@ public class GameView implements GameViewInterface {
             stage.close();
             App.getINSTANCE().restart();
         });
-
+    
         toggleMusic.setOnAction(event -> {
             if (musicManager != null) {
                 if (musicManager.isPlaying()) {
                     musicManager.pause();
-                    toggleMusic.setText("Resume Music");
+                    toggleMusic.setText("Reprendre la Musique");
                 } else {
                     musicManager.play();
-                    toggleMusic.setText("Pause Music");
+                    toggleMusic.setText("Pause la Musique");
                 }
             }
         });
-
+    
         increaseVolume.setOnAction(event -> {
             if (musicManager != null) {
                 double newVolume = Math.min(1.0, musicManager.getVolume() + 0.1);
                 musicManager.setVolume(newVolume);
             }
         });
-
+    
         decreaseVolume.setOnAction(event -> {
             if (musicManager != null) {
                 double newVolume = Math.max(0.0, musicManager.getVolume() - 0.1);
                 musicManager.setVolume(newVolume);
             }
         });
-
+    
         exitGame.setOnAction(event -> stage.close());
-
+    
         // Ajouter les éléments au menu
         gameMenu.getItems().addAll(startNewGame, toggleMusic, increaseVolume, decreaseVolume, exitGame);
-
+    
         // Créer la barre de menu
         MenuBar menuBar = new MenuBar();
         menuBar.getStyleClass().add("menu-bar");
         menuBar.getMenus().add(gameMenu);
-
+    
         return menuBar;
     }
 
@@ -769,97 +767,97 @@ public class GameView implements GameViewInterface {
         // Dynamically adjust the Y position based on the number of players (max 8)
         switch (numberOfPlayers) {
             case 2 -> {
-                return playerIndex == 0 ? 440 : 120;
+                return playerIndex == 0 ? 390 : 70;
             }
             case 3 -> {
-                return playerIndex == 0 ? 590 : (playerIndex == 1 ? 320 : 35);
+                return playerIndex == 0 ? 540 : (playerIndex == 1 ? 270 : -15);
             }
             case 4 -> {
                 switch (playerIndex) {
                     case 0 -> {
-                        return 590;
+                        return 540;
                     }
                     case 1 -> {
-                        return 320;
+                        return 270;
                     }
                     case 2 -> {
-                        return 35;
+                        return -15;
                     }
                     default -> {
-                        return 35;
+                        return -15;
                     }
                 }
             }
             case 5 -> {
                 return switch (playerIndex) {
                     case 0 ->
-                        590;
+                        540;
                     case 1 ->
-                        590;
+                        540;
                     case 2 ->
-                        35;
+                        -15;
                     case 3 ->
-                        35;
+                        -15;
                     default ->
-                        320;
+                        270;
                 };
             }
             case 6 -> {
                 return switch (playerIndex) {
                     case 0 ->
-                        320;
+                        270;
                     case 1 ->
-                        590;
+                        540;
                     case 2 ->
-                        590;
+                        540;
                     case 3 ->
-                        35;
+                        -15;
                     case 4 ->
-                        35;
+                        -15;
                     default ->
-                        35;
+                        -15;
                 };
             }
             case 7 -> {
                 return switch (playerIndex) {
                     case 0 ->
-                        35;
+                        -15;
                     case 1 ->
-                        590;
+                        540;
                     case 2 ->
-                        35;
+                        -15;
                     case 3 ->
-                        590;
+                        540;
                     case 4 ->
-                        35;
+                        -15;
                     case 5 ->
-                        590;
+                        540;
                     default ->
-                        320;
+                        270;
                 };
             }
             case 8 -> {
                 return switch (playerIndex) {
                     case 0 ->
-                        95;
+                        45;
                     case 1 ->
-                        95;
+                        45;
                     case 2 ->
-                        95;
+                        45;
                     case 3 ->
-                        95;
+                        45;
                     case 4 ->
-                        375;
+                        325;
                     case 5 ->
-                        620;
+                        570;
                     case 6 ->
-                        620;
+                        570;
                     default ->
-                        620;
+                        570;
                 };
             }
             default -> {
-                return 400;
+                return 350;
             }
         }
     }
