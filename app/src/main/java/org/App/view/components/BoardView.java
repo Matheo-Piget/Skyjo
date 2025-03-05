@@ -39,8 +39,8 @@ public class BoardView extends GridPane {
         }
 
         // Horizontal and vertical gaps between cards
-        this.setHgap(8);
-        this.setVgap(8);
+        this.setHgap(7);
+        this.setVgap(7);
         this.setMaxSize(75, 60);
         this.setPrefSize(75, 60);
     }

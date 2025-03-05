@@ -329,10 +329,10 @@ public class GameView implements GameViewInterface {
         BoardView boardView = new BoardView(cardViews);
         boardView.setAlignment(Pos.CENTER);
 
-        VBox playerContainer = new VBox(5, playerNameText, boardView);
+        VBox playerContainer = new VBox(2, playerNameText, boardView);
         playerContainer.setAlignment(Pos.CENTER);
-        playerContainer.setPrefSize(200, 300);
-        playerContainer.setMaxSize(200, 300);
+        playerContainer.setPrefSize(150, 225);
+        playerContainer.setMaxSize(150, 225);
 
         if (isCurrent) {
             playerContainer.setStyle(
