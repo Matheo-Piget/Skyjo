@@ -72,24 +72,7 @@
   -fx-scale-y: 0.95;
 }
 
-.card {
-  -fx-background-color: linear-gradient(to bottom, #3a3f51, #2e3345);
-  -fx-border-color: #f0f0f0;
-  -fx-border-width: 3;
-  -fx-border-radius: 12;
-  -fx-background-radius: 12;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 10, 0, 0, 3);
-  -fx-cursor: hand;
-  -fx-transition: all 0.4s ease;
-}
-
-.card:hover {
-  -fx-background-color: linear-gradient(to bottom, #6b889d, #525b71);
-  -fx-scale-x: 1.07;
-  -fx-scale-y: 1.07;
-}
-
-.button:pressed, .card:pressed {
+.button:pressed{
   -fx-scale-x: 0.95;
   -fx-scale-y: 0.95;
 }

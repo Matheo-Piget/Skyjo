@@ -146,6 +146,7 @@ public final class GameController {
             // Set up mouse movement tracking
             view.getScene().setOnMouseMoved(event -> {
                 if (pickedCardView != null) {
+                    pickedCardView.toFront();
                     pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
                     pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
                 }
@@ -193,6 +194,7 @@ public final class GameController {
                 // Set up mouse movement tracking
                 view.getScene().setOnMouseMoved(event -> {
                     if (pickedCardView != null) {
+                        pickedCardView.toFront();
                         pickedCardView.setLayoutX(event.getX() - pickedCardView.getWidth());
                         pickedCardView.setLayoutY(event.getY() - pickedCardView.getHeight());
                     }
