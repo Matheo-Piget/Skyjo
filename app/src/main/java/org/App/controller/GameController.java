@@ -218,13 +218,12 @@ public final class GameController {
      */
     public void handleCardClick(CardView cardView) {
         if (game.getPickedCard() != null) {
-            cardView.flipCard(() -> {
-                game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard(), cardView.getIndex());
-                view.getRootPane().getChildren().remove(pickedCardView);
-                resetPickState();
-                updateView(); // Mettre à jour la vue après l'échange
-                endTurn();
-            });
+            game.exchangeOrRevealCard(game.getActualPlayer(), game.getPickedCard(), cardView.getIndex());
+            view.getRootPane().getChildren().remove(pickedCardView);
+            resetPickState();
+            updateView(); // Mettre à jour la vue après l'échange
+            addDelay(0.5, () -> {});
+            endTurn();
         } else if (game.hasDiscard() && game.getCountReveal() < 1) {
             cardView.flipCard(() -> {
                 game.revealCard(game.getActualPlayer(), cardView.getIndex());

@@ -22,6 +22,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -595,8 +596,9 @@ public class GameView implements GameViewInterface {
 
         // Pour chaque joueur, créer une tâche d'animation pour chaque carte.
         for (Player player : players) {
-            double targetX = getPlayerXPosition(players.indexOf(player), players.size());
-            double targetY = getPlayerYPosition(players.indexOf(player), players.size());
+            Point2D playerPosition = getPlayerPosition(player.getId(), players.size());
+            double targetX = playerPosition.getX();
+            double targetY = playerPosition.getY();
 
             for (int j = 0; j < player.getCartes().size(); j++) {
                 CardView cardView = cardViews.get(index[0]++);
@@ -653,213 +655,101 @@ public class GameView implements GameViewInterface {
     }
 
     /**
-     * Gets the X position for a player based on their index and the number of
-     * players.
+     * Gets the player's position based on their index and the number of players.
      *
      * @param playerIndex     The index of the player.
      * @param numberOfPlayers The total number of players.
-     * @return The X position for the player.
+     * @return A Point2D representing the X and Y position for the player.
      */
-    private double getPlayerXPosition(int playerIndex, int numberOfPlayers) {
-        // Dynamically adjust the X position based on the number of players (max 8)
+    private Point2D getPlayerPosition(int playerIndex, int numberOfPlayers) {
+        double x, y;
         switch (numberOfPlayers) {
             case 2 -> {
-                return 650;
+                x = 650;
+                y = playerIndex == 0 ? 390 : 70;
             }
             case 3 -> {
-                return 650;
+                x = 650;
+                y = playerIndex == 0 ? 540 : (playerIndex == 1 ? 270 : -15);
             }
             case 4 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        650;
-                    case 1 ->
-                        650;
-                    case 2 ->
-                        540;
-                    default ->
-                        775;
+                x = switch (playerIndex) {
+                    case 0, 1 -> 650;
+                    case 2 -> 540;
+                    default -> 775;
+                };
+                y = switch (playerIndex) {
+                    case 0 -> 540;
+                    case 1 -> 270;
+                    case 2 -> 15;
+                    default -> -15;
                 };
             }
             case 5 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        775;
-                    case 1 ->
-                        540;
-                    case 2 ->
-                        540;
-                    case 3 ->
-                        775;
-                    default ->
-                        650;
+                x = switch (playerIndex) {
+                    case 0 -> 775;
+                    case 1, 2 -> 540;
+                    case 3 -> 775;
+                    default -> 650;
+                };
+                y = switch (playerIndex) {
+                    case 0, 1 -> 540;
+                    case 2, 3 -> -15;
+                    default -> 270;
                 };
             }
             case 6 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        650;
-                    case 1 ->
-                        540;
-                    case 2 ->
-                        775;
-                    case 3 ->
-                        420;
-                    case 4 ->
-                        650;
-                    default ->
-                        880;
+                x = switch (playerIndex) {
+                    case 0 -> 650;
+                    case 1 -> 540;
+                    case 2 -> 775;
+                    case 3 -> 420;
+                    case 4 -> 650;
+                    default -> 880;
+                };
+                y = switch (playerIndex) {
+                    case 0 -> 270;
+                    case 1, 2 -> 540;
+                    case 3, 4 -> -15;
+                    default -> -15;
                 };
             }
             case 7 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        420;
-                    case 1 ->
-                        420;
-                    case 2 ->
-                        650;
-                    case 3 ->
-                        650;
-                    case 4 ->
-                        880;
-                    case 5 ->
-                        880;
-                    default ->
-                        650;
+                x = switch (playerIndex) {
+                    case 0, 1 -> 420;
+                    case 2, 3 -> 650;
+                    case 4, 5 -> 880;
+                    default -> 650;
+                };
+                y = switch (playerIndex) {
+                    case 0, 2, 4 -> -15;
+                    case 1, 3, 5 -> 540;
+                    default -> 270;
                 };
             }
             case 8 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        290;
-                    case 1 ->
-                        520;
-                    case 2 ->
-                        760;
-                    case 3 ->
-                        1000;
-                    case 4 ->
-                        650;
-                    case 5 ->
-                        420;
-                    case 6 ->
-                        650;
-                    default ->
-                        880;
+                x = switch (playerIndex) {
+                    case 0 -> 290;
+                    case 1 -> 520;
+                    case 2 -> 760;
+                    case 3 -> 1000;
+                    case 4 -> 650;
+                    case 5 -> 420;
+                    case 6 -> 650;
+                    default -> 880;
+                };
+                y = switch (playerIndex) {
+                    case 0, 1, 2, 3 -> 45;
+                    case 4 -> 325;
+                    default -> 570;
                 };
             }
             default -> {
-                return 300;
+                x = 300;
+                y = 350;
             }
         }
-    }
-
-    /**
-     * Gets the Y position for a player based on their index and the number of
-     * players.
-     *
-     * @param playerIndex     The index of the player.
-     * @param numberOfPlayers The total number of players.
-     * @return The Y position for the player.
-     */
-    private double getPlayerYPosition(int playerIndex, int numberOfPlayers) {
-        // Dynamically adjust the Y position based on the number of players (max 8)
-        switch (numberOfPlayers) {
-            case 2 -> {
-                return playerIndex == 0 ? 390 : 70;
-            }
-            case 3 -> {
-                return playerIndex == 0 ? 540 : (playerIndex == 1 ? 270 : -15);
-            }
-            case 4 -> {
-                switch (playerIndex) {
-                    case 0 -> {
-                        return 540;
-                    }
-                    case 1 -> {
-                        return 270;
-                    }
-                    case 2 -> {
-                        return -15;
-                    }
-                    default -> {
-                        return -15;
-                    }
-                }
-            }
-            case 5 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        540;
-                    case 1 ->
-                        540;
-                    case 2 ->
-                        -15;
-                    case 3 ->
-                        -15;
-                    default ->
-                        270;
-                };
-            }
-            case 6 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        270;
-                    case 1 ->
-                        540;
-                    case 2 ->
-                        540;
-                    case 3 ->
-                        -15;
-                    case 4 ->
-                        -15;
-                    default ->
-                        -15;
-                };
-            }
-            case 7 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        -15;
-                    case 1 ->
-                        540;
-                    case 2 ->
-                        -15;
-                    case 3 ->
-                        540;
-                    case 4 ->
-                        -15;
-                    case 5 ->
-                        540;
-                    default ->
-                        270;
-                };
-            }
-            case 8 -> {
-                return switch (playerIndex) {
-                    case 0 ->
-                        45;
-                    case 1 ->
-                        45;
-                    case 2 ->
-                        45;
-                    case 3 ->
-                        45;
-                    case 4 ->
-                        325;
-                    case 5 ->
-                        570;
-                    case 6 ->
-                        570;
-                    default ->
-                        570;
-                };
-            }
-            default -> {
-                return 350;
-            }
-        }
+        return new Point2D(x, y);
     }
 
     /**
