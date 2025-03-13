@@ -63,6 +63,10 @@ public class GameClient {
         listenerThread.start();
     }
 
+    public void setLocalPlayerName(String name) {
+        
+    }
+
 
     private GameState deserializeGameState(String jsonState) {
         try {

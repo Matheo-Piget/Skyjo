@@ -5,6 +5,7 @@ import org.App.network.GameClient;
 import org.App.network.GameServer;
 import org.App.network.GameState;
 import org.App.network.NetworkManager;
+import org.App.network.NetworkPlayerState;
 import org.App.network.Protocol;
 import org.App.view.utils.MusicManager;
 
@@ -94,7 +95,6 @@ public class LobbyView {
         scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
     }
 
-
     public Scene getScene() {
         return stage.getScene();
     }
@@ -136,6 +136,10 @@ public class LobbyView {
 
         try {
             NetworkManager.createInstance(host, port);
+
+            // Stocker l'ID du joueur pour l'utiliser lors de la transition vers la partie
+            NetworkManager.getInstance().setLocalPlayerName(playerName);
+
             NetworkManager.getInstance().getClient().setListener(new LobbyNetworkListener());
             NetworkManager.getInstance().getClient().sendMessage(
                     Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
@@ -143,6 +147,7 @@ public class LobbyView {
         } catch (Exception e) {
             showError("Erreur de connexion: " + e.getMessage());
         }
+
     }
 
     private void showError(String message) {
@@ -162,12 +167,23 @@ public class LobbyView {
             });
         }
 
+        // Dans la classe LobbyNetworkListener
         @Override
         public void onGameStateUpdated(GameState gameState) {
             Platform.runLater(() -> {
+                // Trouver l'ID du joueur local
+                for (NetworkPlayerState player : gameState.getPlayers()) {
+                    if (player.getName().equals(NetworkManager.getInstance().getLocalPlayerName())) {
+                        NetworkManager.getInstance().setLocalPlayerId(player.getId());
+                        break;
+                    }
+                }
+
                 // Transition vers l'écran de jeu
                 GameViewInterface gameView = new GameView(stage);
-                OnlineGameController controller = new OnlineGameController(gameView, -1); // À remplacer par l'ID réel
+                OnlineGameController controller = new OnlineGameController(
+                        gameView,
+                        NetworkManager.getInstance().getLocalPlayerId());
                 stage.setScene(gameView.getScene());
             });
         }

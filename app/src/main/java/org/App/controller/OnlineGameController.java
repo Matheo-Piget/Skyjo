@@ -12,6 +12,7 @@ import org.App.network.NetworkCardState;
 import org.App.network.NetworkManager;
 import org.App.network.NetworkPlayerState;
 import org.App.network.Protocol;
+import org.App.view.components.CardView;
 import org.App.view.screens.GameViewInterface;
 
 import javafx.application.Platform;
@@ -88,16 +89,6 @@ public class OnlineGameController implements NetworkEventListener {
         });
     }
 
-    // Adapter les méthodes du GameController original pour envoyer des messages au
-    // serveur
-    public void handlePickClick() {
-        if (!isMyTurn)
-            return;
-
-        NetworkManager.getInstance().getClient().sendMessage(
-                Protocol.formatMessage(Protocol.CARD_PICK, playerId));
-    }
-
     public void handleDiscardClick() {
         if (!isMyTurn)
             return;
@@ -119,6 +110,40 @@ public class OnlineGameController implements NetworkEventListener {
             view.showMessageBox("Déconnecté du serveur");
             // Retourner au menu principal
         });
+    }
+
+    // Dans OnlineGameController.java
+    public void handleCardClick(CardView cardView) {
+        if (!isMyTurn) {
+            return;
+        }
+
+        // Les clics de carte peuvent soit révéler soit échanger une carte
+        // selon l'état du jeu (si une carte a été piochée ou non)
+        if (hasPickedCard) {
+            // Échange de carte
+            NetworkManager.getInstance().getClient().sendMessage(
+                    Protocol.formatMessage(Protocol.CARD_EXCHANGE, playerId, String.valueOf(cardView.getIndex())));
+            hasPickedCard = false; // Réinitialiser l'état
+        } else {
+            // Révélation de carte
+            NetworkManager.getInstance().getClient().sendMessage(
+                    Protocol.formatMessage(Protocol.CARD_REVEAL, playerId, String.valueOf(cardView.getIndex())));
+        }
+    }
+
+    // Ajouter une variable pour suivre si le joueur a pioché une carte
+    private boolean hasPickedCard = false;
+
+    // Mettre à jour handlePickClick
+    public void handlePickClick() {
+        if (!isMyTurn)
+            return;
+
+        NetworkManager.getInstance().getClient().sendMessage(
+                Protocol.formatMessage(Protocol.CARD_PICK, playerId));
+
+        hasPickedCard = true; // Le joueur a maintenant une carte en main
     }
 
     // Autres méthodes adaptées...

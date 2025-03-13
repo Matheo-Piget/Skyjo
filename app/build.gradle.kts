@@ -37,6 +37,32 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.register<Jar>("clientJar") {
+    archiveFileName.set("skyjo-client.jar")
+    manifest {
+        attributes["Main-Class"] = "org.App.App"
+    }
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register<Jar>("serverJar") {
+    archiveFileName.set("skyjo-server.jar")
+    manifest {
+        attributes["Main-Class"] = "org.App.ServerLauncher"
+    }
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 application {
     mainClass.set("org.App.App")
 }
