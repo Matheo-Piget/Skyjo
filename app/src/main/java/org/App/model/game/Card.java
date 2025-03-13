@@ -1,5 +1,7 @@
 package org.App.model.game;
 
+import java.io.Serializable;
+
 /**
  * A record representing a card in the game.
  * A card has a value and a visibility state (face up or face down).
@@ -18,9 +20,10 @@ package org.App.model.game;
  * @author Mathéo Piget
  * @version 1.0
  */
-public record Card(CardValue valeur, boolean faceVisible, int id) implements ICard {
+public record Card(CardValue valeur, boolean faceVisible, int id) implements ICard, Serializable {
 
     private static int cardId = 0;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor for the Card class.

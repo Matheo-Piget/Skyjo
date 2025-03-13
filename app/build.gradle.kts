@@ -10,6 +10,8 @@ repositories {
 dependencies {
     implementation(libs.guava)
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+
     // Add JavaFX dependencies
     implementation("org.openjfx:javafx-controls:21")
     implementation("org.openjfx:javafx-fxml:21")

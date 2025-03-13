@@ -6,14 +6,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.App.model.game.SkyjoGame;
-
 public class GameClient {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private Thread listenerThread;
     private NetworkEventListener listener;
+
+    // Jackson ObjectMapper for JSON serialization
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
     
     public GameClient(String host, int port) {
         try {
@@ -41,7 +42,7 @@ public class GameClient {
                     if (listener != null) {
                         switch (type) {
                             case Protocol.GAME_STATE:
-                                SkyjoGame updatedGame = deserializeGameState(parts[2]);
+                                GameState updatedGame = deserializeGameState(parts[2]);
                                 listener.onGameStateUpdated(updatedGame);
                                 break;
                             case Protocol.PLAYER_TURN:
@@ -63,9 +64,13 @@ public class GameClient {
     }
 
 
-    private SkyjoGame deserializeGameState(String gameState) {
-        // Implémentez la logique de désérialisation ici
-        return null; // Remplacez par l'objet SkyjoGame désérialisé
+    private GameState deserializeGameState(String jsonState) {
+        try {
+            return objectMapper.readValue(jsonState, GameState.class);
+        } catch (IOException e) {
+            System.err.println("Error deserializing game state: " + e.getMessage());
+            return new GameState(); // Retourner un état vide en cas d'erreur
+        }
     }
     
     public void sendMessage(String message) {
@@ -77,10 +82,9 @@ public class GameClient {
     }
     
     public interface NetworkEventListener {
-        void onGameStateUpdated(SkyjoGame game);
+        void onGameStateUpdated(GameState gameState);
         void onPlayerTurnChanged(int playerId);
         void onPlayerJoined(String playerName);
         void onDisconnected();
-        // Autres événements réseau
     }
 }

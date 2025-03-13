@@ -1,5 +1,6 @@
 package org.App.model.game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +33,8 @@ import org.App.model.player.Player;
  * @author Mathéo Piget
  * @version 1.0
  */
-public final class SkyjoGame {
+public final class SkyjoGame implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int startingPlayerIndex = 0;
     private final List<Player> players;
     private List<Card> pick;
@@ -46,6 +48,16 @@ public final class SkyjoGame {
     private boolean hasPickeInDiscard;
     private Player firstPlayerToReavealAllCards;
     private boolean isFinalRound = false;
+
+    /**
+     * Constructs a new SkyjoGame with no players.
+     * This constructor is used for serialization purposes.
+     */
+    public SkyjoGame() {
+        this.players = new ArrayList<>();
+        this.pick = new ArrayList<>();
+        this.discard = new ArrayList<>();
+    }
 
     /**
      * Constructs a new SkyjoGame with the specified players.

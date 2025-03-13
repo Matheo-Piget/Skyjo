@@ -10,12 +10,18 @@ import org.App.model.game.SkyjoGame;
 import org.App.model.player.HumanPlayer;
 import org.App.model.player.Player;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class GameServer {
     private ServerSocket serverSocket;
     private final List<ClientHandler> clients = new ArrayList<>();
     private SkyjoGame game;
     private boolean gameStarted = false;
     private int playerIdCounter = 0;
+
+    // Jackson ObjectMapper for JSON serialization
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public GameServer(int port) {
         try {
@@ -80,8 +86,21 @@ public class GameServer {
     }
 
     private String serializeGameState(SkyjoGame game) {
-        // Implémenter la sérialisation de l'état du jeu
-        return game.toString(); // Remplacer par une vraie sérialisation
+        try {
+            // Créez un objet qui contient uniquement les informations nécessaires
+            GameState gameState = new GameState(
+                game.getPlayers(),
+                game.getDiscard().isEmpty() ? null : game.getTopDiscard(),
+                game.getPick().size(),
+                game.getActualPlayer().getId(),
+                game.isFinalRound()
+            );
+            
+            return objectMapper.writeValueAsString(gameState);
+        } catch (JsonProcessingException e) {
+            System.err.println("Error serializing game state: " + e.getMessage());
+            return "{}"; // Retourner un objet JSON vide en cas d'erreur
+        }
     }
 
     // Receives messages from clients and met à jour l'état du jeu en se basant sur
