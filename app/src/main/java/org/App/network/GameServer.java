@@ -6,9 +6,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.App.model.game.SkyjoGame;
+import org.App.model.player.HumanPlayer;
+import org.App.model.player.Player;
+
 public class GameServer {
     private ServerSocket serverSocket;
     private final List<ClientHandler> clients = new ArrayList<>();
+    private SkyjoGame game;
+    private boolean gameStarted = false;
+    private int playerIdCounter = 0;
 
     public GameServer(int port) {
         try {
@@ -20,36 +27,99 @@ public class GameServer {
     }
 
     public void start() {
-        while (true) {
-            try {
-                Socket clientSocket = serverSocket.accept();
-                ClientHandler handler = new ClientHandler(clientSocket, this);
-                clients.add(handler);
-                new Thread(handler).start();
-                System.out.println("New client connected.");
-            } catch (IOException e) {
-                System.err.println("Error accepting client: " + e.getMessage());
+        new Thread(() -> {
+            while (!serverSocket.isClosed()) {
+                try {
+                    Socket clientSocket = serverSocket.accept();
+                    String name = "Player" + (clients.size() + 1); // Nom par défaut
+                    ClientHandler handler = new ClientHandler(clientSocket, this, name);
+                    new Thread(handler).start();
+                    System.out.println("New client connected: " + name);
+                } catch (IOException e) {
+                    System.err.println("Error accepting client: " + e.getMessage());
+                }
             }
-        }
+        }).start();
     }
-    
+
+    public synchronized void startGame() {
+        if (clients.size() < 2) {
+            broadcast(Protocol.formatMessage(Protocol.ERROR, -1, "Not enough players"));
+            return;
+        }
+
+        List<Player> players = new ArrayList<>();
+        for (ClientHandler client : clients) {
+            players.add(new HumanPlayer(playerIdCounter++, client.getName()));
+        }
+
+        game = new SkyjoGame(players);
+        game.startGame();
+        gameStarted = true;
+
+        // Envoyer l'état initial à tous les joueurs
+        broadcastGameState();
+
+        // Désigner le premier joueur
+        game.revealInitialCards();
+        broadcastGameState();
+        broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+    }
+
     // Broadcast message to all connected clients
     public synchronized void broadcast(String message) {
         for (ClientHandler client : clients) {
             client.sendMessage(message);
         }
     }
-    
-    // Receives messages from clients and met à jour l'état du jeu en se basant sur le protocole défini.
-    public synchronized void onClientMessage(ClientHandler sender, String message) {
-        // Traitez les commandes telles que "MOVE", "PICK", etc.
-        // Ici, updatez le modèle de jeu avec l'action et diffusez le nouvel état
-        System.out.println("Message received from client: " + message);
-        broadcast(message);
+
+    private void broadcastGameState() {
+        // Convertir l'état du jeu en chaîne JSON ou format personnalisé
+        String gameState = serializeGameState(game);
+        broadcast(Protocol.formatMessage(Protocol.GAME_STATE, -1, gameState));
     }
-    
+
+    private String serializeGameState(SkyjoGame game) {
+        // Implémenter la sérialisation de l'état du jeu
+        return game.toString(); // Remplacer par une vraie sérialisation
+    }
+
+    // Receives messages from clients and met à jour l'état du jeu en se basant sur
+    // le protocole défini.
+    public synchronized void onClientMessage(ClientHandler sender, String message) {
+        String[] parts = Protocol.parseMessage(message);
+        String type = parts[0];
+
+        switch (type) {
+            case Protocol.PLAYER_JOIN:
+                handlePlayerJoin(sender, parts[1]); // parts[1] est le nom du joueur
+                break;
+            case Protocol.CARD_PICK:
+                handleCardPick(sender);
+                break;
+            // Gérer les autres types de messages
+        }
+    }
+
+    private void handlePlayerJoin(ClientHandler sender, String playerName) {
+        if (gameStarted) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game already started"));
+            return;
+        }
+
+        clients.add(sender);
+        broadcast(Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
+    }
+
+    private void handleCardPick(ClientHandler sender) {
+        if (!gameStarted) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
+            return;
+        }
+    }
+
     public static void main(String[] args) {
         GameServer server = new GameServer(5555);
-        server.start();
+        server.startGame();
     }
 }

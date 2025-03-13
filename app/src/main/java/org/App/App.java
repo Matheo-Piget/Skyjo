@@ -1,9 +1,15 @@
 package org.App;
 
 import org.App.view.screens.GameMenuView;
+import org.App.view.screens.LobbyView;
 import org.App.view.utils.MusicManager;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
@@ -32,15 +38,38 @@ public final class App extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-
         MusicManager musicManager = new MusicManager("src/main/resources/musics/menu_music.mp3");
 
-        // Passer le MusicManager à GameMenuView
-        GameMenuView gameMenuView = new GameMenuView(primaryStage, musicManager);
-        primaryStage.setScene(gameMenuView.getScene());
-        primaryStage.show();
+        // Menu principal modifié avec options de jeu
+        VBox mainMenu = new VBox(20);
+        mainMenu.setAlignment(Pos.CENTER);
 
-        INSTANCE = this;
+        Button localGameButton = new Button("Jeu Local");
+        localGameButton.setOnAction(e -> startLocalGame(primaryStage, musicManager));
+
+        Button onlineGameButton = new Button("Jeu En Ligne");
+        onlineGameButton.setOnAction(e -> startOnlineGame(primaryStage, musicManager));
+
+        mainMenu.getChildren().addAll(
+                new Text("Skyjo"),
+                localGameButton,
+                onlineGameButton);
+
+        Scene scene = new Scene(mainMenu, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void startLocalGame(Stage stage, MusicManager musicManager) {
+        // Code existant qui lance le jeu local
+        GameMenuView gameMenuView = new GameMenuView(stage, musicManager);
+        stage.setScene(gameMenuView.getScene());
+    }
+
+    private void startOnlineGame(Stage stage, MusicManager musicManager) {
+        // Nouveau code qui lance le lobby pour le jeu en ligne
+        LobbyView lobbyView = new LobbyView(stage, musicManager);
+        stage.setScene(lobbyView.getScene());
     }
 
     /**

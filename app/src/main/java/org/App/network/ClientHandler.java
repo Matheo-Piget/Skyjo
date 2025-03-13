@@ -11,8 +11,10 @@ public class ClientHandler implements Runnable {
     private GameServer server;
     private PrintWriter out;
     private BufferedReader in;
+    private String name;
 
-    public ClientHandler(Socket socket, GameServer server) {
+    public ClientHandler(Socket socket, GameServer server, String name) {
+        this.name = name;
         this.socket = socket;
         this.server = server;
         try {
@@ -21,6 +23,10 @@ public class ClientHandler implements Runnable {
         } catch(IOException e) {
             System.err.println("Error setting up client handler: " + e.getMessage());
         }
+    }
+
+    public String getName() {
+        return name;
     }
     
     @Override
