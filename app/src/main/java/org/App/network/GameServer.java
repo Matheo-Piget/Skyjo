@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.App.model.game.SkyjoGame;
 import org.App.model.player.HumanPlayer;
@@ -89,13 +90,12 @@ public class GameServer {
         try {
             // Créez un objet qui contient uniquement les informations nécessaires
             GameState gameState = new GameState(
-                game.getPlayers(),
-                game.getDiscard().isEmpty() ? null : game.getTopDiscard(),
-                game.getPick().size(),
-                game.getActualPlayer().getId(),
-                game.isFinalRound()
-            );
-            
+                    game.getPlayers(),
+                    game.getDiscard().isEmpty() ? null : game.getTopDiscard(),
+                    game.getPick().size(),
+                    game.getActualPlayer().getId(),
+                    game.isFinalRound());
+
             return objectMapper.writeValueAsString(gameState);
         } catch (JsonProcessingException e) {
             System.err.println("Error serializing game state: " + e.getMessage());
@@ -137,8 +137,16 @@ public class GameServer {
         }
     }
 
+    // Dans GameServer.java
     public static void main(String[] args) {
         GameServer server = new GameServer(5555);
+        server.start(); // Ajoutez cette ligne pour démarrer l'écoute des clients
+        System.out.println("Serveur démarré sur le port 5555");
+
+        // Attendre que des joueurs se connectent avant de démarrer la partie
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Appuyez sur Entrée pour démarrer la partie...");
+        scanner.nextLine();
         server.startGame();
     }
 }

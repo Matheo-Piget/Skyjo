@@ -25,4 +25,28 @@ public class NetworkCardState implements Serializable {
     }
     
     // Getters et setters
+
+    public CardValue getValue() {
+        return value;
+    }
+
+    public void setValue(CardValue value) {
+        this.value = value;
+    }
+
+    public boolean isFaceVisible() {
+        return faceVisible;
+    }
+
+    public void setFaceVisible(boolean faceVisible) {
+        this.faceVisible = faceVisible;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

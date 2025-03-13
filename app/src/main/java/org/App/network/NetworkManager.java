@@ -23,4 +23,13 @@ public class NetworkManager {
     public void disconnect() {
         client.disconnect();
     }
+
+    public static void createInstance(String host, int port) {
+        if (instance == null) {
+            instance = new NetworkManager();
+            instance.client = new GameClient(host, port);
+        } else {
+            instance.client = new GameClient(host, port);
+        }
+    }
 }

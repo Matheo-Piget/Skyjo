@@ -30,4 +30,32 @@ public class NetworkPlayerState implements Serializable {
     }
     
     // Getters et setters
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public List<NetworkCardState> getCards() {
+        return cards;
+    }
 }

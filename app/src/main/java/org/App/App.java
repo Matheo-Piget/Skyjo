@@ -70,6 +70,7 @@ public final class App extends Application {
         // Nouveau code qui lance le lobby pour le jeu en ligne
         LobbyView lobbyView = new LobbyView(stage, musicManager);
         stage.setScene(lobbyView.getScene());
+        stage.show();
     }
 
     /**

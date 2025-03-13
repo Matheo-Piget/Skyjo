@@ -1,11 +1,17 @@
 package org.App.view.screens;
 
+import org.App.controller.OnlineGameController;
+import org.App.network.GameClient;
 import org.App.network.GameServer;
+import org.App.network.GameState;
 import org.App.network.NetworkManager;
 import org.App.network.Protocol;
 import org.App.view.utils.MusicManager;
 
+import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -21,75 +27,167 @@ public class LobbyView {
     private final TextField serverAddressField;
     private final MusicManager musicManager;
 
+    // Dans LobbyView.java
     public LobbyView(Stage stage, MusicManager musicManager) {
-        this.musicManager = musicManager;
         this.stage = stage;
-        container = new VBox(10);
-        playersList = new ListView<>();
+        this.musicManager = musicManager;
+
+        // En-tête
+        Text title = new Text("Skyjo Online");
+        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+
+        // Conteneur principal avec style
+        container = new VBox(20);
+        container.setAlignment(Pos.CENTER);
+        container.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 30px;");
+
+        // Champs pour nom du joueur et adresse du serveur
         TextField playerNameField = new TextField("Joueur");
+        playerNameField.setPromptText("Votre nom");
+
         serverAddressField = new TextField("localhost:5555");
+        serverAddressField.setPromptText("IP:port");
 
-        // Ajouter les éléments à la vue
+        // Boutons avec style CSS
+        Button connectButton = new Button("Se connecter");
+        connectButton.getStyleClass().add("button-primary");
+        connectButton.setOnAction(e -> connectToServer(playerNameField.getText()));
 
-        // Créer les éléments UI
-        Button connectButton = new Button("Connect");
-        connectButton.setOnAction(e -> connectToServer());
+        Button hostButton = new Button("Héberger");
+        hostButton.getStyleClass().add("button-secondary");
+        hostButton.setOnAction(e -> {
+            hostGame();
+            connectToServer(playerNameField.getText());
+        });
 
-        Button hostButton = new Button("Host Game");
-        hostButton.setOnAction(e -> hostGame());
+        Button backButton = new Button("Retour");
+        backButton.getStyleClass().add("button-danger");
+        backButton.setOnAction(e -> {
+            musicManager.stop();
+            stage.setScene(new GameMenuView(stage, musicManager).getScene());
+        });
 
-        Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> startGame());
+        // Liste des joueurs connectés
+        playersList = new ListView<>();
+        playersList.setPrefHeight(200);
+
+        // Assemblage
+        HBox inputRow1 = new HBox(10, new Text("Nom:"), playerNameField);
+        inputRow1.setAlignment(Pos.CENTER);
+
+        HBox inputRow2 = new HBox(10, new Text("Serveur:"), serverAddressField);
+        inputRow2.setAlignment(Pos.CENTER);
+
+        HBox buttonRow = new HBox(20, connectButton, hostButton, backButton);
+        buttonRow.setAlignment(Pos.CENTER);
 
         container.getChildren().addAll(
-                new Text("Skyjo Online"),
-                new HBox(10, new Text("Nom:"), playerNameField),
-                new HBox(10, new Text("Serveur:"), serverAddressField),
-                new HBox(10, connectButton, hostButton, startButton),
+                title,
+                inputRow1,
+                inputRow2,
+                buttonRow,
                 new Text("Joueurs connectés:"),
                 playersList);
 
-        // Construire la vue
-        // ...
+        // Style global
+        Scene scene = new Scene(container, 800, 600);
+        scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
     }
+
 
     public Scene getScene() {
-        return new Scene(container, 800, 600);
+        return stage.getScene();
     }
 
-    private void connectToServer() {
-        String address = serverAddressField.getText();
-        String[] parts = address.split(":");
-        String host = parts[0];
-        int port = parts.length > 1 ? Integer.parseInt(parts[1]) : 5555;
+    // Méthode pour héberger une partie
 
-        // Utiliser un nouveau client avec l'adresse spécifiée
+    private void hostGame() {
         try {
-            NetworkManager.createInstance(host, port);
-            // S'identifier auprès du serveur
-            NetworkManager.getInstance().getClient().sendMessage(
-                    Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerNameField.getText()));
+            GameServer server = new GameServer(5555);
+            server.start();
         } catch (Exception e) {
-            System.err.println("Erreur de connexion au serveur: " + e.getMessage());
-            // Afficher un message d'erreur à l'utilisateur
-            // ...
+            showError("Erreur lors du démarrage du serveur: " + e.getMessage());
         }
     }
 
-    private void hostGame() {
-        // Lancer un serveur local
-        new Thread(() -> {
-            GameServer server = new GameServer(5555);
-            server.startGame();
-        }).start();
+    // Méthode à modifier
+    private void connectToServer(String playerName) {
+        if (playerName == null || playerName.trim().isEmpty()) {
+            showError("Veuillez entrer un nom valide");
+            return;
+        }
 
-        // Se connecter au serveur local
-        connectToServer();
+        String address = serverAddressField.getText();
+        String[] parts = address.split(":");
+
+        if (parts.length != 2) {
+            showError("Format d'adresse invalide. Utilisez IP:port");
+            return;
+        }
+
+        String host = parts[0];
+        int port;
+        try {
+            port = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            showError("Format de port invalide");
+            return;
+        }
+
+        try {
+            NetworkManager.createInstance(host, port);
+            NetworkManager.getInstance().getClient().setListener(new LobbyNetworkListener());
+            NetworkManager.getInstance().getClient().sendMessage(
+                    Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
+            addPlayer(playerName + " (vous)");
+        } catch (Exception e) {
+            showError("Erreur de connexion: " + e.getMessage());
+        }
     }
 
-    private void startGame() {
-        // Envoyer la commande de démarrage au serveur
-        NetworkManager.getInstance().getClient().sendMessage(
-                Protocol.formatMessage(Protocol.GAME_START, -1));
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // Ajouter cette classe interne pour gérer les événements réseau
+    private class LobbyNetworkListener implements GameClient.NetworkEventListener {
+        @Override
+        public void onPlayerJoined(String playerName) {
+            Platform.runLater(() -> {
+                addPlayer(playerName);
+            });
+        }
+
+        @Override
+        public void onGameStateUpdated(GameState gameState) {
+            Platform.runLater(() -> {
+                // Transition vers l'écran de jeu
+                GameViewInterface gameView = new GameView(stage);
+                OnlineGameController controller = new OnlineGameController(gameView, -1); // À remplacer par l'ID réel
+                stage.setScene(gameView.getScene());
+            });
+        }
+
+        @Override
+        public void onPlayerTurnChanged(int playerId) {
+            // Ignoré dans le lobby
+        }
+
+        @Override
+        public void onDisconnected() {
+            Platform.runLater(() -> {
+                showError("Déconnecté du serveur");
+            });
+        }
+    }
+
+    public void addPlayer(String playerName) {
+        if (!playersList.getItems().contains(playerName)) {
+            playersList.getItems().add(playerName);
+        }
     }
 }
