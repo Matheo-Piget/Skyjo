@@ -37,16 +37,31 @@ tasks.test {
     useJUnitPlatform()
 }
 
+// Dans build.gradle.kts
 tasks.register<Jar>("clientJar") {
     archiveFileName.set("skyjo-client.jar")
     manifest {
         attributes["Main-Class"] = "org.App.App"
+        // Ajouter cette ligne pour le classpath
+        attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(" ") { it.name }
     }
     from(sourceSets.main.get().output)
-    dependsOn(configurations.runtimeClasspath)
+    
+    // Inclure TOUT depuis les dépendances, y compris JavaFX
     from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
+        configurations.runtimeClasspath.get().map { 
+            if (it.isDirectory) it else zipTree(it) 
+        }
+    }) {
+        // Exclure les signatures META-INF qui causent des problèmes
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    }
+    
+    // Inclure explicitement les resources
+    from("src/main/resources") {
+        into("resources")
+    }
+    
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -61,6 +76,27 @@ tasks.register<Jar>("serverJar") {
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register("createExecutable") {
+    dependsOn("clientJar")
+    doLast {
+        exec {
+            workingDir("${buildDir}/libs")
+            commandLine(
+                "jpackage",
+                "--input", ".",
+                "--main-jar", "skyjo-client.jar",
+                "--main-class", "org.App.App",
+                "--type", "app-image",
+                "--name", "Skyjo",
+                "--app-version", "1.0",
+                "--vendor", "YourName",
+                "--module-path", System.getProperty("java.home") + "/jmods",
+                "--add-modules", "java.base,java.desktop,javafx.controls,javafx.fxml,javafx.media"
+            )
+        }
+    }
 }
 
 application {

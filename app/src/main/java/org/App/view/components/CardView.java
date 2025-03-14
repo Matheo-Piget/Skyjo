@@ -123,11 +123,11 @@ public class CardView extends StackPane {
         if (value.faceVisible()) {
             // Face avant
             switch (value.valeur()) {
-                case MOINS_DEUX, MOINS_UN -> cardBackground.setFill(Color.MAGENTA);
-                case ZERO -> cardBackground.setFill(Color.CYAN);
-                case UN, DEUX, TROIS, QUATRE -> cardBackground.setFill(Color.GREENYELLOW);
-                case CINQ, SIX, SEPT, HUIT -> cardBackground.setFill(Color.YELLOW);
-                case NEUF, DIX, ONZE, DOUZE -> cardBackground.setFill(Color.RED);
+                case MOINS_DEUX, MOINS_UN -> cardBackground.setFill(Color.web("#4caf50")); // Coral color
+                case ZERO -> cardBackground.setFill(Color.web("#03a9f4"));
+                case UN, DEUX, TROIS, QUATRE -> cardBackground.setFill(Color.web("#ffeb3b"));
+                case CINQ, SIX, SEPT, HUIT -> cardBackground.setFill(Color.web("#ff9800"));
+                case NEUF, DIX, ONZE, DOUZE -> cardBackground.setFill(Color.web("#f44336"));
                 default -> throw new AssertionError();
             }
             frontText.setText(String.valueOf((int) switch (value.valeur()) {

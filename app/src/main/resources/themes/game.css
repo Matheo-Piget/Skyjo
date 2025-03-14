@@ -1,132 +1,216 @@
+/* Base styles avec effet de dégradé animé */
 .root {
-  -fx-background-color: linear-gradient(to bottom, #2a475e, #353b48);
-  -fx-font-family: 'Arial', sans-serif;
-  -fx-background-size: cover;
-  -fx-background-repeat: no-repeat;
-  -fx-background-position: center;
-  -fx-animation: background-pan 20s linear infinite;
+  -fx-background-color: linear-gradient(to bottom right, #1a2a3a, #2c3e50, #34495e);
+  -fx-font-family: 'Montserrat', 'Roboto', sans-serif;
+  -fx-background-size: 400% 400%;
+  -fx-animation: gradient-shift 15s ease infinite;
 }
 
-@keyframes background-pan {
-  0% {
-    -fx-background-position: 0% 50%;
-  }
-  50% {
-    -fx-background-position: 100% 50%;
-  }
-  100% {
-    -fx-background-position: 0% 50%;
-  }
+@keyframes gradient-shift {
+  0% { -fx-background-position: 0% 50%; }
+  50% { -fx-background-position: 100% 50%; }
+  100% { -fx-background-position: 0% 50%; }
 }
 
+/* Conteneur principal avec effet de verre */
 .vbox {
-  -fx-background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent for better blending */
-  -fx-padding: 10;
-  -fx-spacing: 10;
+  -fx-background-color: rgba(255, 255, 255, 0.08);
+  -fx-background-radius: 20px;
+  -fx-border-radius: 20px;
+  -fx-border-color: rgba(255, 255, 255, 0.15);
+  -fx-border-width: 1px;
+  -fx-padding: 20;
+  -fx-spacing: 15;
   -fx-alignment: center;
-  -fx-border-radius: 15px;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 15, 0, 0, 10);
+  -fx-transition: all 0.5s ease;
 }
 
-/* Styles pour la barre de menu */
+.vbox:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.12);
+  -fx-border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Barre de menu moderne */
 .menu-bar {
-  -fx-background-color: linear-gradient(to bottom, #2a475e, #1c2a38);
-  -fx-padding: 10;
-  -fx-border-radius: 5;
-  -fx-background-radius: 5;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+  -fx-background-color: rgba(42, 71, 94, 0.8);
+  -fx-padding: 8 16;
+  -fx-background-radius: 12;
+  -fx-border-radius: 12;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 4);
+  -fx-border-color: rgba(255, 255, 255, 0.1);
+  -fx-border-width: 1px;
 }
 
-/* Styles pour les menus */
+/* Menus avec effets */
 .menu {
-  -fx-text-fill: #f0f0f0;
+  -fx-text-fill: #ecf0f1;
   -fx-font-size: 16px;
   -fx-font-weight: bold;
-  -fx-padding: 10 20;
+  -fx-padding: 8 16;
   -fx-background-color: transparent;
   -fx-cursor: hand;
   -fx-transition: all 0.3s ease;
 }
 
+.menu:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.1);
+  -fx-background-radius: 8;
+}
+
+.menu-item {
+  -fx-background-color: rgba(42, 71, 94, 0.95);
+  -fx-text-fill: #ecf0f1;
+  -fx-font-size: 14px;
+  -fx-padding: 8 16;
+  -fx-transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.15);
+  -fx-text-fill: white;
+}
+
+/* Boutons avec effets dynamiques */
 .button {
-  -fx-background-color: linear-gradient(to bottom, #353b48, #2a475e);
-  -fx-text-fill: #f0f0f0;
+  -fx-background-color: linear-gradient(to bottom right, #3498db, #2980b9);
+  -fx-text-fill: white;
   -fx-font-size: 18px;
   -fx-font-weight: bold;
   -fx-padding: 15 30;
   -fx-border-radius: 12;
   -fx-background-radius: 12;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 12, 0, 0, 4);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 4);
   -fx-cursor: hand;
-  -fx-transition: all 0.4s ease;
+  -fx-transition: all 0.3s ease;
 }
 
 .button:hover {
-  -fx-background-color: linear-gradient(to bottom, #6b889d, #525b71);
-  -fx-scale-x: 1.1;
-  -fx-scale-y: 1.1;
+  -fx-background-color: linear-gradient(to bottom right, #3498db, #1abc9c);
+  -fx-effect: dropshadow(gaussian, rgba(0, 116, 217, 0.6), 15, 0, 0, 8);
+  -fx-translate-y: -2;
 }
 
 .button:pressed {
-  -fx-scale-x: 0.95;
-  -fx-scale-y: 0.95;
+  -fx-background-color: linear-gradient(to bottom right, #2980b9, #16a085);
+  -fx-scale-x: 0.97;
+  -fx-scale-y: 0.97;
+  -fx-translate-y: 1;
 }
 
-.button:pressed{
-  -fx-scale-x: 0.95;
-  -fx-scale-y: 0.95;
-}
-
+/* Nom du joueur avec effet de dégradé */
 .player-name {
-  -fx-font-size: 22px;
+  -fx-font-size: 24px;
   -fx-font-weight: bold;
-  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 6, 0, 0, 3);
+  -fx-fill: linear-gradient(to right, #f39c12, #e74c3c, #9b59b6);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 2);
+  -fx-font-family: 'Poppins', sans-serif;
+  -fx-padding: 10;
 }
 
+/* Titre du classement avec effet coloré */
 .ranking-title {
-  -fx-font-size: 36px;
+  -fx-font-size: 40px;
   -fx-font-weight: bold;
-  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 8, 0, 0, 2);
-  -fx-font-family: 'Roboto', sans-serif;
+  -fx-fill: linear-gradient(to right, #f39c12, #e74c3c, #9b59b6);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
+  -fx-font-family: 'Poppins', sans-serif;
+  -fx-padding: 10;
 }
 
+/* Boîte de message avec effet coloré */
 .message-box {
-  -fx-font-size: 32px;
-  -fx-fill: linear-gradient(to right, #e69a8d, #7a5dc7);
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 8, 0, 0, 2);
+  -fx-font-size: 34px;
+  -fx-fill: linear-gradient(to right, #f39c12, #e74c3c, #9b59b6);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
   -fx-alignment: center;
-  -fx-font-family: 'Roboto', sans-serif;
+  -fx-font-family: 'Poppins', sans-serif;
+  -fx-padding: 15;
 }
 
+/* Élément de classement avec effet de survol */
 .ranking-item {
   -fx-font-size: 22px;
-  -fx-fill: #f0f0f0;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0, 0, 2);
+  -fx-fill: #ecf0f1;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 5, 0, 0, 2);
+  -fx-padding: 8;
+  -fx-background-radius: 8;
+  -fx-transition: all 0.3s ease;
 }
 
+.ranking-item:hover {
+  -fx-fill: #f39c12;
+  -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.6), 8, 0, 0, 2);
+  -fx-translate-x: 3;
+}
+
+/* Animations diverses */
 @keyframes pulse {
   0% { -fx-scale-x: 1; -fx-scale-y: 1; }
-  50% { -fx-scale-x: 1.07; -fx-scale-y: 1.07; }
+  50% { -fx-scale-x: 1.03; -fx-scale-y: 1.03; }
   100% { -fx-scale-x: 1; -fx-scale-y: 1; }
 }
 
-/* Appliquer une animation subtile sur les boutons et cartes au survol */
-.button:hover, .card:hover {
-  -fx-animation: pulse 1.5s infinite;
+@keyframes card-flip {
+  0% { -fx-rotate: 0; -fx-scale-x: 1; -fx-opacity: 1; }
+  50% { -fx-rotate: 10; -fx-scale-x: 0; -fx-opacity: 0.8; }
+  100% { -fx-rotate: 0; -fx-scale-x: 1; -fx-opacity: 1; }
 }
 
-.card-flip {
-  -fx-animation: card-flip 0.6s ease-in-out;
+/* Effet de survol des cartes */
+.card {
+  -fx-background-color: rgba(255, 255, 255, 0.1);
+  -fx-background-radius: 15;
+  -fx-border-radius: 15;
+  -fx-border-color: rgba(255, 255, 255, 0.2);
+  -fx-border-width: 1;
+  -fx-padding: 15;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 4);
+  -fx-transition: all 0.3s ease;
 }
 
-@keyframes pulse {
-  0% { -fx-scale-x: 1; -fx-scale-y: 1; }
-  50% { -fx-scale-x: 1.05; -fx-scale-y: 1.05; }
-  100% { -fx-scale-x: 1; -fx-scale-y: 1; }
+.card:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.15);
+  -fx-border-color: rgba(255, 255, 255, 0.3);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 8);
+  -fx-translate-y: -3;
+  -fx-animation: pulse 2s infinite;
 }
 
-.menu:hover, .menu-item:hover {
-  -fx-animation: pulse 0.5s ease-in-out;
+/* Animation de points de suivi pour les effets de chargement */
+.loading-effect {
+  -fx-animation: loading-pulse 1.5s infinite;
+}
+
+@keyframes loading-pulse {
+  0% { -fx-opacity: 0.4; }
+  50% { -fx-opacity: 1; }
+  100% { -fx-opacity: 0.4; }
+}
+
+/* Overlay pour les notifications */
+.notification {
+  -fx-background-color: rgba(52, 152, 219, 0.9);
+  -fx-background-radius: 10;
+  -fx-padding: 15;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+  -fx-opacity: 0;
+  -fx-animation: fade-in 0.5s forwards;
+}
+
+@keyframes fade-in {
+  0% { -fx-opacity: 0; -fx-translate-y: -20; }
+  100% { -fx-opacity: 1; -fx-translate-y: 0; }
+}
+
+/* Effet de lueur pour les éléments importants */
+.highlight {
+  -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.8), 20, 0, 0, 0);
+  -fx-animation: glow 2s infinite;
+}
+
+@keyframes glow {
+  0% { -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.5), 10, 0, 0, 0); }
+  50% { -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.8), 20, 0, 0, 0); }
+  100% { -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.5), 10, 0, 0, 0); }
 }
