@@ -6,7 +6,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.App.model.game.Card;
 import org.App.model.game.SkyjoGame;
 import org.App.model.player.HumanPlayer;
 import org.App.model.player.Player;
@@ -16,9 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GameServer {
     private ServerSocket serverSocket;
-    private final List<ClientHandler> clients = new ArrayList<>();
+    private final List<ClientHandler> clients = new CopyOnWriteArrayList<>(); // Thread-safe list
     private SkyjoGame game;
     private boolean gameStarted = false;
+    private boolean isRunning = true;
     private int playerIdCounter = 0;
 
     // Jackson ObjectMapper for JSON serialization
@@ -35,7 +38,7 @@ public class GameServer {
 
     public void start() {
         new Thread(() -> {
-            while (!serverSocket.isClosed()) {
+            while (isRunning && !serverSocket.isClosed()) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     String name = "Player" + (clients.size() + 1); // Nom par défaut
@@ -43,10 +46,39 @@ public class GameServer {
                     new Thread(handler).start();
                     System.out.println("New client connected: " + name);
                 } catch (IOException e) {
-                    System.err.println("Error accepting client: " + e.getMessage());
+                    if (isRunning) {
+                        System.err.println("Error accepting client: " + e.getMessage());
+                    }
                 }
             }
         }).start();
+    }
+
+    public synchronized void stop() {
+        isRunning = false;
+        try {
+            // Notify all clients that server is shutting down
+            broadcast(Protocol.formatMessage(Protocol.ERROR, -1, "Server shutting down"));
+            
+            // Close all client connections
+            for (ClientHandler client : clients) {
+                try {
+                    client.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Server closed"));
+                } catch (Exception e) {
+                    // Ignore errors during shutdown
+                }
+            }
+            
+            // Clear client list
+            clients.clear();
+            
+            // Close server socket
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Error stopping server: " + e.getMessage());
+        }
     }
 
     public synchronized void startGame() {
@@ -57,7 +89,7 @@ public class GameServer {
 
         List<Player> players = new ArrayList<>();
         for (ClientHandler client : clients) {
-            players.add(new HumanPlayer(playerIdCounter++, client.getName()));
+            players.add(new HumanPlayer(client.getId(), client.getName()));
         }
 
         game = new SkyjoGame(players);
@@ -66,6 +98,9 @@ public class GameServer {
 
         // Envoyer l'état initial à tous les joueurs
         broadcastGameState();
+        
+        // Notify players that the game has started
+        broadcast(Protocol.formatMessage(Protocol.GAME_START, -1));
 
         // Désigner le premier joueur
         game.revealInitialCards();
@@ -75,8 +110,41 @@ public class GameServer {
 
     // Broadcast message to all connected clients
     public synchronized void broadcast(String message) {
+        List<ClientHandler> disconnectedClients = new ArrayList<>();
+        
         for (ClientHandler client : clients) {
-            client.sendMessage(message);
+            try {
+                client.sendMessage(message);
+            } catch (Exception e) {
+                System.err.println("Error sending message to client: " + e.getMessage());
+                disconnectedClients.add(client);
+            }
+        }
+        
+        // Remove disconnected clients
+        for (ClientHandler client : disconnectedClients) {
+            handleClientDisconnect(client);
+        }
+    }
+
+    public synchronized void handleClientDisconnect(ClientHandler client) {
+        clients.remove(client);
+        broadcast(Protocol.formatMessage(Protocol.PLAYER_LEFT, -1, client.getName()));
+        
+        // If game has started and a player disconnects, we may need to handle that
+        if (gameStarted && game != null) {
+            // Check if we need to end the game due to too few players
+            if (clients.size() < 2) {
+                broadcast(Protocol.formatMessage(Protocol.GAME_END, -1, "Not enough players remaining"));
+                gameStarted = false;
+            } else {
+                // Otherwise, we might need to skip this player's turn if it's their turn
+                if (game.getActualPlayer().getId() == client.getId()) {
+                    game.nextPlayer();
+                    broadcastGameState();
+                    broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+                }
+            }
         }
     }
 
@@ -103,93 +171,211 @@ public class GameServer {
         }
     }
 
-    // Receives messages from clients and met à jour l'état du jeu en se basant sur
-    // le protocole défini.
-    // Dans GameServer.java, complétez la méthode onClientMessage
     public synchronized void onClientMessage(ClientHandler sender, String message) {
-        String[] parts = Protocol.parseMessage(message);
-        String type = parts[0];
-        int playerId = Integer.parseInt(parts[1]);
+        try {
+            String[] parts = Protocol.parseMessage(message);
+            if (parts.length < 2) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid message format"));
+                return;
+            }
+            
+            String type = parts[0];
+            int playerId = Integer.parseInt(parts[1]);
 
-        switch (type) {
-            case Protocol.PLAYER_JOIN:
-                handlePlayerJoin(sender, parts[2]);
-                break;
-            case Protocol.CARD_PICK:
-                handleCardPick(sender);
-                break;
-            case Protocol.CARD_DISCARD:
-                handleCardDiscard(sender);
-                break;
-            case Protocol.CARD_REVEAL:
-                if (parts.length >= 3) {
-                    int cardIndex = Integer.parseInt(parts[2]);
-                    handleCardReveal(sender, playerId, cardIndex);
-                }
-                break;
-            case Protocol.CARD_EXCHANGE:
-                if (parts.length >= 3) {
-                    int cardIndex = Integer.parseInt(parts[2]);
-                    handleCardExchange(sender, playerId, cardIndex);
-                }
-                break;
+            // Verify that the sender is allowed to send messages for this player ID
+            if (playerId != -1 && playerId != sender.getId() && type != Protocol.PLAYER_JOIN) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Unauthorized player ID"));
+                return;
+            }
+
+            switch (type) {
+                case Protocol.PLAYER_JOIN:
+                    if (parts.length >= 3) {
+                        handlePlayerJoin(sender, parts[2]);
+                    } else {
+                        sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid player join message"));
+                    }
+                    break;
+                case Protocol.CARD_PICK:
+                    handleCardPick(sender);
+                    break;
+                case Protocol.CARD_DISCARD:
+                    handleCardDiscard(sender);
+                    break;
+                case Protocol.CARD_REVEAL:
+                    if (parts.length >= 3) {
+                        int cardIndex = Integer.parseInt(parts[2]);
+                        handleCardReveal(sender, playerId, cardIndex);
+                    } else {
+                        sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid card reveal message"));
+                    }
+                    break;
+                case Protocol.CARD_EXCHANGE:
+                    if (parts.length >= 3) {
+                        int cardIndex = Integer.parseInt(parts[2]);
+                        handleCardExchange(sender, playerId, cardIndex);
+                    } else {
+                        sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid card exchange message"));
+                    }
+                    break;
+                default:
+                    sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Unknown message type: " + type));
+                    break;
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing message: " + e.getMessage());
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error processing message"));
         }
     }
 
-    // Ajoutez ces méthodes pour gérer les différentes actions
+    public synchronized int getClientId(ClientHandler client) {
+        int index = clients.indexOf(client);
+        return index >= 0 ? index : -1;
+    }
+    
+    // Helper method to find player by ID
+    private Player findPlayerById(int playerId) {
+        if (game == null) return null;
+        
+        for (Player p : game.getPlayers()) {
+            if (p.getId() == playerId) {
+                return p;
+            }
+        }
+        return null;
+    }
+    
+    // Helper method to check if it's the player's turn
+    private boolean isPlayerTurn(int playerId) {
+        return game != null && game.getActualPlayer().getId() == playerId;
+    }
+
     private void handleCardDiscard(ClientHandler sender) {
-        if (!gameStarted) {
+        if (!gameStarted || game == null) {
             sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
             return;
         }
 
-        // Logique pour défausser une carte ou prendre une carte de la défausse
-        // game.addToDiscard(game.getPickedCard()) ou game.pickDiscard()
+        int playerId = sender.getId();
+        if (!isPlayerTurn(playerId)) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Not your turn"));
+            return;
+        }
 
-        // Mettre à jour l'état du jeu et le diffuser
-        broadcastGameState();
+        Player player = findPlayerById(playerId);
+        if (player == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Player not found"));
+            return;
+        }
 
-        // Passer au joueur suivant
-        game.nextPlayer();
-        broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+        try {
+            // Implement the discard logic in your game model
+            game.addToDiscard(game.getTopDiscard());
+            
+            // Broadcast updated state
+            broadcastGameState();
+
+            // Move to next player's turn
+            game.nextPlayer();
+            broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+        } catch (Exception e) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error discarding card: " + e.getMessage()));
+        }
     }
 
     private void handleCardReveal(ClientHandler sender, int playerId, int cardIndex) {
-        if (!gameStarted) {
+        if (!gameStarted || game == null) {
             sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
             return;
         }
 
-        // Trouver le joueur correspondant
-        Player player = null;
-        for (Player p : game.getPlayers()) {
-            if (p.getId() == playerId) {
-                player = p;
-                break;
-            }
+        if (!isPlayerTurn(playerId)) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Not your turn"));
+            return;
         }
 
-        if (player != null) {
-            // Révéler la carte
+        Player player = findPlayerById(playerId);
+        if (player == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Player not found"));
+            return;
+        }
+
+        try {
+            // Check if the card index is valid
+            if (cardIndex < 0 || cardIndex >= player.getCartes().size()) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid card index"));
+                return;
+            }
+            
+            // Implement the reveal card logic in your game model
             game.revealCard(player, cardIndex);
-
-            // Mettre à jour l'état du jeu et le diffuser
+            
+            // Broadcast the updated game state to all clients
             broadcastGameState();
-
-            // Vérifier si le jeu est terminé
+            
+            // Check if the game is finished after this move
             if (game.isFinished()) {
+                // Handle game end
                 broadcast(Protocol.formatMessage(Protocol.GAME_END, -1));
+                gameStarted = false;
             } else {
-                // Passer au joueur suivant
+                // Move to next player
                 game.nextPlayer();
                 broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
             }
+        } catch (Exception e) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error revealing card: " + e.getMessage()));
         }
     }
 
     private void handleCardExchange(ClientHandler sender, int playerId, int cardIndex) {
-        // Similaire à handleCardReveal mais pour l'échange de cartes
-        // ...
+        if (!gameStarted || game == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
+            return;
+        }
+
+        if (!isPlayerTurn(playerId)) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Not your turn"));
+            return;
+        }
+
+        Player player = findPlayerById(playerId);
+        if (player == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Player not found"));
+            return;
+        }
+
+        try {
+            // Check if the card index is valid
+            if (cardIndex < 0 || cardIndex >= player.getCartes().size()) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid card index"));
+                return;
+            }
+            
+            // Check if player has a picked card to exchange
+            if(game.getPickedCard() == null) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "No card picked to exchange"));
+                return;
+            }
+            
+            // Implement the exchange card logic
+            game.exchangeOrRevealCard(player, game.getPickedCard(), cardIndex);
+            
+            // Broadcast updated state
+            broadcastGameState();
+            
+            // Check if the game is finished after this move
+            if (game.isFinished()) {
+                broadcast(Protocol.formatMessage(Protocol.GAME_END, -1));
+                gameStarted = false;
+            } else {
+                // Move to next player
+                game.nextPlayer();
+                broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+            }
+        } catch (Exception e) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error exchanging card: " + e.getMessage()));
+        }
     }
 
     private void handlePlayerJoin(ClientHandler sender, String playerName) {
@@ -198,27 +384,109 @@ public class GameServer {
             return;
         }
 
-        clients.add(sender);
-        broadcast(Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
-    }
-
-    private void handleCardPick(ClientHandler sender) {
-        if (!gameStarted) {
-            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
-            return;
+        // Set the player's name
+        sender.setName(playerName);
+        
+        // Assign a unique ID to the client
+        if (!clients.contains(sender)) {
+            sender.setId(playerIdCounter++);
+            clients.add(sender);
+        }
+        
+        // Notify all clients about the new player
+        broadcast(Protocol.formatMessage(Protocol.PLAYER_JOIN, sender.getId(), playerName));
+        
+        // Send the current player list to the new player
+        for (ClientHandler client : clients) {
+            if (client != sender) {
+                sender.sendMessage(Protocol.formatMessage(
+                    Protocol.PLAYER_JOIN, client.getId(), client.getName()));
+            }
         }
     }
 
-    // Dans GameServer.java
+    private void handleCardPick(ClientHandler sender) {
+        if (!gameStarted || game == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Game not started"));
+            return;
+        }
+
+        int playerId = sender.getId();
+        if (!isPlayerTurn(playerId)) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Not your turn"));
+            return;
+        }
+
+        Player player = findPlayerById(playerId);
+        if (player == null) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Player not found"));
+            return;
+        }
+
+        try {
+            // Check if pick pile has cards
+            if (game.getPick().isEmpty()) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Pick pile is empty"));
+                return;
+            }
+            
+            // Implement the pick card logic
+            Card pickedCard = game.pickCard();
+            
+            if (pickedCard != null) {
+                // Notify all clients about the picked card
+                broadcast(Protocol.formatMessage(Protocol.CARD_PICK, playerId));
+                
+                // Send the updated game state
+                broadcastGameState();
+            } else {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Failed to pick a card"));
+            }
+        } catch (Exception e) {
+            sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error picking card: " + e.getMessage()));
+        }
+    }
+
+    // Main method for standalone server
     public static void main(String[] args) {
         GameServer server = new GameServer(5555);
-        server.start(); // Ajoutez cette ligne pour démarrer l'écoute des clients
+        server.start();
         System.out.println("Serveur démarré sur le port 5555");
 
-        // Attendre que des joueurs se connectent avant de démarrer la partie
+        // Simple console commands
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Appuyez sur Entrée pour démarrer la partie...");
-        scanner.nextLine();
-        server.startGame();
+        boolean running = true;
+        
+        while (running) {
+            System.out.println("\nCommandes disponibles:");
+            System.out.println("- start : Démarrer la partie");
+            System.out.println("- list : Lister les joueurs connectés");
+            System.out.println("- quit : Arrêter le serveur");
+            
+            String command = scanner.nextLine().trim();
+            
+            switch (command) {
+                case "start":
+                    server.startGame();
+                    break;
+                case "list":
+                    System.out.println("Joueurs connectés (" + server.clients.size() + ") :");
+                    for (ClientHandler client : server.clients) {
+                        System.out.println("- " + client.getName() + " (ID: " + client.getId() + ")");
+                    }
+                    break;
+                case "quit":
+                    running = false;
+                    System.out.println("Arrêt du serveur...");
+                    server.stop();
+                    break;
+                default:
+                    System.out.println("Commande non reconnue: " + command);
+                    break;
+            }
+        }
+        
+        scanner.close();
+        System.exit(0);
     }
 }

@@ -14,10 +14,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -27,6 +29,9 @@ public class LobbyView {
     private final ListView<String> playersList;
     private final TextField serverAddressField;
     private final MusicManager musicManager;
+    private GameServer server; // Stockage de l'instance du serveur
+    private boolean isHost = false; // Indique si le joueur est l'hôte
+    private Button startGameButton; // Bouton pour démarrer la partie
 
     // Dans LobbyView.java
     public LobbyView(Stage stage, MusicManager musicManager) {
@@ -65,8 +70,23 @@ public class LobbyView {
         backButton.getStyleClass().add("button-danger");
         backButton.setOnAction(e -> {
             musicManager.stop();
+            // Fermer le serveur s'il est actif
+            if (server != null) {
+                // Idéalement, il faudrait avoir une méthode stop() dans GameServer
+                // server.stop();
+            }
             stage.setScene(new GameMenuView(stage, musicManager).getScene());
         });
+
+        // Bouton pour démarrer la partie (initialement désactivé)
+        startGameButton = new Button("Démarrer la partie");
+        startGameButton.getStyleClass().add("button-primary");
+        startGameButton.setDisable(true); // Désactivé jusqu'à ce qu'on soit l'hôte
+        startGameButton.setOnAction(e -> startGame());
+
+        // Label pour indiquer si on est l'hôte
+        Label hostLabel = new Label("En attente de connexion...");
+        hostLabel.setTextFill(Color.LIGHTGRAY);
 
         // Liste des joueurs connectés
         playersList = new ListView<>();
@@ -87,12 +107,16 @@ public class LobbyView {
                 inputRow1,
                 inputRow2,
                 buttonRow,
+                hostLabel,
                 new Text("Joueurs connectés:"),
-                playersList);
+                playersList,
+                startGameButton);
 
         // Style global
         Scene scene = new Scene(container, 800, 600);
         scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
+        
+        stage.setScene(scene);
     }
 
     public Scene getScene() {
@@ -100,17 +124,39 @@ public class LobbyView {
     }
 
     // Méthode pour héberger une partie
-
     private void hostGame() {
         try {
-            GameServer server = new GameServer(5555);
+            server = new GameServer(5555);
             server.start();
+            isHost = true;
+            startGameButton.setDisable(false); // Activer le bouton de démarrage
+            
+            // Mettre à jour le label
+            for (int i = 0; i < container.getChildren().size(); i++) {
+                if (container.getChildren().get(i) instanceof Label) {
+                    Label hostLabel = (Label) container.getChildren().get(i);
+                    hostLabel.setText("Vous êtes l'hôte de la partie");
+                    hostLabel.setTextFill(Color.GREEN);
+                    break;
+                }
+            }
         } catch (Exception e) {
             showError("Erreur lors du démarrage du serveur: " + e.getMessage());
         }
     }
 
-    // Méthode à modifier
+    // Méthode pour démarrer la partie
+    private void startGame() {
+        if (isHost && server != null) {
+            // Envoyer un message au serveur pour démarrer la partie
+            // Le serveur doit avoir une méthode startGame()
+            server.startGame();
+        } else {
+            showError("Vous n'êtes pas l'hôte ou le serveur n'est pas démarré");
+        }
+    }
+
+    // Méthode pour se connecter au serveur
     private void connectToServer(String playerName) {
         if (playerName == null || playerName.trim().isEmpty()) {
             showError("Veuillez entrer un nom valide");
@@ -144,15 +190,40 @@ public class LobbyView {
             NetworkManager.getInstance().getClient().sendMessage(
                     Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
             addPlayer(playerName + " (vous)");
+            
+            // Désactiver les boutons après la connexion
+            for (int i = 0; i < container.getChildren().size(); i++) {
+                if (container.getChildren().get(i) instanceof HBox) {
+                    HBox hbox = (HBox) container.getChildren().get(i);
+                    for (int j = 0; j < hbox.getChildren().size(); j++) {
+                        if (hbox.getChildren().get(j) instanceof Button) {
+                            Button button = (Button) hbox.getChildren().get(j);
+                            if (button.getText().equals("Se connecter") || button.getText().equals("Héberger")) {
+                                button.setDisable(true);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Afficher un message de succès
+            showMessage("Connecté avec succès! En attente d'autres joueurs...");
         } catch (Exception e) {
             showError("Erreur de connexion: " + e.getMessage());
         }
-
     }
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    private void showMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -163,7 +234,10 @@ public class LobbyView {
         @Override
         public void onPlayerJoined(String playerName) {
             Platform.runLater(() -> {
-                addPlayer(playerName);
+                if (!playerName.equals(NetworkManager.getInstance().getLocalPlayerName())) {
+                    addPlayer(playerName);
+                    showMessage("Nouveau joueur connecté: " + playerName);
+                }
             });
         }
 
@@ -197,6 +271,21 @@ public class LobbyView {
         public void onDisconnected() {
             Platform.runLater(() -> {
                 showError("Déconnecté du serveur");
+                // Réactiver les boutons en cas de déconnexion
+                for (int i = 0; i < container.getChildren().size(); i++) {
+                    if (container.getChildren().get(i) instanceof HBox) {
+                        HBox hbox = (HBox) container.getChildren().get(i);
+                        for (int j = 0; j < hbox.getChildren().size(); j++) {
+                            if (hbox.getChildren().get(j) instanceof Button) {
+                                Button button = (Button) hbox.getChildren().get(j);
+                                button.setDisable(false);
+                            }
+                        }
+                    }
+                }
+                playersList.getItems().clear();
+                isHost = false;
+                startGameButton.setDisable(true);
             });
         }
     }
@@ -205,5 +294,9 @@ public class LobbyView {
         if (!playersList.getItems().contains(playerName)) {
             playersList.getItems().add(playerName);
         }
+    }
+    
+    public void show() {
+        stage.show();
     }
 }

@@ -12,11 +12,13 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
     private String name;
+    private int id;
 
     public ClientHandler(Socket socket, GameServer server, String name) {
         this.name = name;
         this.socket = socket;
         this.server = server;
+        this.id = server.getClientId(this);
         try {
             out = new PrintWriter(socket.getOutputStream(), true);
             in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -43,6 +45,18 @@ public class ClientHandler implements Runnable {
                 socket.close();
             } catch(IOException e) { }
         }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getId() {
+        return server.getClientId(this);
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
     
     public void sendMessage(String message) {
