@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.App.model.game.Card;
@@ -445,48 +444,5 @@ public class GameServer {
         } catch (Exception e) {
             sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error picking card: " + e.getMessage()));
         }
-    }
-
-    // Main method for standalone server
-    public static void main(String[] args) {
-        GameServer server = new GameServer(5555);
-        server.start();
-        System.out.println("Serveur démarré sur le port 5555");
-
-        // Simple console commands
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
-        
-        while (running) {
-            System.out.println("\nCommandes disponibles:");
-            System.out.println("- start : Démarrer la partie");
-            System.out.println("- list : Lister les joueurs connectés");
-            System.out.println("- quit : Arrêter le serveur");
-            
-            String command = scanner.nextLine().trim();
-            
-            switch (command) {
-                case "start":
-                    server.startGame();
-                    break;
-                case "list":
-                    System.out.println("Joueurs connectés (" + server.clients.size() + ") :");
-                    for (ClientHandler client : server.clients) {
-                        System.out.println("- " + client.getName() + " (ID: " + client.getId() + ")");
-                    }
-                    break;
-                case "quit":
-                    running = false;
-                    System.out.println("Arrêt du serveur...");
-                    server.stop();
-                    break;
-                default:
-                    System.out.println("Commande non reconnue: " + command);
-                    break;
-            }
-        }
-        
-        scanner.close();
-        System.exit(0);
     }
 }

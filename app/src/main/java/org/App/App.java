@@ -38,7 +38,7 @@ public final class App extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        MusicManager musicManager = new MusicManager("src/main/resources/musics/menu_music.mp3");
+        MusicManager musicManager = new MusicManager("/resources/musics/menu_music.mp3");
 
         // Menu principal modifié avec options de jeu
         VBox mainMenu = new VBox(20);

@@ -84,7 +84,7 @@ public class GameView implements GameViewInterface {
         stage.setFullScreen(false);
         stage.setMaximized(true);
 
-        musicManager = new MusicManager("src/main/resources/musics/game_music.mp3");
+        musicManager = new MusicManager("/resources/musics/game_music.mp3");
 
         if (OptionsManager.getVolume() != 0) {
             musicManager.play();

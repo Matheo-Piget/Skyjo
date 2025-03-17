@@ -36,20 +36,33 @@ public class GameClient {
             String message;
             try {
                 while ((message = in.readLine()) != null) {
+                    System.out.println("CLIENT RECEIVED: " + message);  // Add this debug line
                     String[] parts = Protocol.parseMessage(message);
                     String type = parts[0];
                     
                     if (listener != null) {
                         switch (type) {
                             case Protocol.GAME_STATE:
-                                GameState updatedGame = deserializeGameState(parts[2]);
-                                listener.onGameStateUpdated(updatedGame);
+                                System.out.println("Received GAME_STATE message");  // Add this debug line
+                                try {
+                                    GameState updatedGame = deserializeGameState(parts[2]);
+                                    listener.onGameStateUpdated(updatedGame);
+                                } catch (Exception e) {
+                                    System.err.println("Error processing game state: " + e);
+                                    e.printStackTrace();
+                                }
                                 break;
                             case Protocol.PLAYER_TURN:
                                 int playerId = Integer.parseInt(parts[1]);
                                 listener.onPlayerTurnChanged(playerId);
                                 break;
-                            // Gérer les autres types de messages
+                            case Protocol.PLAYER_JOIN:
+                                String playerName = parts[2];
+                                listener.onPlayerJoined(playerName);
+                                break;
+                            default:
+                                System.out.println("Unhandled message type: " + type);
+                                break;
                         }
                     }
                 }

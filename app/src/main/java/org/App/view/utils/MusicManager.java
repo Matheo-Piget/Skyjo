@@ -1,6 +1,6 @@
 package org.App.view.utils;
 
-import java.io.File;
+import java.net.URL;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -27,13 +27,26 @@ import javafx.util.Duration;
 
 public class MusicManager {
 
-    private final MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
     private static final double FADE_DURATION = 1.0;
 
     public MusicManager(String musicFilePath) {
-        Media media = new Media(new File(musicFilePath).toURI().toString());
-        mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        try {
+            URL resourceUrl = getClass().getResource(musicFilePath);
+            if (resourceUrl == null) {
+                System.err.println("Couldn't find music file: " + musicFilePath);
+                // Create a silent MediaPlayer or null
+                mediaPlayer = null;
+                return;
+            }
+            Media media = new Media(resourceUrl.toString());
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        } catch (Exception e) {
+            System.err.println("Error initializing music player: " + e.getMessage());
+            e.printStackTrace();
+            mediaPlayer = null;
+        }
     }
 
     /**
@@ -54,6 +67,9 @@ public class MusicManager {
      * Arrête la musique de fond avec un fondu.
      */
     public void stop() {
+        if (mediaPlayer == null) {
+            return;
+        }
         if (mediaPlayer != null) {
             fadeOut(() -> mediaPlayer.stop());
         }

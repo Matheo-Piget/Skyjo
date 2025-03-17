@@ -15,6 +15,7 @@ public class GameState implements Serializable {
     private int remainingCards;
     private int currentPlayerId;
     private boolean isFinalRound;
+    private String currentPlayerName;
 
     // Constructeur sans arguments pour la désérialisation
     public GameState() {
@@ -30,6 +31,24 @@ public class GameState implements Serializable {
         this.remainingCards = remainingCards;
         this.currentPlayerId = currentPlayerId;
         this.isFinalRound = isFinalRound;
+    }
+
+    public void setCurrentPlayerName(String currentPlayerName) {
+        this.currentPlayerName = currentPlayerName;
+    }
+
+    public String getCurrentPlayerName() {
+        if (currentPlayerName != null) {
+            return currentPlayerName;
+        }
+        
+        // Fall back to existing logic
+        for (NetworkPlayerState player : players) {
+            if (player.getId() == currentPlayerId) {
+                return player.getName();
+            }
+        }
+        return "Joueur";
     }
 
     // Getters et setters
@@ -64,16 +83,7 @@ public class GameState implements Serializable {
     public void setCurrentPlayerId(int currentPlayerId) {
         this.currentPlayerId = currentPlayerId;
     }
-
-    public String getCurrentPlayerName() {
-        for (NetworkPlayerState player : players) {
-            if (player.getId() == currentPlayerId) {
-                return player.getName();
-            }
-        }
-        return "Joueur";
-    }
-
+    
     public boolean isFinalRound() {
         return isFinalRound;
     }

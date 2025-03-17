@@ -5,7 +5,6 @@ import org.App.network.GameClient;
 import org.App.network.GameServer;
 import org.App.network.GameState;
 import org.App.network.NetworkManager;
-import org.App.network.NetworkPlayerState;
 import org.App.network.Protocol;
 import org.App.view.utils.MusicManager;
 
@@ -115,7 +114,7 @@ public class LobbyView {
         // Style global
         Scene scene = new Scene(container, 800, 600);
         scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
-        
+
         stage.setScene(scene);
     }
 
@@ -130,7 +129,7 @@ public class LobbyView {
             server.start();
             isHost = true;
             startGameButton.setDisable(false); // Activer le bouton de démarrage
-            
+
             // Mettre à jour le label
             for (int i = 0; i < container.getChildren().size(); i++) {
                 if (container.getChildren().get(i) instanceof Label) {
@@ -190,7 +189,7 @@ public class LobbyView {
             NetworkManager.getInstance().getClient().sendMessage(
                     Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
             addPlayer(playerName + " (vous)");
-            
+
             // Désactiver les boutons après la connexion
             for (int i = 0; i < container.getChildren().size(); i++) {
                 if (container.getChildren().get(i) instanceof HBox) {
@@ -205,7 +204,7 @@ public class LobbyView {
                     }
                 }
             }
-            
+
             // Afficher un message de succès
             showMessage("Connecté avec succès! En attente d'autres joueurs...");
         } catch (Exception e) {
@@ -220,7 +219,7 @@ public class LobbyView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private void showMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
@@ -241,24 +240,44 @@ public class LobbyView {
             });
         }
 
-        // Dans la classe LobbyNetworkListener
         @Override
         public void onGameStateUpdated(GameState gameState) {
-            Platform.runLater(() -> {
-                // Trouver l'ID du joueur local
-                for (NetworkPlayerState player : gameState.getPlayers()) {
-                    if (player.getName().equals(NetworkManager.getInstance().getLocalPlayerName())) {
-                        NetworkManager.getInstance().setLocalPlayerId(player.getId());
-                        break;
-                    }
-                }
+            System.out.println("LobbyView received game state update");
+            if (gameState == null) {
+                System.err.println("Received null game state");
+                return;
+            }
 
-                // Transition vers l'écran de jeu
-                GameViewInterface gameView = new GameView(stage);
-                OnlineGameController controller = new OnlineGameController(
-                        gameView,
-                        NetworkManager.getInstance().getLocalPlayerId());
-                stage.setScene(gameView.getScene());
+            Platform.runLater(() -> {
+                try {
+                    // Only transition if we haven't already
+                    if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
+                        System.out.println("Transitioning to game view");
+
+                        // Stop the lobby music
+                        if (musicManager != null) {
+                            musicManager.stop();
+                        }
+
+                        // Create new GameView with minimal initialization
+                        GameView gameView = new GameView(stage);
+
+                        // Set up controller and transition to game view
+                        OnlineGameController controller = new OnlineGameController(gameView,
+                                NetworkManager.getInstance().getLocalPlayerId());
+
+                        // Important: Set the listener on the network manager before changing scene
+                        NetworkManager.getInstance().getClient().setListener(controller);
+
+                        // Switch to game scene
+                        stage.setScene(gameView.getScene());
+                        gameView.show();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error transitioning to game view: " + e.getMessage());
+                    e.printStackTrace();
+                    showError("Failed to start game: " + e.getMessage());
+                }
             });
         }
 
@@ -295,7 +314,7 @@ public class LobbyView {
             playersList.getItems().add(playerName);
         }
     }
-    
+
     public void show() {
         stage.show();
     }
