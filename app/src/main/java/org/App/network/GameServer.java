@@ -107,23 +107,27 @@ public class GameServer {
         broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
     }
 
-    // Broadcast message to all connected clients
+    /**
+     * Broadcast a message to all connected clients.
+     * This method is synchronized to ensure thread safety when modifying the client list.
+     * @param message The message to broadcast.
+     * @throws IOException If an error occurs while sending the message.
+     */
     public synchronized void broadcast(String message) {
+        System.out.println("SERVER BROADCASTING: " + message);
         List<ClientHandler> disconnectedClients = new ArrayList<>();
         
         for (ClientHandler client : clients) {
             try {
                 client.sendMessage(message);
             } catch (Exception e) {
-                System.err.println("Error sending message to client: " + e.getMessage());
+                System.err.println("Error broadcasting to client: " + e.getMessage());
                 disconnectedClients.add(client);
             }
         }
         
         // Remove disconnected clients
-        for (ClientHandler client : disconnectedClients) {
-            handleClientDisconnect(client);
-        }
+        clients.removeAll(disconnectedClients);
     }
 
     public synchronized void handleClientDisconnect(ClientHandler client) {

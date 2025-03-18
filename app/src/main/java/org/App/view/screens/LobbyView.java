@@ -155,59 +155,30 @@ public class LobbyView {
         }
     }
 
-    // Méthode pour se connecter au serveur
     private void connectToServer(String playerName) {
-        if (playerName == null || playerName.trim().isEmpty()) {
-            showError("Veuillez entrer un nom valide");
-            return;
-        }
-
-        String address = serverAddressField.getText();
-        String[] parts = address.split(":");
-
-        if (parts.length != 2) {
-            showError("Format d'adresse invalide. Utilisez IP:port");
-            return;
-        }
-
-        String host = parts[0];
-        int port;
         try {
-            port = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException e) {
-            showError("Format de port invalide");
-            return;
-        }
-
-        try {
-            NetworkManager.createInstance(host, port);
-
-            // Stocker l'ID du joueur pour l'utiliser lors de la transition vers la partie
-            NetworkManager.getInstance().setLocalPlayerName(playerName);
-
-            NetworkManager.getInstance().getClient().setListener(new LobbyNetworkListener());
-            NetworkManager.getInstance().getClient().sendMessage(
-                    Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
-            addPlayer(playerName + " (vous)");
-
-            // Désactiver les boutons après la connexion
-            for (int i = 0; i < container.getChildren().size(); i++) {
-                if (container.getChildren().get(i) instanceof HBox) {
-                    HBox hbox = (HBox) container.getChildren().get(i);
-                    for (int j = 0; j < hbox.getChildren().size(); j++) {
-                        if (hbox.getChildren().get(j) instanceof Button) {
-                            Button button = (Button) hbox.getChildren().get(j);
-                            if (button.getText().equals("Se connecter") || button.getText().equals("Héberger")) {
-                                button.setDisable(true);
-                            }
-                        }
-                    }
-                }
+            String address = serverAddressField.getText();
+            String[] parts = address.split(":");
+            
+            if (parts.length != 2) {
+                showError("Format d'adresse invalide. Utilisez 'host:port'");
+                return;
             }
-
-            // Afficher un message de succès
+            
+            String host = parts[0];
+            int port = Integer.parseInt(parts[1]);
+            
+            // Create network manager with correct host/port
+            NetworkManager.createInstance(host, port);
+            NetworkManager.getInstance().setLocalPlayerName(playerName);
+            NetworkManager.getInstance().getClient().setListener(new LobbyNetworkListener());
+            
+            // Send JOIN message to server
+            NetworkManager.getInstance().getClient().sendMessage(
+                Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
+                
             showMessage("Connecté avec succès! En attente d'autres joueurs...");
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             showError("Erreur de connexion: " + e.getMessage());
         }
     }
@@ -233,8 +204,11 @@ public class LobbyView {
         @Override
         public void onPlayerJoined(String playerName) {
             Platform.runLater(() -> {
+                // Add the new player to the list
+                addPlayer(playerName);
+                
+                // Show message only for other players
                 if (!playerName.equals(NetworkManager.getInstance().getLocalPlayerName())) {
-                    addPlayer(playerName);
                     showMessage("Nouveau joueur connecté: " + playerName);
                 }
             });

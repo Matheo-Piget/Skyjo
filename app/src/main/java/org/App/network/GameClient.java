@@ -91,7 +91,13 @@ public class GameClient {
     }
     
     public void sendMessage(String message) {
-        out.println(message);
+        System.out.println("CLIENT SENDING: " + message);
+        if (out != null) {
+            out.println(message);
+            out.flush(); // Important to flush!
+        } else {
+            System.err.println("Cannot send message - not connected");
+        }
     }
     
     public void disconnect() {

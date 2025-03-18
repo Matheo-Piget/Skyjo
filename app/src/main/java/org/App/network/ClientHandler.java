@@ -60,6 +60,12 @@ public class ClientHandler implements Runnable {
     }
     
     public void sendMessage(String message) {
-        System.out.println(message);
+        System.out.println("SERVER SENDING TO " + name + ": " + message);
+        if (out != null) {
+            out.println(message);
+            out.flush(); // Important to flush!
+        } else {
+            System.err.println("Cannot send message to " + name + " - connection lost");
+        }
     }
 }
