@@ -70,7 +70,7 @@ public class GameView implements GameViewInterface {
     private final VBox cardsContainer;
     private final Scene scene;
     private final Pane rootPane;
-    private final MusicManager musicManager;
+    private MusicManager musicManager;
 
     /**
      * Constructs a new GameView with the specified stage.
@@ -84,8 +84,16 @@ public class GameView implements GameViewInterface {
         stage.setFullScreen(false);
         stage.setMaximized(true);
 
-        musicManager = new MusicManager("/resources/musics/game_music.mp3");
-
+        try {
+            musicManager = new MusicManager("/resources/musics/game_music.mp3");
+            if (OptionsManager.getVolume() > 0) {
+                musicManager.setVolume(OptionsManager.getVolume());
+                musicManager.play();
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to initialize music: " + e.getMessage());
+            musicManager = null;
+        }
         if (OptionsManager.getVolume() != 0) {
             musicManager.play();
         }

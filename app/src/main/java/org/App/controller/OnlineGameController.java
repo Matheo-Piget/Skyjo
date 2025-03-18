@@ -49,9 +49,14 @@ public class OnlineGameController implements NetworkEventListener {
     public OnlineGameController(GameViewInterface view, int playerId) {
         this.view = view;
         this.playerId = playerId;
+        this.playerNames = new HashMap<>();
         
         // Register this controller as the network event listener
         NetworkManager.getInstance().getClient().setListener(this);
+
+        if (lastGameState != null) {
+            updateViewWithGameState(lastGameState);
+        }
         
         // Initial UI setup while waiting for server state
         Platform.runLater(() -> {

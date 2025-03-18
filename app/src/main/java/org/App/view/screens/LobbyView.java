@@ -159,24 +159,24 @@ public class LobbyView {
         try {
             String address = serverAddressField.getText();
             String[] parts = address.split(":");
-            
+
             if (parts.length != 2) {
                 showError("Format d'adresse invalide. Utilisez 'host:port'");
                 return;
             }
-            
+
             String host = parts[0];
             int port = Integer.parseInt(parts[1]);
-            
+
             // Create network manager with correct host/port
             NetworkManager.createInstance(host, port);
             NetworkManager.getInstance().setLocalPlayerName(playerName);
             NetworkManager.getInstance().getClient().setListener(new LobbyNetworkListener());
-            
+
             // Send JOIN message to server
             NetworkManager.getInstance().getClient().sendMessage(
-                Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
-                
+                    Protocol.formatMessage(Protocol.PLAYER_JOIN, -1, playerName));
+
             showMessage("Connecté avec succès! En attente d'autres joueurs...");
         } catch (NumberFormatException e) {
             showError("Erreur de connexion: " + e.getMessage());
@@ -206,7 +206,7 @@ public class LobbyView {
             Platform.runLater(() -> {
                 // Add the new player to the list
                 addPlayer(playerName);
-                
+
                 // Show message only for other players
                 if (!playerName.equals(NetworkManager.getInstance().getLocalPlayerName())) {
                     showMessage("Nouveau joueur connecté: " + playerName);
@@ -216,35 +216,34 @@ public class LobbyView {
 
         @Override
         public void onGameStateUpdated(GameState gameState) {
-            System.out.println("LobbyView received game state update");
+            System.out.println("LobbyView received game state update: " + gameState);
+
             if (gameState == null) {
                 System.err.println("Received null game state");
                 return;
             }
 
+            // Execute UI updates on JavaFX thread
             Platform.runLater(() -> {
                 try {
-                    // Only transition if we haven't already
                     if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
-                        System.out.println("Transitioning to game view");
+                        System.out.println("Creating game view and controller");
 
-                        // Stop the lobby music
-                        if (musicManager != null) {
-                            musicManager.stop();
-                        }
-
-                        // Create new GameView with minimal initialization
+                        // Create game view with proper error handling
                         GameView gameView = new GameView(stage);
 
-                        // Set up controller and transition to game view
-                        OnlineGameController controller = new OnlineGameController(gameView,
-                                NetworkManager.getInstance().getLocalPlayerId());
+                        // Create controller and register as network listener BEFORE switching scenes
+                        OnlineGameController controller = new OnlineGameController(
+                                gameView, NetworkManager.getInstance().getLocalPlayerId());
 
-                        // Important: Set the listener on the network manager before changing scene
+                        // Important: set listener before changing scene
                         NetworkManager.getInstance().getClient().setListener(controller);
 
-                        // Switch to game scene
+                        // Then change scene
+                        System.out.println("Switching to game view");
                         stage.setScene(gameView.getScene());
+
+                        // And show the scene
                         gameView.show();
                     }
                 } catch (Exception e) {
