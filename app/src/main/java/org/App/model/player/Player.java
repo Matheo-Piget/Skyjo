@@ -44,6 +44,14 @@ public interface Player {
     }
 
     /**
+     * Sets the list of cards for the player.
+     * 
+     * @param carte The list of cards to set.
+     * @see Card
+     */
+    public void setCards(List<Card> carte);
+
+    /**
      * Gets the unique identifier of the player.
      * 
      * @return The unique identifier of the player.

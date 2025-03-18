@@ -58,6 +58,19 @@ public final class HumanPlayer implements Player {
     }
 
     /**
+     * Sets the list of cards for the AI player.
+     * 
+     * @param carte The list of cards to set.
+     * 
+     * @see Card
+     */
+    @Override
+    public void setCards(List<Card> carte) {
+        this.cartes.clear();
+        this.cartes.addAll(carte);
+    }
+
+    /**
      * Returns the commutative score of the AI player.
      * 
      * @return The commutative score of the AI player.

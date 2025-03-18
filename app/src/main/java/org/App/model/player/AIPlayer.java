@@ -83,6 +83,19 @@ public class AIPlayer implements Player {
     }
 
     /**
+     * Sets the list of cards for the AI player.
+     * 
+     * @param carte The list of cards to set.
+     * 
+     * @see Card
+     */
+    @Override
+    public void setCards(List<Card> carte) {
+        this.cartes.clear();
+        this.cartes.addAll(carte);
+    }
+
+    /**
      * Returns the list of cards held by the AI player.
      * 
      * @return A list of {@link Card} instances.

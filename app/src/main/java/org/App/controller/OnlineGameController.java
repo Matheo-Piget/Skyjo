@@ -28,6 +28,14 @@ import javafx.util.Duration;
 /**
  * Controller for online game functionality.
  * Manages the communication between the network layer and the view.
+ * 
+ * Handles game state updates, player actions, and UI updates.
+ * 
+ * @see GameViewInterface
+ * @see NetworkEventListener
+ * 
+ * @author Mathéo Piget
+ * @version 1.1
  */
 public class OnlineGameController implements NetworkEventListener {
     private GameViewInterface view;
@@ -39,6 +47,9 @@ public class OnlineGameController implements NetworkEventListener {
     
     // Store last game state to handle any UI transitions
     private GameState lastGameState;
+    
+    // Card that's currently being held after picking
+    private Card heldCard;
 
     /**
      * Creates a new OnlineGameController with the specified view and player ID.
@@ -54,16 +65,19 @@ public class OnlineGameController implements NetworkEventListener {
         // Register this controller as the network event listener
         NetworkManager.getInstance().getClient().setListener(this);
 
-        if (lastGameState != null) {
-            updateViewWithGameState(lastGameState);
-        }
-        
         // Initial UI setup while waiting for server state
         Platform.runLater(() -> {
-            view.showMessageBox("Connexion au serveur en cours...");
+            if (view != null) {
+                view.showMessageBox("Connexion au serveur en cours...");
+            }
         });
     }
 
+    /**
+     * Sets the view for this controller and updates it with any saved game state.
+     * 
+     * @param view The game view interface.
+     */
     public void setView(GameViewInterface view) {
         this.view = view;
         
@@ -75,24 +89,31 @@ public class OnlineGameController implements NetworkEventListener {
 
     @Override
     public void onGameStateUpdated(GameState gameState) {
+        if (gameState == null) {
+            System.err.println("Received null game state");
+            return;
+        }
+        
+        // Store the game state for future reference
+        lastGameState = gameState;
+        
         Platform.runLater(() -> {
             try {
-                // Store for reference
-                lastGameState = gameState;
-                
-                // Convert network objects to model objects and update the view
-                updateViewWithGameState(gameState);
-                
-                // Check if it's the final round and show that information
-                if (gameState.isFinalRound()) {
-                    view.showMessageBox("Tour final !");
+                // Check if there's a view to update
+                if (view != null) {
+                    updateViewWithGameState(gameState);
+                    
+                    // Check if it's the final round
+                    if (gameState.isFinalRound()) {
+                        handleFinalRound();
+                    }
                 }
-                
-                // Update turn status
-                isMyTurn = (gameState.getCurrentPlayerId() == playerId);
             } catch (Exception e) {
+                System.err.println("Error updating view with game state: " + e.getMessage());
                 e.printStackTrace();
-                view.showMessageBox("Erreur lors de la mise à jour de l'interface : " + e.getMessage());
+                if (view != null) {
+                    view.showMessageBox("Erreur lors de la mise à jour du jeu: " + e.getMessage());
+                }
             }
         });
     }
@@ -145,11 +166,17 @@ public class OnlineGameController implements NetworkEventListener {
             Player player = new HumanPlayer(netPlayer.getId(), netPlayer.getName());
             
             // Add cards to the player
+            List<Card> cards = new ArrayList<>();
             if (netPlayer.getCards() != null) {
                 for (NetworkCardState netCard : netPlayer.getCards()) {
-                    player.piocher(new Card(netCard.getValue(), netCard.isFaceVisible(), netCard.getId()));
+                    Card card = convertNetworkCardToModelCard(netCard);
+                    if (card != null) {
+                        cards.add(card);
+                    }
                 }
             }
+
+            player.setCards(cards);
             
             modelPlayers.add(player);
         }
@@ -172,14 +199,19 @@ public class OnlineGameController implements NetworkEventListener {
     public void onPlayerTurnChanged(int currentPlayerId) {
         // Update turn status and notify the player if it's their turn
         isMyTurn = (currentPlayerId == playerId);
+        
         Platform.runLater(() -> {
             if (isMyTurn) {
                 view.showMessageBox("C'est votre tour!");
-                view.showPlaying(
-                        convertNetworkPlayersToModelPlayers(lastGameState.getPlayers()),
-                        getPlayerName(currentPlayerId),
-                        lastGameState.getRemainingCards(),
-                        convertNetworkCardToModelCard(lastGameState.getTopDiscard()));
+                
+                // Refresh the view with the latest game state to highlight current player
+                if (lastGameState != null) {
+                    view.showPlaying(
+                            convertNetworkPlayersToModelPlayers(lastGameState.getPlayers()),
+                            getPlayerName(currentPlayerId),
+                            lastGameState.getRemainingCards(),
+                            convertNetworkCardToModelCard(lastGameState.getTopDiscard()));
+                }
             } else {
                 String playerName = getPlayerName(currentPlayerId);
                 view.showMessageBox("Tour de " + playerName);
@@ -201,6 +233,8 @@ public class OnlineGameController implements NetworkEventListener {
                 Alert alert = new Alert(Alert.AlertType.ERROR, 
                     "Déconnecté du serveur. Retour au menu principal.", 
                     ButtonType.OK);
+                alert.setTitle("Déconnexion");
+                alert.setHeaderText("Connexion perdue");
                 alert.showAndWait();
                 
                 // Return to the main menu
@@ -219,7 +253,7 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handleCardClick(CardView cardView) {
         if (!isMyTurn) {
-            view.showMessageBox("Ce n'est pas votre tour !");
+            view.showMessageBox("Ce n'est pas votre tour!");
             return;
         }
 
@@ -232,6 +266,7 @@ public class OnlineGameController implements NetworkEventListener {
             
             view.showMessageBox("Échange de carte...");
             hasPickedCard = false; // Reset state
+            heldCard = null;
         } else {
             // Reveal card
             NetworkManager.getInstance().getClient().sendMessage(
@@ -247,7 +282,12 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handlePickClick() {
         if (!isMyTurn) {
-            view.showMessageBox("Ce n'est pas votre tour !");
+            view.showMessageBox("Ce n'est pas votre tour!");
+            return;
+        }
+        
+        if (hasPickedCard) {
+            view.showMessageBox("Vous avez déjà pioché une carte!");
             return;
         }
 
@@ -265,12 +305,12 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handleDiscardClick() {
         if (!isMyTurn) {
-            view.showMessageBox("Ce n'est pas votre tour !");
+            view.showMessageBox("Ce n'est pas votre tour!");
             return;
         }
         
         if (!hasPickedCard) {
-            view.showMessageBox("Vous devez d'abord piocher une carte !");
+            view.showMessageBox("Vous devez d'abord piocher une carte!");
             return;
         }
 
@@ -278,6 +318,7 @@ public class OnlineGameController implements NetworkEventListener {
                 Protocol.formatMessage(Protocol.CARD_DISCARD, playerId));
         
         hasPickedCard = false;
+        heldCard = null;
         view.showMessageBox("Défausse de la carte...");
     }
     
@@ -342,10 +383,12 @@ public class OnlineGameController implements NetworkEventListener {
             
             if (playerId == this.playerId) {
                 if (cardValue != null) {
+                    heldCard = new Card(cardValue, true, -1);
                     view.showMessageBox("Vous avez pioché une carte: " + cardValue.getValue());
                 } else {
-                    view.showMessageBox("Vous avez pioché une carte");
+                    view.showMessageBox("Vous avez pioché une carte.");
                 }
+                hasPickedCard = true;
             } else {
                 view.showMessageBox(playerName + " a pioché une carte");
             }
@@ -363,9 +406,14 @@ public class OnlineGameController implements NetworkEventListener {
             String playerName = getPlayerName(playerId);
             
             if (playerId == this.playerId) {
-                view.showMessageBox("Vous avez révélé: " + cardValue.getValue());
+                view.showMessageBox("Vous avez révélé un " + cardValue.getValue());
             } else {
-                view.showMessageBox(playerName + " a révélé: " + cardValue.getValue());
+                view.showMessageBox(playerName + " a révélé un " + cardValue.getValue());
+            }
+            
+            // Request a refresh of the game state after a card is revealed
+            if (lastGameState != null) {
+                updateViewWithGameState(lastGameState);
             }
         });
     }
@@ -382,10 +430,17 @@ public class OnlineGameController implements NetworkEventListener {
             String playerName = getPlayerName(playerId);
             
             if (playerId == this.playerId) {
-                view.showMessageBox("Vous avez échangé " + discardedValue.getValue() + 
-                                    " pour " + receivedValue.getValue());
+                view.showMessageBox("Vous avez échangé un " + discardedValue.getValue() +
+                                   " contre un " + receivedValue.getValue());
+                hasPickedCard = false;
+                heldCard = null;
             } else {
                 view.showMessageBox(playerName + " a échangé une carte");
+            }
+            
+            // Request a refresh of the game state after a card exchange
+            if (lastGameState != null) {
+                updateViewWithGameState(lastGameState);
             }
         });
     }
@@ -397,7 +452,11 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handleError(String message) {
         Platform.runLater(() -> {
-            view.showMessageBox("Erreur: " + message);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Une erreur s'est produite");
+            alert.setContentText(message);
+            alert.showAndWait();
         });
     }
     
@@ -406,7 +465,11 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handleFinalRound() {
         Platform.runLater(() -> {
-            view.showMessageBox("Tour final ! Un joueur a retourné toutes ses cartes.");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Dernier tour");
+            alert.setHeaderText("C'est le dernier tour!");
+            alert.setContentText("Un joueur a retourné toutes ses cartes. C'est le dernier tour de jeu!");
+            alert.show();
         });
     }
     

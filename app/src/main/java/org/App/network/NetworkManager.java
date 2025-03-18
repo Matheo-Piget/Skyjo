@@ -36,7 +36,6 @@ public class NetworkManager {
     }
 
     private NetworkManager() {
-        // Connectez-vous au serveur (par ex., localhost, port 5555)
         client = new GameClient("localhost", 5555);
     }
 

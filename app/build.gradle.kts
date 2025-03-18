@@ -99,6 +99,10 @@ tasks.register("createExecutable") {
     }
 }
 
+tasks.register("buildAll") {
+    dependsOn("clientJar", "serverJar")
+}
+
 application {
     mainClass.set("org.App.App")
 }

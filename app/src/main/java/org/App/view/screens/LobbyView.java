@@ -204,10 +204,8 @@ public class LobbyView {
         @Override
         public void onPlayerJoined(String playerName) {
             Platform.runLater(() -> {
-                // Add the new player to the list
                 addPlayer(playerName);
 
-                // Show message only for other players
                 if (!playerName.equals(NetworkManager.getInstance().getLocalPlayerName())) {
                     showMessage("Nouveau joueur connecté: " + playerName);
                 }
@@ -223,34 +221,27 @@ public class LobbyView {
                 return;
             }
 
-            // Store game state in static field to ensure it's available to controller
             final GameState gameStateCopy = gameState;
 
-            // Execute UI updates on JavaFX thread
             Platform.runLater(() -> {
                 try {
                     if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
                         System.out.println("Creating game view and controller");
 
-                        // Create controller FIRST
                         OnlineGameController controller = new OnlineGameController(null,
                                 NetworkManager.getInstance().getLocalPlayerId());
 
                         NetworkManager.getInstance().setOnlineController(controller);
 
-                        // Set listener BEFORE creating view to avoid race conditions
                         NetworkManager.getInstance().getClient().setListener(controller);
 
-                        // Now create view and associate it with controller
                         GameView gameView = new GameView(stage);
-                        controller.setView(gameView); // You'll need to add this method
+                        controller.setView(gameView);
 
-                        // Switch scenes
                         System.out.println("Switching to game view");
                         stage.setScene(gameView.getScene());
                         gameView.show();
 
-                        // Process the game state we already have
                         controller.onGameStateUpdated(gameStateCopy);
                     }
                 } catch (Exception e) {
