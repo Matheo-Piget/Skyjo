@@ -223,28 +223,35 @@ public class LobbyView {
                 return;
             }
 
+            // Store game state in static field to ensure it's available to controller
+            final GameState gameStateCopy = gameState;
+
             // Execute UI updates on JavaFX thread
             Platform.runLater(() -> {
                 try {
                     if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
                         System.out.println("Creating game view and controller");
 
-                        // Create game view with proper error handling
-                        GameView gameView = new GameView(stage);
+                        // Create controller FIRST
+                        OnlineGameController controller = new OnlineGameController(null,
+                                NetworkManager.getInstance().getLocalPlayerId());
 
-                        // Create controller and register as network listener BEFORE switching scenes
-                        OnlineGameController controller = new OnlineGameController(
-                                gameView, NetworkManager.getInstance().getLocalPlayerId());
+                        NetworkManager.getInstance().setOnlineController(controller);
 
-                        // Important: set listener before changing scene
+                        // Set listener BEFORE creating view to avoid race conditions
                         NetworkManager.getInstance().getClient().setListener(controller);
 
-                        // Then change scene
+                        // Now create view and associate it with controller
+                        GameView gameView = new GameView(stage);
+                        controller.setView(gameView); // You'll need to add this method
+
+                        // Switch scenes
                         System.out.println("Switching to game view");
                         stage.setScene(gameView.getScene());
-
-                        // And show the scene
                         gameView.show();
+
+                        // Process the game state we already have
+                        controller.onGameStateUpdated(gameStateCopy);
                     }
                 } catch (Exception e) {
                     System.err.println("Error transitioning to game view: " + e.getMessage());

@@ -1,11 +1,23 @@
 package org.App.network;
 
+import org.App.controller.OnlineGameController;
+
 public class NetworkManager {
     private static NetworkManager instance;
     private GameClient client;
 
     private String localPlayerName;
     private int localPlayerId = -1;
+
+    private OnlineGameController onlineController;
+
+    public void setOnlineController(OnlineGameController controller) {
+        this.onlineController = controller;
+    }
+
+    public OnlineGameController getOnlineController() {
+        return onlineController;
+    }
 
     public void setLocalPlayerName(String name) {
         this.localPlayerName = name;

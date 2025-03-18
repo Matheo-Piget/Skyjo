@@ -30,7 +30,7 @@ import javafx.util.Duration;
  * Manages the communication between the network layer and the view.
  */
 public class OnlineGameController implements NetworkEventListener {
-    private final GameViewInterface view;
+    private GameViewInterface view;
     private final int playerId;
     private boolean isMyTurn = false;
     private boolean hasPickedCard = false;
@@ -62,6 +62,15 @@ public class OnlineGameController implements NetworkEventListener {
         Platform.runLater(() -> {
             view.showMessageBox("Connexion au serveur en cours...");
         });
+    }
+
+    public void setView(GameViewInterface view) {
+        this.view = view;
+        
+        // Process any saved game state
+        if (lastGameState != null) {
+            updateViewWithGameState(lastGameState);
+        }
     }
 
     @Override

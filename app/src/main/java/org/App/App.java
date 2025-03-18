@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 public final class App extends Application {
 
     public static App INSTANCE;
+    public boolean isOnlineGame = false;
 
     /**
      * Starts the game by displaying the main menu.
@@ -38,7 +39,7 @@ public final class App extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        MusicManager musicManager = new MusicManager("/resources/musics/menu_music.mp3");
+        MusicManager musicManager = new MusicManager("/musics/menu_music.mp3");
 
         // Menu principal modifié avec options de jeu
         VBox mainMenu = new VBox(20);
@@ -58,6 +59,8 @@ public final class App extends Application {
         Scene scene = new Scene(mainMenu, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        INSTANCE = this;
     }
 
     private void startLocalGame(Stage stage, MusicManager musicManager) {
@@ -67,10 +70,15 @@ public final class App extends Application {
     }
 
     private void startOnlineGame(Stage stage, MusicManager musicManager) {
+
+        isOnlineGame = true;
+        
         // Nouveau code qui lance le lobby pour le jeu en ligne
         LobbyView lobbyView = new LobbyView(stage, musicManager);
         stage.setScene(lobbyView.getScene());
         stage.show();
+
+
     }
 
     /**

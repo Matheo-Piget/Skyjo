@@ -1,6 +1,9 @@
 package org.App.view.components;
 
+import org.App.App;
 import org.App.controller.GameController;
+import org.App.controller.OnlineGameController;
+import org.App.network.NetworkManager;
 
 import javafx.animation.ScaleTransition;
 import javafx.scene.effect.DropShadow;
@@ -87,7 +90,14 @@ public class PickView extends StackPane {
      * This method delegates the click handling to the GameController.
      */
     private void handleClick() {
-        GameController.getInstance().handlePickClick();
+        if (App.getINSTANCE().isOnlineGame) {
+            OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
+            if (controller != null) {
+                controller.handlePickClick();
+            }
+        } else {
+            GameController.getInstance().handlePickClick();
+        }
     }
 
     /**

@@ -68,7 +68,7 @@ public class GameView implements GameViewInterface {
 
     private final Stage stage;
     private final VBox cardsContainer;
-    private final Scene scene;
+    private Scene scene;
     private final Pane rootPane;
     private MusicManager musicManager;
 
@@ -83,42 +83,54 @@ public class GameView implements GameViewInterface {
         stage.setTitle("Skyjo");
         stage.setFullScreen(false);
         stage.setMaximized(true);
-
+    
         try {
-            musicManager = new MusicManager("/resources/musics/game_music.mp3");
+            // Use resource path instead of file path
+            musicManager = new MusicManager("/musics/game_music.mp3");
             if (OptionsManager.getVolume() > 0) {
                 musicManager.setVolume(OptionsManager.getVolume());
                 musicManager.play();
             }
         } catch (Exception e) {
             System.err.println("Failed to initialize music: " + e.getMessage());
+            e.printStackTrace();
             musicManager = null;
         }
-        if (OptionsManager.getVolume() != 0) {
-            musicManager.play();
-        }
-
+    
         this.cardsContainer = new VBox(0);
         this.cardsContainer.setAlignment(Pos.CENTER);
         this.cardsContainer.getStyleClass().add("vbox");
-
-        MenuBar menuBar = createMenuBar();
-        menuBar.getStyleClass().add("menu-bar");
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setTop(menuBar);
-        borderPane.setCenter(rootPane);
-        borderPane.setBottom(cardsContainer);
-
-        this.scene = new Scene(borderPane, 1400, 900);
-        if (OptionsManager.getTheme().equals("Sombre")) {
-            scene.getStylesheets().add("file:src/main/resources/themes/game.css");
-        } else {
-            scene.getStylesheets().add("file:src/main/resources/themes/game_light.css");
+        
+        try {
+            MenuBar menuBar = createMenuBar();
+            menuBar.getStyleClass().add("menu-bar");
+    
+            BorderPane borderPane = new BorderPane();
+            borderPane.setTop(menuBar);
+            borderPane.setCenter(rootPane);
+            borderPane.setBottom(cardsContainer);
+            
+            this.scene = new Scene(borderPane, 1400, 900);
+            
+            // Use resource URLs instead of file paths
+            String cssPath = OptionsManager.getTheme().equals("Sombre") 
+                ? "/themes/game.css" 
+                : "/themes/game_light.css";
+                
+            try {
+                scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+            } catch (Exception e) {
+                System.err.println("Failed to load CSS: " + cssPath + " - " + e.getMessage());
+            }
+            
+            cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
+            cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
+        } catch (Exception e) {
+            // Create a minimal scene if normal initialization fails
+            System.err.println("Error in GameView initialization: " + e.getMessage());
+            e.printStackTrace();
+            this.scene = new Scene(new javafx.scene.control.Label("Loading game..."), 800, 600);
         }
-
-        cardsContainer.prefHeightProperty().bind(scene.heightProperty().subtract(100));
-        cardsContainer.prefWidthProperty().bind(scene.widthProperty().subtract(100));
     }
 
     /**

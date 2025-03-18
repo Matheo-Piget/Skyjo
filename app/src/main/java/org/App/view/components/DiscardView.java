@@ -1,7 +1,10 @@
 package org.App.view.components;
 
+import org.App.App;
 import org.App.controller.GameController;
+import org.App.controller.OnlineGameController;
 import org.App.model.game.Card;
+import org.App.network.NetworkManager;
 
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
@@ -79,8 +82,14 @@ public class DiscardView extends StackPane {
      * @param event The mouse event.
      */
     private void handleClick(javafx.scene.input.MouseEvent event) {
-        GameController.getInstance().handleDiscardClick();
-        // Prevent the event from propagating to children
+        if (App.getINSTANCE().isOnlineGame) {
+            OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
+            if (controller != null) {
+                controller.handleDiscardClick();
+            }
+        } else {
+            GameController.getInstance().handleDiscardClick();
+        }
         event.consume();
     }
 }

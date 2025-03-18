@@ -1,7 +1,10 @@
 package org.App.view.components;
 
+import org.App.App;
 import org.App.controller.GameController;
+import org.App.controller.OnlineGameController;
 import org.App.model.game.Card;
+import org.App.network.NetworkManager;
 import org.App.view.utils.SoundManager;
 
 import javafx.animation.Interpolator;
@@ -211,12 +214,19 @@ public class CardView extends StackPane {
      * Handles the click event on the card.
      */
     private void handleClick() {
-        if (GameController.getInstance() == null) {
-            System.out.println("GameController est null !");
+    if (App.getINSTANCE().isOnlineGame) {
+        OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
+        if (controller != null) {
+            controller.handleCardClick(this);
         } else {
-            GameController.getInstance().handleCardClick(this);
+            System.out.println("Online controller is null!");
         }
+    } else if (GameController.getInstance() == null) {
+        System.out.println("GameController est null !");
+    } else {
+        GameController.getInstance().handleCardClick(this);
     }
+}
 
     /**
      * Gets the card value.

@@ -1,7 +1,8 @@
 package org.App;
 
-import org.App.network.GameServer;
 import java.util.Scanner;
+
+import org.App.network.GameServer;
 
 public class ServerLauncher {
     public static void main(String[] args) {
