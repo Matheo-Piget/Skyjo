@@ -39,7 +39,7 @@ import javafx.util.Duration;
  */
 public class OnlineGameController implements NetworkEventListener {
     private GameViewInterface view;
-    private final int playerId;
+    private int playerId;
     private boolean isMyTurn = false;
     private boolean hasPickedCard = false;
     private boolean gameEnded = false;
@@ -61,6 +61,8 @@ public class OnlineGameController implements NetworkEventListener {
         this.view = view;
         this.playerId = playerId;
         this.playerNames = new HashMap<>();
+        
+        System.out.println("OnlineGameController initialisé avec l'ID de joueur: " + playerId);
         
         // Register this controller as the network event listener
         NetworkManager.getInstance().getClient().setListener(this);
@@ -96,6 +98,22 @@ public class OnlineGameController implements NetworkEventListener {
         
         // Store the game state for future reference
         lastGameState = gameState;
+        
+        // Vérification de sécurité: s'assurer que l'ID du joueur est correctement défini
+        String localPlayerName = NetworkManager.getInstance().getLocalPlayerName();
+        for (NetworkPlayerState playerState : gameState.getPlayers()) {
+            if (playerState.getName().equals(localPlayerName) && this.playerId != playerState.getId()) {
+                System.out.println("⚠️ Correction d'ID détectée: L'ID local " + this.playerId + 
+                                   " ne correspond pas à l'ID du serveur " + playerState.getId() + 
+                                   " pour le joueur " + localPlayerName);
+                this.playerId = playerState.getId();
+                NetworkManager.getInstance().setLocalPlayerId(this.playerId);
+            }
+        }
+        
+        // Update isMyTurn based on the current player ID
+        isMyTurn = (gameState.getCurrentPlayerId() == playerId);
+        System.out.println("Current player ID: " + gameState.getCurrentPlayerId() + ", My ID: " + playerId + ", Is my turn: " + isMyTurn);
         
         Platform.runLater(() -> {
             try {
@@ -135,14 +153,96 @@ public class OnlineGameController implements NetworkEventListener {
             playerNames.put(player.getId(), player.getName());
         }
         
+        // Check if any cards are face visible - if so, we need to animate the initial flips
+        boolean hasVisibleCards = false;
+        for (Player player : modelPlayers) {
+            for (Card card : player.getCartes()) {
+                if (card.faceVisible()) {
+                    hasVisibleCards = true;
+                    break;
+                }
+            }
+            if (hasVisibleCards) break;
+        }
+        
         // Update the view
         view.showPlaying(
                 modelPlayers,
                 getPlayerName(gameState.getCurrentPlayerId()),
                 gameState.getRemainingCards(),
                 topDiscard);
+                
+        // If we have visible cards, animate the flips
+        if (hasVisibleCards) {
+            // Use a small delay to ensure the views are fully updated
+            addDelay(0.2, () -> animateInitialFlips(modelPlayers));
+        }
     }
     
+    /**
+     * Called after receiving game state with revealed cards.
+     * Finds the CardViews that need to be flipped and animates them.
+     * 
+     * @param players List of players with their current cards
+     */
+    private void animateInitialFlips(List<Player> players) {
+        List<CardView> allCardViews = view.getAllCardViews();
+        List<CardView> toFlip = new ArrayList<>();
+
+        for (Player player : players) {
+            for (int i = 0; i < player.getCartes().size(); i++) {
+                Card card = player.getCartes().get(i);
+                if (card.faceVisible()) {
+                    for (CardView cardView : allCardViews) {
+                        if (cardView.getIndex() == i && cardView.getPlayerId() == player.getId() 
+                                && !cardView.isFlipped()) {
+                            toFlip.add(cardView);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!toFlip.isEmpty()) {
+            System.out.println("🎴 Animation de retournement pour " + toFlip.size() + " cartes");
+            animateCardFlipsSequentially(toFlip, () -> {
+                System.out.println("🎴 Animation de retournement terminée");
+            });
+        }
+    }
+
+    /**
+     * Animates the flip for each CardView in the provided list sequentially.
+     * 
+     * @param cardViews  The list of CardViews to flip.
+     * @param onFinished The action to execute after all flips are completed.
+     */
+    private void animateCardFlipsSequentially(List<CardView> cardViews, Runnable onFinished) {
+        if (cardViews.isEmpty()) {
+            onFinished.run();
+            return;
+        }
+        CardView cv = cardViews.remove(0);
+        cv.flipCard(() -> {
+            PauseTransition delay = new PauseTransition(Duration.seconds(0.1));
+            delay.setOnFinished(event -> animateCardFlipsSequentially(cardViews, onFinished));
+            delay.play();
+        });
+    }
+    
+    /**
+     * Adds a delay before executing an action.
+     * 
+     * @param seconds The delay in seconds.
+     * @param action  The action to execute.
+     */
+    private void addDelay(double seconds, Runnable action) {
+        PauseTransition delay = new PauseTransition(Duration.seconds(seconds));
+        delay.setOnFinished(event -> action.run());
+        delay.play();
+    }
+
     /**
      * Gets a player's name from their ID.
      * 
@@ -197,11 +297,21 @@ public class OnlineGameController implements NetworkEventListener {
 
     @Override
     public void onPlayerTurnChanged(int currentPlayerId) {
+        // Debug logs pour comprendre les problèmes d'ID
+        System.out.println("🎲 onPlayerTurnChanged: serveur dit que c'est le tour du joueur ID=" + currentPlayerId);
+        System.out.println("🎲 Mon ID est: " + this.playerId);
+        
         // Update turn status and notify the player if it's their turn
-        isMyTurn = (currentPlayerId == playerId);
+        boolean previousTurnState = isMyTurn;
+        isMyTurn = (currentPlayerId == this.playerId);
+        
+        if (previousTurnState != isMyTurn) {
+            System.out.println("🎲 Changement d'état de tour: " + previousTurnState + " -> " + isMyTurn);
+        }
         
         Platform.runLater(() -> {
             if (isMyTurn) {
+                System.out.println("🎲 C'EST MON TOUR!");
                 view.showMessageBox("C'est votre tour!");
                 
                 // Refresh the view with the latest game state to highlight current player
@@ -214,6 +324,7 @@ public class OnlineGameController implements NetworkEventListener {
                 }
             } else {
                 String playerName = getPlayerName(currentPlayerId);
+                System.out.println("🎲 Tour du joueur " + playerName + " (ID=" + currentPlayerId + ")");
                 view.showMessageBox("Tour de " + playerName);
             }
         });
@@ -237,10 +348,40 @@ public class OnlineGameController implements NetworkEventListener {
                 alert.setHeaderText("Connexion perdue");
                 alert.showAndWait();
                 
-                // Return to the main menu
+                returnToMainMenu();
+            }
+        });
+    }
+
+    @Override
+    public void onGameEnd(String winnerName, Map<String, Integer> scores) {
+        gameEnded = true;
+        
+        Platform.runLater(() -> {
+            // Build results message
+            StringBuilder results = new StringBuilder("Partie terminée !\n");
+            results.append("Gagnant : ").append(winnerName).append("\n\n");
+            results.append("Scores finaux :\n");
+            
+            for (Map.Entry<String, Integer> entry : scores.entrySet()) {
+                results.append(entry.getKey()).append(": ").append(entry.getValue()).append(" points\n");
+            }
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, 
+                results.toString(), 
+                ButtonType.OK);
+            alert.setTitle("Fin de partie");
+            alert.setHeaderText("Résultats");
+            
+            alert.showAndWait();
+            
+            // Delay a bit before returning to menu
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e -> {
                 NetworkManager.getInstance().disconnect();
                 App.getINSTANCE().restart();
-            }
+            });
+            delay.play();
         });
     }
 
@@ -253,10 +394,14 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void handleCardClick(CardView cardView) {
         if (!isMyTurn) {
+            System.out.println("❌ Tentative d'action hors tour. Mon ID=" + playerId + 
+                              ", Joueur actuel=" + (lastGameState != null ? lastGameState.getCurrentPlayerId() : "?"));
             view.showMessageBox("Ce n'est pas votre tour!");
             return;
         }
 
+        System.out.println("✅ Action validée: c'est bien mon tour (ID=" + playerId + ")");
+        
         // Card clicks can either reveal or exchange a card
         // depending on the game state (if a card has been picked or not)
         if (hasPickedCard) {
@@ -478,5 +623,22 @@ public class OnlineGameController implements NetworkEventListener {
      */
     public void disconnect() {
         NetworkManager.getInstance().disconnect();
+    }
+
+    @Override
+    public void onGameStarted() {
+        System.out.println("🎮 Partie en ligne démarrée!");
+        Platform.runLater(() -> {
+            view.showMessageBox("La partie commence!");
+        });
+    }
+
+    /**
+     * Retourne au menu principal.
+     */
+    private void returnToMainMenu() {
+        // Return to the main menu
+        NetworkManager.getInstance().disconnect();
+        App.getINSTANCE().restart();
     }
 }

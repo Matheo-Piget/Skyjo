@@ -1,5 +1,7 @@
 package org.App.view.screens;
 
+import java.util.Map;
+
 import org.App.controller.OnlineGameController;
 import org.App.network.GameClient;
 import org.App.network.GameServer;
@@ -157,6 +159,13 @@ public class LobbyView {
 
     private void connectToServer(String playerName) {
         try {
+            // Rendre le nom unique en ajoutant un suffixe numérique si nécessaire
+            String uniqueName = makeNameUnique(playerName);
+            if (!uniqueName.equals(playerName)) {
+                System.out.println("🎮 Le nom a été rendu unique: " + playerName + " -> " + uniqueName);
+                playerName = uniqueName;
+            }
+            
             String address = serverAddressField.getText();
             String[] parts = address.split(":");
 
@@ -182,6 +191,21 @@ public class LobbyView {
             showError("Erreur de connexion: " + e.getMessage());
         }
     }
+    
+    /**
+     * Rend un nom de joueur unique en y ajoutant un suffixe numérique aléatoire si nécessaire
+     * @param name Le nom de base
+     * @return Un nom unique
+     */
+    private String makeNameUnique(String name) {
+        if (!playersList.getItems().contains(name)) {
+            return name; // Le nom est déjà unique
+        }
+        
+        // Ajouter un suffixe random au nom pour le rendre unique
+        int randomSuffix = new java.util.Random().nextInt(1000);
+        return name + "_" + randomSuffix;
+    }
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -206,8 +230,51 @@ public class LobbyView {
             Platform.runLater(() -> {
                 addPlayer(playerName);
 
+                // Vérifier si c'est nous qui rejoignons
+                String localName = NetworkManager.getInstance().getLocalPlayerName();
+                if (playerName.equals(localName)) {
+                    // L'ID est déjà défini par GameClient.java quand il reçoit le message JOIN
+                    int savedId = NetworkManager.getInstance().getLocalPlayerId();
+                    System.out.println("✅ Joueur local identifié: " + playerName + " avec ID=" + savedId);
+                }
+
                 if (!playerName.equals(NetworkManager.getInstance().getLocalPlayerName())) {
                     showMessage("Nouveau joueur connecté: " + playerName);
+                }
+            });
+        }
+
+        @Override
+        public void onGameStarted() {
+            System.out.println("🎮 LOBBY: Réception du message de démarrage du jeu (START)");
+
+            Platform.runLater(() -> {
+                try {
+                    if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
+                        System.out.println("Préparation de la vue de jeu suite au signal START");
+
+                        // Création du contrôleur de jeu
+                        int localPlayerId = NetworkManager.getInstance().getLocalPlayerId();
+                        System.out.println("🎮 LOBBY: Création du contrôleur de jeu avec ID=" + localPlayerId + 
+                                           " pour le joueur " + NetworkManager.getInstance().getLocalPlayerName());
+                        
+                        OnlineGameController controller = new OnlineGameController(null, localPlayerId);
+                        NetworkManager.getInstance().setOnlineController(controller);
+                        NetworkManager.getInstance().getClient().setListener(controller);
+
+                        // Création de la vue de jeu
+                        GameView gameView = new GameView(stage);
+                        controller.setView(gameView);
+
+                        // Affichage de la vue
+                        System.out.println("Passage à la vue de jeu");
+                        stage.setScene(gameView.getScene());
+                        gameView.show();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erreur lors de la transition vers la vue de jeu: " + e.getMessage());
+                    e.printStackTrace();
+                    showError("Échec du démarrage du jeu: " + e.getMessage());
                 }
             });
         }
@@ -221,35 +288,39 @@ public class LobbyView {
                 return;
             }
 
-            final GameState gameStateCopy = gameState;
-
-            Platform.runLater(() -> {
-                try {
-                    if (stage.getScene() != null && stage.getScene() == LobbyView.this.getScene()) {
-                        System.out.println("Creating game view and controller");
-
-                        OnlineGameController controller = new OnlineGameController(null,
-                                NetworkManager.getInstance().getLocalPlayerId());
-
+            // Si nous sommes encore dans le lobby et que nous recevons un état de jeu,
+            // cela signifie que la partie a commencé, mais nous n'avons pas reçu le message START.
+            // Dans ce cas, nous devons quand même créer la vue de jeu.
+            if (stage.getScene() == LobbyView.this.getScene()) {
+                final GameState gameStateCopy = gameState;
+                Platform.runLater(() -> {
+                    try {
+                        System.out.println("🎮 LOBBY: Création de la vue de jeu suite à la réception d'un état de jeu");
+                        
+                        int localPlayerId = NetworkManager.getInstance().getLocalPlayerId();
+                        System.out.println("🎮 LOBBY: Création du contrôleur de jeu avec ID=" + localPlayerId + 
+                                           " pour le joueur " + NetworkManager.getInstance().getLocalPlayerName());
+                        
+                        OnlineGameController controller = new OnlineGameController(null, localPlayerId);
                         NetworkManager.getInstance().setOnlineController(controller);
-
                         NetworkManager.getInstance().getClient().setListener(controller);
 
                         GameView gameView = new GameView(stage);
                         controller.setView(gameView);
 
-                        System.out.println("Switching to game view");
+                        System.out.println("Passage à la vue de jeu");
                         stage.setScene(gameView.getScene());
                         gameView.show();
 
+                        // Transmettre l'état de jeu au controller
                         controller.onGameStateUpdated(gameStateCopy);
+                    } catch (Exception e) {
+                        System.err.println("Erreur lors de la transition vers la vue de jeu: " + e.getMessage());
+                        e.printStackTrace();
+                        showError("Échec du démarrage du jeu: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.err.println("Error transitioning to game view: " + e.getMessage());
-                    e.printStackTrace();
-                    showError("Failed to start game: " + e.getMessage());
-                }
-            });
+                });
+            }
         }
 
         @Override
@@ -277,6 +348,13 @@ public class LobbyView {
                 isHost = false;
                 startGameButton.setDisable(true);
             });
+        }
+
+        @Override
+        public void onGameEnd(String winnerName, Map<String, Integer> scores) {
+            System.out.println("🏆 LOBBY: Fin de partie reçue. Gagnant: " + winnerName);
+            // Note: Cette méthode ne devrait jamais être appelée dans le lobby
+            // car le listener est remplacé par celui d'OnlineGameController lorsque la partie commence
         }
     }
 

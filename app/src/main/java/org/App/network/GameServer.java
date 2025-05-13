@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.App.model.game.Card;
@@ -74,6 +75,7 @@ public class GameServer {
             // Close server socket
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
+                System.out.println("Server socket closed successfully");
             }
         } catch (IOException e) {
             System.err.println("Error stopping server: " + e.getMessage());
@@ -102,8 +104,14 @@ public class GameServer {
         broadcast(Protocol.formatMessage(Protocol.GAME_START, -1));
 
         // Désigner le premier joueur
+        System.out.println("SERVER: Révélation des cartes initiales pour déterminer le premier joueur");
         game.revealInitialCards();
+        
+        // S'assurer que l'état mise à jour est envoyé après la révélation des cartes initiales
+        System.out.println("SERVER: Diffusion de l'état du jeu après révélation des cartes initiales");
         broadcastGameState();
+        
+        System.out.println("SERVER: Premier joueur: " + game.getActualPlayer().getName() + " (ID: " + game.getActualPlayer().getId() + ")");
         broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
     }
 
@@ -318,7 +326,7 @@ public class GameServer {
             // Check if the game is finished after this move
             if (game.isFinished()) {
                 // Handle game end
-                broadcast(Protocol.formatMessage(Protocol.GAME_END, -1));
+                sendFinalResults();
                 gameStarted = false;
             } else {
                 // Move to next player
@@ -368,7 +376,7 @@ public class GameServer {
             
             // Check if the game is finished after this move
             if (game.isFinished()) {
-                broadcast(Protocol.formatMessage(Protocol.GAME_END, -1));
+                sendFinalResults();
                 gameStarted = false;
             } else {
                 // Move to next player
@@ -446,6 +454,50 @@ public class GameServer {
             }
         } catch (Exception e) {
             sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error picking card: " + e.getMessage()));
+        }
+    }
+
+    // Nouvelle méthode pour envoyer les résultats finaux
+    private void sendFinalResults() {
+        try {
+            // Révéler toutes les cartes
+            game.revealAllCards();
+            
+            // Obtenir le classement final
+            Map<Player, Integer> finalRanking = game.getRanking();
+            
+            // Construire un message JSON avec les résultats
+            StringBuilder results = new StringBuilder();
+            results.append("{\"ranking\":[");
+            
+            int count = 0;
+            String winnerName = "";
+            
+            for (Map.Entry<Player, Integer> entry : finalRanking.entrySet()) {
+                if (count == 0) {
+                    winnerName = entry.getKey().getName();
+                }
+                
+                results.append("{\"name\":\"").append(entry.getKey().getName())
+                       .append("\",\"score\":").append(entry.getValue()).append("}");
+                
+                if (count < finalRanking.size() - 1) {
+                    results.append(",");
+                }
+                count++;
+            }
+            
+            results.append("],\"winner\":\"").append(winnerName).append("\"}");
+            
+            // Envoyer les résultats à tous les clients
+            broadcast(Protocol.formatMessage(Protocol.GAME_END, -1, results.toString()));
+            
+            // Mettre à jour l'état du jeu une dernière fois
+            broadcastGameState();
+            
+        } catch (Exception e) {
+            System.err.println("Error sending final results: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
