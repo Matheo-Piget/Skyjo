@@ -193,7 +193,7 @@ public class GameServer {
             int playerId = Integer.parseInt(parts[1]);
 
             // Verify that the sender is allowed to send messages for this player ID
-            if (playerId != -1 && playerId != sender.getId() && type != Protocol.PLAYER_JOIN) {
+            if (playerId != -1 && playerId != sender.getId() && !type.equals(Protocol.PLAYER_JOIN)) {
                 sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Unauthorized player ID"));
                 return;
             }
@@ -279,9 +279,15 @@ public class GameServer {
         }
 
         try {
-            // Implement the discard logic in your game model
-            game.addToDiscard(game.getTopDiscard());
-            
+            Card pickedCard = game.getPickedCard();
+            if (pickedCard == null) {
+                sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "No card picked to discard"));
+                return;
+            }
+            game.addToDiscard(pickedCard);
+            game.setPickedCard(null);
+            game.setHasDiscard(true);
+
             // Broadcast updated state
             broadcastGameState();
 
@@ -323,9 +329,12 @@ public class GameServer {
             // Broadcast the updated game state to all clients
             broadcastGameState();
             
+            // Check columns and final round
+            game.checkColumns();
+            game.checkAndEnterFinalRound();
+
             // Check if the game is finished after this move
-            if (game.isFinished()) {
-                // Handle game end
+            if (game.isGameOver()) {
                 sendFinalResults();
                 gameStarted = false;
             } else {
@@ -361,21 +370,26 @@ public class GameServer {
                 sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Invalid card index"));
                 return;
             }
-            
+
             // Check if player has a picked card to exchange
-            if(game.getPickedCard() == null) {
+            if (game.getPickedCard() == null) {
                 sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "No card picked to exchange"));
                 return;
             }
-            
+
             // Implement the exchange card logic
             game.exchangeOrRevealCard(player, game.getPickedCard(), cardIndex);
-            
+            game.setPickedCard(null);
+
             // Broadcast updated state
             broadcastGameState();
-            
+
+            // Check columns and final round
+            game.checkColumns();
+            game.checkAndEnterFinalRound();
+
             // Check if the game is finished after this move
-            if (game.isFinished()) {
+            if (game.isGameOver()) {
                 sendFinalResults();
                 gameStarted = false;
             } else {

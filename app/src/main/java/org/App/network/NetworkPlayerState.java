@@ -22,7 +22,7 @@ public class NetworkPlayerState implements Serializable {
         NetworkPlayerState state = new NetworkPlayerState();
         state.id = player.getId();
         state.name = player.getName();
-        state.score = player.getCommutativeScore();
+        state.score = player.getCumulativeScore();
         state.cards = player.getCartes().stream()
             .map(NetworkCardState::fromCard)
             .collect(Collectors.toList());

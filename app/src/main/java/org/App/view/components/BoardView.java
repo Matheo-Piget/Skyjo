@@ -2,47 +2,30 @@ package org.App.view.components;
 
 import java.util.List;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 
 /**
  * Represents the board view in the Skyjo game.
- * This class is responsible for displaying the cards in a grid layout.
- * 
- * <p>
- * The board is organized in rows and columns, with gaps between the cards for
- * better visibility.
- * </p>
- * 
- * @see CardView
- * 
- * @author Mathéo Piget
- * @version 1.0
+ * Displays cards in a grid layout.
  */
 public class BoardView extends GridPane {
 
-    /**
-     * Constructs a new BoardView with the specified list of card views.
-     *
-     * @param cardViews The list of {@link CardView} instances to display on the
-     *                  board.
-     */
     public BoardView(List<CardView> cardViews) {
         int cols = cardViews.size() / 3;
+        if (cols == 0) {
+            cols = 1;
+        }
 
         for (int i = 0; i < cardViews.size(); i++) {
-            if (cols == 0) {
-                cols = 1;
-            }
             int row = i / cols;
             int col = i % cols;
             this.add(cardViews.get(i), col, row);
         }
 
-        // Horizontal and vertical gaps between cards
-        this.setHgap(7);
-        this.setVgap(7);
-        this.setMaxSize(75, 60);
-        this.setPrefSize(75, 60);
+        this.setHgap(5);
+        this.setVgap(5);
+        this.setAlignment(Pos.CENTER);
     }
 
     public CardView getCardViewAtIndex(int index) {

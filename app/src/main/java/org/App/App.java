@@ -1,109 +1,170 @@
 package org.App;
 
+import java.util.Random;
+
 import org.App.view.screens.GameMenuView;
 import org.App.view.screens.LobbyView;
 import org.App.view.utils.MusicManager;
+import org.App.view.utils.OptionsManager;
 
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
- * Represents the main application class for the Skyjo game.
- * This class is responsible for starting the game and handling the primary
- * stage.
- * 
- * <p>
- * The application class is a subclass of {@link Application} and overrides the
- * {@link Application#start(Stage)} method.
- * </p>
- * 
- * @see GameMenuView
- * 
- * @author Mathéo Piget
- * @version 1.0
+ * Main application class for the Skyjo game.
  */
 public final class App extends Application {
 
     public static App INSTANCE;
     public boolean isOnlineGame = false;
 
-    /**
-     * Starts the game by displaying the main menu.
-     *
-     * @param primaryStage The primary stage of the application.
-     */
     @Override
     public void start(Stage primaryStage) {
         MusicManager musicManager = new MusicManager("/musics/menu_music.mp3");
 
-        // Menu principal modifié avec options de jeu
-        VBox mainMenu = new VBox(20);
-        mainMenu.setAlignment(Pos.CENTER);
+        // Background layer with floating card decorations
+        Pane backgroundLayer = new Pane();
+        backgroundLayer.setMouseTransparent(true);
+        backgroundLayer.setPickOnBounds(false);
+        createFloatingCards(backgroundLayer);
 
-        Button localGameButton = new Button("Jeu Local");
+        VBox mainMenu = new VBox(24);
+        mainMenu.setAlignment(Pos.CENTER);
+        mainMenu.setPadding(new Insets(60));
+
+        // Title
+        Label title = new Label("SKYJO");
+        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 56));
+        title.setTextFill(Color.web("#f1f5f9"));
+        title.setStyle(
+                "-fx-background-color: rgba(99, 102, 241, 0.1); " +
+                "-fx-border-color: rgba(129, 140, 248, 0.3); " +
+                "-fx-border-width: 2; -fx-border-radius: 16; " +
+                "-fx-background-radius: 16; -fx-padding: 16 40;");
+
+        Label subtitle = new Label("Le jeu de cartes");
+        subtitle.setFont(Font.font("Segoe UI", 16));
+        subtitle.setTextFill(Color.web("#94a3b8"));
+
+        // Buttons
+        Button localGameButton = createMenuButton("Jeu Local");
         localGameButton.setOnAction(e -> startLocalGame(primaryStage, musicManager));
 
-        Button onlineGameButton = new Button("Jeu En Ligne");
+        Button onlineGameButton = createMenuButton("Jeu En Ligne");
         onlineGameButton.setOnAction(e -> startOnlineGame(primaryStage, musicManager));
 
-        mainMenu.getChildren().addAll(
-                new Text("Skyjo"),
-                localGameButton,
-                onlineGameButton);
+        mainMenu.getChildren().addAll(title, subtitle, localGameButton, onlineGameButton);
 
-        Scene scene = new Scene(mainMenu, 800, 600);
+        StackPane root = new StackPane(backgroundLayer, mainMenu);
+
+        Scene scene = new Scene(root, 800, 600);
+
+        // Apply theme
+        String cssPath = OptionsManager.getTheme().equals("Sombre")
+                ? "/themes/menu.css"
+                : "/themes/menu_light.css";
+        try {
+            scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+        } catch (Exception e) {
+            System.err.println("Could not load CSS: " + e.getMessage());
+        }
+
+        primaryStage.setTitle("Skyjo");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         INSTANCE = this;
     }
 
+    /** Creates floating card-shaped decorations in the background. */
+    private void createFloatingCards(Pane layer) {
+        Random rng = new Random();
+        boolean isDark = OptionsManager.getTheme().equals("Sombre");
+
+        for (int i = 0; i < 8; i++) {
+            Rectangle card = new Rectangle(35 + rng.nextInt(25), 50 + rng.nextInt(30));
+            card.setArcWidth(8);
+            card.setArcHeight(8);
+            card.setFill(isDark
+                    ? Color.web("#818cf8", 0.03 + rng.nextDouble() * 0.04)
+                    : Color.web("#6366f1", 0.04 + rng.nextDouble() * 0.05));
+            card.setStroke(isDark
+                    ? Color.web("#818cf8", 0.06)
+                    : Color.web("#6366f1", 0.07));
+            card.setStrokeWidth(1);
+
+            card.setLayoutX(rng.nextDouble() * 900);
+            card.setLayoutY(rng.nextDouble() * 700);
+            card.setRotate(rng.nextDouble() * 360);
+
+            layer.getChildren().add(card);
+
+            TranslateTransition tt = new TranslateTransition(
+                    Duration.seconds(14 + rng.nextDouble() * 16), card);
+            tt.setFromY(0);
+            tt.setToY(-25 - rng.nextDouble() * 50);
+            tt.setFromX(0);
+            tt.setToX(-15 + rng.nextDouble() * 30);
+            tt.setAutoReverse(true);
+            tt.setCycleCount(TranslateTransition.INDEFINITE);
+            tt.setInterpolator(Interpolator.EASE_BOTH);
+            tt.play();
+
+            RotateTransition rt = new RotateTransition(
+                    Duration.seconds(22 + rng.nextDouble() * 20), card);
+            rt.setByAngle(-12 + rng.nextDouble() * 24);
+            rt.setAutoReverse(true);
+            rt.setCycleCount(RotateTransition.INDEFINITE);
+            rt.setInterpolator(Interpolator.EASE_BOTH);
+            rt.play();
+        }
+    }
+
+    private Button createMenuButton(String text) {
+        Button button = new Button(text);
+        button.getStyleClass().addAll("button", "button-primary");
+        button.setPrefSize(240, 48);
+        button.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        return button;
+    }
+
     private void startLocalGame(Stage stage, MusicManager musicManager) {
-        // Code existant qui lance le jeu local
         GameMenuView gameMenuView = new GameMenuView(stage, musicManager);
         stage.setScene(gameMenuView.getScene());
     }
 
     private void startOnlineGame(Stage stage, MusicManager musicManager) {
-
         isOnlineGame = true;
-        
-        // Nouveau code qui lance le lobby pour le jeu en ligne
         LobbyView lobbyView = new LobbyView(stage, musicManager);
         stage.setScene(lobbyView.getScene());
         stage.show();
-
-
     }
 
-    /**
-     * Returns the singleton instance of the application.
-     *
-     * @return The singleton instance of the application.
-     */
     public static App getINSTANCE() {
         return INSTANCE;
     }
 
-    /**
-     * Restarts the game by creating a new primary stage.
-     */
     public void restart() {
         Stage primaryStage = new Stage();
         start(primaryStage);
     }
 
-    /**
-     * Launches the application by calling the {@link Application#launch(String...)}
-     * method.
-     *
-     * @param args The command-line arguments.
-     */
     public static void main(String[] args) {
         launch(args);
     }

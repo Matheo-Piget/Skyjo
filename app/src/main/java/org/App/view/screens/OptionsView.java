@@ -20,135 +20,120 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /**
- * Represents the options view of the application.
- * This view allows the user to select and save preferences such as theme, game
- * mode, and volume.
- * 
- * @version 1.0
- * @author Piget Mathéo
- * @see Stage
- * @see Scene
- * @see OptionsManager
+ * Options view. Navigating back restores the parent menu view
+ * without losing player configuration (persistence fix).
  */
 public class OptionsView {
 
     private final Stage stage;
     private final Scene scene;
     private final MusicManager musicManager;
+    private final GameMenuView parentMenu;
 
     /**
-     * Constructs the options view.
-     * 
-     * @param stage        The primary stage of the application.
-     * @param musicManager The music manager to control background music.
+     * @param parentMenu The parent GameMenuView to return to (preserves player list).
      */
-    /**
-     * Constructs the options view.
-     * 
-     * @param stage        The primary stage of the application.
-     * @param musicManager The music manager to control background music.
-     */
-    public OptionsView(Stage stage, MusicManager musicManager) {
+    public OptionsView(Stage stage, MusicManager musicManager, GameMenuView parentMenu) {
         this.stage = stage;
         this.musicManager = musicManager;
+        this.parentMenu = parentMenu;
 
-        // Create UI elements
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(30));
+        VBox root = new VBox(24);
+        root.setPadding(new Insets(40));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);");
 
         // Title
-        Label title = new Label();
-        title.setText("Options");
+        Label title = new Label("Options");
         title.setId("options-title");
 
-        // Theme selection
-        GridPane themePanel = createPanel("");
-        Label themeLabel = new Label("Select theme:");
+        // Theme
+        GridPane themePanel = createPanel("Theme");
+        Label themeLabel = new Label("Theme :");
         themeLabel.getStyleClass().add("label");
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Clair", "Sombre");
         themeComboBox.setValue(OptionsManager.getTheme());
-        themePanel.add(themeLabel, 0, 0);
-        themePanel.add(themeComboBox, 1, 0);
+        themeComboBox.getStyleClass().add("combo-box");
+        themePanel.add(themeLabel, 0, 1);
+        themePanel.add(themeComboBox, 1, 1);
 
-        // Game mode selection
-        GridPane modePanel = createPanel("");
+        // Game mode
+        GridPane modePanel = createPanel("Mode de jeu");
+        Label modeLabel = new Label("Mode :");
+        modeLabel.getStyleClass().add("label");
         ComboBox<String> modeComboBox = new ComboBox<>();
         modeComboBox.getItems().addAll("Classique", "Action");
         modeComboBox.setValue(OptionsManager.getMode());
-        modePanel.add(new Label("Select game mode:"), 0, 0);
-        modePanel.add(modeComboBox, 1, 0);
+        modeComboBox.getStyleClass().add("combo-box");
+        modePanel.add(modeLabel, 0, 1);
+        modePanel.add(modeComboBox, 1, 1);
 
-        // Volume control
-        GridPane volumePanel = createPanel("");
-        Label volumeLabel = new Label("Adjust volume:");
+        // Volume
+        GridPane volumePanel = createPanel("Audio");
+        Label volumeLabel = new Label("Volume :");
         volumeLabel.getStyleClass().add("label");
         Slider volumeSlider = new Slider(0, 1, musicManager.getVolume());
-        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            musicManager.setVolume(newVal.doubleValue());
-        });
         volumeSlider.getStyleClass().add("slider");
-        volumePanel.add(volumeLabel, 0, 0);
-        volumePanel.add(volumeSlider, 1, 0);
+        volumeSlider.setPrefWidth(250);
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                musicManager.setVolume(newVal.doubleValue()));
+        volumePanel.add(volumeLabel, 0, 1);
+        volumePanel.add(volumeSlider, 1, 1);
+
+        // Animation speed
+        GridPane speedPanel = createPanel("Animations");
+        Label speedLabel = new Label("Vitesse :");
+        speedLabel.getStyleClass().add("label");
+        ComboBox<String> speedComboBox = new ComboBox<>();
+        speedComboBox.getItems().addAll("Lent", "Normal", "Rapide");
+        speedComboBox.setValue(OptionsManager.getAnimationSpeedLabel());
+        speedComboBox.getStyleClass().add("combo-box");
+        speedPanel.add(speedLabel, 0, 1);
+        speedPanel.add(speedComboBox, 1, 1);
 
         // Buttons
-        Button saveButton = createStyledButton("Save");
+        Button saveButton = createStyledButton("Sauvegarder");
         saveButton.setOnAction(e -> {
-            saveOptions(themeComboBox.getValue(), modeComboBox.getValue(), volumeSlider.getValue());
-            showConfirmation("Options saved successfully!");
+            saveOptions(themeComboBox.getValue(), modeComboBox.getValue(),
+                    volumeSlider.getValue(), speedComboBox.getValue());
+            showConfirmation("Options sauvegardees !");
         });
 
-        Button resetButton = createStyledButton("Reset to Default");
+        Button resetButton = createStyledButton("Reinitialiser");
         resetButton.setOnAction(e -> {
             themeComboBox.setValue("Clair");
             modeComboBox.setValue("Classique");
             volumeSlider.setValue(0.5);
-            showConfirmation("Options reset to default!");
+            speedComboBox.setValue("Normal");
+            showConfirmation("Options reinitialisees !");
         });
 
-        Button backButton = createStyledButton("Back to Menu");
+        Button backButton = createStyledButton("Retour au menu");
         backButton.setOnAction(e -> goBackToMenu());
 
-        // Add elements to root
-        root.getChildren().addAll(title, themePanel, modePanel, volumePanel, saveButton, resetButton, backButton);
+        root.getChildren().addAll(title, themePanel, modePanel, volumePanel, speedPanel,
+                saveButton, resetButton, backButton);
 
-        // Create scene
         this.scene = new Scene(root, 800, 600);
-        if (OptionsManager.getTheme().equals("Sombre")) {
-            scene.getStylesheets().add(getClass().getResource("/themes/option.css").toExternalForm());
-        } else {
-            scene.getStylesheets().add(getClass().getResource("/themes/option_light.css").toExternalForm());
-        }
+        String cssPath = OptionsManager.getTheme().equals("Sombre")
+                ? "/themes/option.css"
+                : "/themes/option_light.css";
+        scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
     }
 
-    /**
-     * Creates a styled panel with a title.
-     * 
-     * @param title The title of the panel.
-     * @return The styled GridPane.
-     */
     private GridPane createPanel(String title) {
         GridPane panel = new GridPane();
-        panel.setHgap(20);
+        panel.setHgap(16);
         panel.setVgap(10);
-        panel.setPadding(new Insets(20));
+        panel.setPadding(new Insets(16));
         panel.getStyleClass().add("panel");
         Label panelTitle = new Label(title);
-        panelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        panelTitle.setTextFill(Color.WHITE);
+        panelTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        panelTitle.getStyleClass().add("label");
         panel.add(panelTitle, 0, 0, 2, 1);
-
         return panel;
     }
 
-    /**
-     * Creates a styled button with the specified text.
-     * 
-     * @param text The text to display on the button.
-     * @return The styled button.
-     */
     private Button createStyledButton(String text) {
         Button button = new Button(text);
         button.getStyleClass().add("button");
@@ -156,64 +141,44 @@ public class OptionsView {
         return button;
     }
 
-    /**
-     * Displays a confirmation message.
-     * 
-     * @param message The message to display.
-     */
     private void showConfirmation(String message) {
         Label confirmation = new Label(message);
-        confirmation.setTextFill(Color.LIGHTGREEN);
-        confirmation.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        confirmation.setTextFill(Color.web("#22c55e"));
+        confirmation.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
         ((VBox) scene.getRoot()).getChildren().add(confirmation);
 
-        // Remove the message after 3 seconds
         new Thread(() -> {
             try {
-                Thread.sleep(3000);
-                javafx.application.Platform.runLater(() -> ((VBox) scene.getRoot()).getChildren().remove(confirmation));
+                Thread.sleep(2500);
+                javafx.application.Platform.runLater(() ->
+                        ((VBox) scene.getRoot()).getChildren().remove(confirmation));
             } catch (InterruptedException e) {
-                throw new AssertionError("Thread interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt();
             }
         }).start();
     }
 
-    /**
-     * Returns the scene associated with the options view.
-     * 
-     * @return The options view scene.
-     */
     public Scene getScene() {
         return scene;
     }
 
-    /**
-     * Saves the selected theme and game mode.
-     * 
-     * @param theme The selected theme.
-     * @param mode  The selected game mode.
-     */
-    private void saveOptions(String theme, String mode, double volume) {
+    private void saveOptions(String theme, String mode, double volume, String animationSpeed) {
         try {
-            OptionsManager.saveOptions(theme, mode, volume);
+            OptionsManager.saveOptions(theme, mode, volume, animationSpeed);
         } catch (IOException e) {
             System.err.println("Error saving options: " + e.getMessage());
         }
     }
 
     /**
-     * Navigates back to the main menu.
+     * Returns to the parent menu view without recreating it (preserves player list).
      */
     private void goBackToMenu() {
-        GameMenuView gameMenuView = new GameMenuView(stage, musicManager);
-        stage.setScene(gameMenuView.getScene());
+        parentMenu.applySavedOptions();
+        stage.setScene(parentMenu.getScene());
         stage.setFullScreen(true);
-        gameMenuView.show();
     }
 
-    /**
-     * Shows the options view.
-     */
     public void show() {
         stage.setScene(scene);
         stage.setFullScreen(true);

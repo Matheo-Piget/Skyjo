@@ -44,4 +44,14 @@ public interface GameViewInterface {
 
     void clearAll();
 
+    /** Shows a non-intrusive toast message (fades in/out without clearing the board). */
+    default void showToast(String message) {
+        showMessageBox(message); // fallback for online view
+    }
+
+    /** Updates the status bar with a game phase hint (e.g. "Piochez une carte"). */
+    default void showStatusMessage(String message) {}
+
+    /** Shows a brief turn announcement animation ("Tour de [Player]"). */
+    default void showTurnAnnouncement(String playerName) {}
 }

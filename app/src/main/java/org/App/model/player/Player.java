@@ -6,72 +6,47 @@ import org.App.model.game.Card;
 
 /**
  * Represents a player in the Skyjo game.
- * A player has a name, a list of cards, and a difficulty level (for AI
- * players).
- * 
+ * A player has a name, a unique ID, a list of cards, and a cumulative score.
  * <p>
  * This interface defines the common behavior for both human and AI players.
  * </p>
- * 
+ *
  * @see HumanPlayer
  * @see AIPlayer
  * @see Card
- * 
+ *
  * @author Mathéo Piget
- * @version 1.0
+ * @version 2.0
  */
 public interface Player {
 
     /**
-     * Represents the difficulty levels for AI players.
-     */
-    public enum Difficulty {
-
-        /**
-         * Easy difficulty level.
-         */
-        EASY,
-
-        /**
-         * Medium difficulty level.
-         */
-        MEDIUM,
-
-        /**
-         * Hard difficulty level.
-         */
-        HARD
-    }
-
-    /**
      * Sets the list of cards for the player.
-     * 
-     * @param carte The list of cards to set.
-     * @see Card
+     *
+     * @param cards The list of cards to set.
      */
-    public void setCards(List<Card> carte);
+    void setCards(List<Card> cards);
 
     /**
      * Gets the unique identifier of the player.
-     * 
+     *
      * @return The unique identifier of the player.
      */
     int getId();
 
     /**
-     * Gets the commutative score of the player.
-     * The commutative score is the sum of all the scores of the player.
-     * 
-     * @return The commutative score of the player.
+     * Gets the cumulative score of the player across all rounds.
+     *
+     * @return The cumulative score of the player.
      */
-    public int getCommutativeScore();
+    int getCumulativeScore();
 
     /**
-     * Adds a score to the commutative score of the player.
-     * 
+     * Adds a round score to the player's cumulative total.
+     *
      * @param score The score to add.
      */
-    public void addScore(int score);
+    void addScore(int score);
 
     /**
      * Gets the name of the player.

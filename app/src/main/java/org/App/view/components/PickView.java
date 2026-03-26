@@ -6,89 +6,72 @@ import org.App.controller.OnlineGameController;
 import org.App.network.NetworkManager;
 
 import javafx.animation.ScaleTransition;
+import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 /**
- * Represents a view for the draw pile in the game.
- * This view displays the number of remaining cards and allows the user to
- * interact with the pile.
- * It includes animations for hover effects and handles click events to draw a
- * card.
- * 
- * @version 1.0
- * @author Piget Mathéo
- * @see StackPane
- * @see GameController
- * @see Rectangle
- * @see Text
+ * Represents the draw pile in the game.
  */
 public class PickView extends StackPane {
 
-    /**
-     * Constructs a PickView with the specified number of remaining cards.
-     * 
-     * @param remainingCards The number of cards remaining in the draw pile.
-     */
     public PickView(int remainingCards) {
-        // Create the card background
-        Rectangle cardBackground = new Rectangle(40, 60);
-        cardBackground.setFill(Color.GRAY);
-        cardBackground.setStroke(Color.BLACK);
-        cardBackground.setArcWidth(10);
-        cardBackground.setArcHeight(10);
+        Rectangle cardBackground = new Rectangle(50, 72);
+        cardBackground.setFill(Color.web("#334155"));
+        cardBackground.setStroke(Color.web("#475569"));
+        cardBackground.setStrokeWidth(1.5);
+        cardBackground.setArcWidth(12);
+        cardBackground.setArcHeight(12);
 
-        // Display the number of remaining cards
+        // Stacked card effect - second card behind
+        Rectangle bgCard = new Rectangle(50, 72);
+        bgCard.setFill(Color.web("#293548"));
+        bgCard.setStroke(Color.web("#3d4f63"));
+        bgCard.setStrokeWidth(1);
+        bgCard.setArcWidth(12);
+        bgCard.setArcHeight(12);
+        bgCard.setTranslateX(3);
+        bgCard.setTranslateY(3);
+
         Text cardCount = new Text(String.valueOf(remainingCards));
-        cardCount.setStyle("-fx-font-size: 24px;");
+        cardCount.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20));
+        cardCount.setFill(Color.web("#94a3b8"));
 
-        // Add a shadow effect for depth
-        DropShadow shadow = new DropShadow(5, 3, 3, Color.GRAY);
-        cardBackground.setEffect(shadow);
+        Text label = new Text("Pioche");
+        label.setFont(Font.font("Segoe UI", 10));
+        label.setFill(Color.web("#64748b"));
+        label.setTranslateY(28);
 
-        // Add hover animations
-        cardBackground.setOnMouseEntered(event -> scaleUp(cardBackground));
-        cardBackground.setOnMouseExited(event -> scaleDown(cardBackground));
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(10);
+        shadow.setOffsetY(4);
+        shadow.setColor(Color.color(0, 0, 0, 0.3));
+        this.setEffect(shadow);
 
-        // Add components to the view
-        getChildren().addAll(cardBackground, cardCount);
+        setOnMouseEntered(event -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(150), this);
+            st.setToX(1.08);
+            st.setToY(1.08);
+            st.play();
+        });
+        setOnMouseExited(event -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(150), this);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        });
 
-        // Handle click events
+        setAlignment(Pos.CENTER);
+        getChildren().addAll(bgCard, cardBackground, cardCount, label);
         setOnMouseClicked(event -> handleClick());
     }
 
-    /**
-     * Animates the card background to scale up when the mouse enters.
-     * 
-     * @param cardBackground The rectangle representing the card background.
-     */
-    private void scaleUp(Rectangle cardBackground) {
-        ScaleTransition transition = new ScaleTransition(Duration.millis(200), cardBackground);
-        transition.setToX(1.3);
-        transition.setToY(1.3);
-        transition.play();
-    }
-
-    /**
-     * Animates the card background to scale down when the mouse exits.
-     * 
-     * @param cardBackground The rectangle representing the card background.
-     */
-    private void scaleDown(Rectangle cardBackground) {
-        ScaleTransition transition = new ScaleTransition(Duration.millis(200), cardBackground);
-        transition.setToX(1);
-        transition.setToY(1);
-        transition.play();
-    }
-
-    /**
-     * Handles the click event on the draw pile.
-     * This method delegates the click handling to the GameController.
-     */
     private void handleClick() {
         if (App.getINSTANCE().isOnlineGame) {
             OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
@@ -100,11 +83,6 @@ public class PickView extends StackPane {
         }
     }
 
-    /**
-     * Adds a card view to the draw pile.
-     * 
-     * @param cardView The card view to add.
-     */
     public void addCard(CardView cardView) {
         this.getChildren().add(cardView);
     }

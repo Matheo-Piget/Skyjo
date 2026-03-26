@@ -6,81 +6,73 @@ import org.App.controller.OnlineGameController;
 import org.App.model.game.Card;
 import org.App.network.NetworkManager;
 
+import javafx.animation.ScaleTransition;
+import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 /**
  * Represents the discard pile view in the Skyjo game.
- * This class is responsible for displaying the top card of the discard pile and
- * handling its interactions.
- * 
- * <p>
- * The discard pile supports a shadow effect and updates its appearance when the
- * top card changes.
- * </p>
- * 
- * @see Card
- * @see GameController
- * 
- * @author Mathéo Piget
- * @version 1.0
  */
 public class DiscardView extends StackPane {
     private Card topCard;
 
-    /**
-     * Constructs a new DiscardView with the specified top card.
-     *
-     * @param topCard The top card of the discard pile.
-     */
     public DiscardView(Card topCard) {
         this.topCard = topCard;
         updateView();
 
-        // Adding shadow effect
-        DropShadow shadow = new DropShadow(5, 3, 3, Color.GRAY);
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(10);
+        shadow.setOffsetY(4);
+        shadow.setColor(Color.color(0, 0, 0, 0.3));
         this.setEffect(shadow);
+
+        Text label = new Text("Defausse");
+        label.setFont(Font.font("Segoe UI", 10));
+        label.setFill(Color.web("#64748b"));
+        label.setTranslateY(28);
+        getChildren().add(label);
+
+        setAlignment(Pos.CENTER);
+
+        setOnMouseEntered(event -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(150), this);
+            st.setToX(1.08);
+            st.setToY(1.08);
+            st.play();
+        });
+        setOnMouseExited(event -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(150), this);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        });
 
         setOnMouseClicked(event -> handleClick(event));
     }
 
-    /**
-     * Sets the top card of the discard pile and updates the view.
-     *
-     * @param topCard The new top card.
-     */
     public void setTopCard(Card topCard) {
         this.topCard = topCard;
         updateView();
     }
 
-    /**
-     * Updates the view to reflect the current top card.
-     */
     private void updateView() {
-        getChildren().clear();
+        getChildren().removeIf(node -> node instanceof CardView);
         if (topCard != null) {
             CardView cardView = new CardView(topCard, -1, -1);
-            cardView.setMouseTransparent(true); // Disable interactions to prevent multiple clicks
-            getChildren().add(cardView);
+            cardView.setMouseTransparent(true);
+            getChildren().addFirst(cardView);
         }
     }
 
-    /**
-     * Adds a card view to the discard pile.
-     *
-     * @param cardView The card view to add.
-     */
     public void addCard(CardView cardView) {
         this.getChildren().add(cardView);
     }
 
-    /**
-     * Handles the click event on the discard pile.
-     *
-     * @param event The mouse event.
-     */
     private void handleClick(javafx.scene.input.MouseEvent event) {
         if (App.getINSTANCE().isOnlineGame) {
             OnlineGameController controller = NetworkManager.getInstance().getOnlineController();

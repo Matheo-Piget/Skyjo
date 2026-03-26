@@ -68,7 +68,7 @@ public class OptionsManager {
 
     /**
      * Retrieves the currently selected volume level.
-     * 
+     *
      * @return The selected volume level, or 0.5 as the default if not specified.
      */
     public static double getVolume() {
@@ -76,14 +76,41 @@ public class OptionsManager {
     }
 
     /**
+     * Returns the animation speed multiplier.
+     * Lent = 2.0 (slower), Normal = 1.0, Rapide = 0.5 (faster).
+     */
+    public static double getAnimationSpeed() {
+        String speed = properties.getProperty("animationSpeed", "Normal");
+        return switch (speed) {
+            case "Lent" -> 2.0;
+            case "Rapide" -> 0.5;
+            default -> 1.0;
+        };
+    }
+
+    /**
+     * Returns the animation speed label (Lent, Normal, Rapide).
+     */
+    public static String getAnimationSpeedLabel() {
+        return properties.getProperty("animationSpeed", "Normal");
+    }
+
+    /**
      * Saves the selected theme and game mode to the configuration file.
-     * 
+     *
      * @param theme The theme to save.
      * @param mode  The game mode to save.
      * @param volume The volume level to save.
      * @throws IllegalArgumentException If the theme or mode is null.*
      */
     public static void saveOptions(String theme, String mode, double volume) throws IOException {
+        saveOptions(theme, mode, volume, getAnimationSpeedLabel());
+    }
+
+    /**
+     * Saves all options including animation speed.
+     */
+    public static void saveOptions(String theme, String mode, double volume, String animationSpeed) throws IOException {
         if (theme == null || mode == null) {
             throw new IllegalArgumentException("Theme and mode cannot be null.");
         }
@@ -91,13 +118,14 @@ public class OptionsManager {
         properties.setProperty("theme", theme);
         properties.setProperty("mode", mode);
         properties.setProperty("volume", String.valueOf(volume));
+        properties.setProperty("animationSpeed", animationSpeed != null ? animationSpeed : "Normal");
 
         try (FileOutputStream output = new FileOutputStream(FILE_PATH)) {
             properties.store(output, "Skyjo Game Configuration");
             System.out.println("Options saved successfully!");
         } catch (IOException e) {
             System.err.println("Error saving options: " + e.getMessage());
-            throw e; // Re-throw the exception for the caller to handle
+            throw e;
         }
     }
 }

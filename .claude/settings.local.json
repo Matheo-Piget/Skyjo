@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava)",
+      "Bash(gradle compileJava)",
+      "Bash(/c/Gradle/gradle-8.10.2/bin/gradle build:*)"
+    ]
+  }
+}

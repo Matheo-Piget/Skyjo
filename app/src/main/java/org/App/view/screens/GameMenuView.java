@@ -2,14 +2,19 @@ package org.App.view.screens;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.App.controller.GameController;
 import org.App.model.player.AIPlayer;
+import org.App.model.player.Difficulty;
 import org.App.model.player.HumanPlayer;
 import org.App.model.player.Player;
 import org.App.view.utils.MusicManager;
 import org.App.view.utils.OptionsManager;
 
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,86 +22,60 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
- * Represents the main menu view for the Skyjo game.
- * This class is responsible for displaying the game menu, allowing players to
- * configure the game,
- * and starting the game with the specified settings.
- * 
- * <p>
- * The menu includes options to set the number of players, configure AI players,
- * and access game options.
- * </p>
- * 
- * @see GameController
- * @see GameView
- * @see AIPlayer
- * @see HumanPlayer
- * @see Player
- * 
- * @author Mathéo Piget
- * @version 1.0
+ * Main menu view for the Skyjo game.
+ * Player configuration is preserved when navigating to/from options.
  */
 public class GameMenuView {
     private final Stage stage;
+    private Scene menuScene;
     private final VBox playerInputs;
     private final List<TextField> nameFields;
-    private final List<ComboBox<Player.Difficulty>> difficultyBoxes;
+    private final List<ComboBox<Difficulty>> difficultyBoxes;
     private final MusicManager musicManager;
     private int idplayer = 0;
-
     private boolean hasPressOnGenerateFieldsButton;
 
-    /**
-     * Constructs a new GameMenuView with the specified stage.
-     *
-     * @param stage The primary stage for the application.
-     */
     public GameMenuView(Stage stage, MusicManager musicManager) {
         this.stage = stage;
         stage.setFullScreen(true);
         this.nameFields = new ArrayList<>();
         this.musicManager = musicManager;
         this.difficultyBoxes = new ArrayList<>();
-        this.playerInputs = new VBox(10);
+        this.playerInputs = new VBox(12);
         this.playerInputs.setAlignment(Pos.CENTER);
         this.hasPressOnGenerateFieldsButton = false;
 
         setupMenu();
-
         applySavedOptions();
-
         musicManager.play();
-
     }
 
     /**
-     * Applies the saved options (theme, mode and volume) to the game menu.
+     * Applies saved theme and volume. Public so OptionsView can call it on return.
      */
-    private void applySavedOptions() {
+    public void applySavedOptions() {
         String theme = OptionsManager.getTheme();
-        String mode = OptionsManager.getMode();
         double volume = OptionsManager.getVolume();
-        System.out.println("Applying saved options: theme=" + theme + ", mode=" + mode + ", volume=" + volume);
 
-        // Appliquer le thème
-        if (theme.equals("Sombre")) {
-            if (!stage.getScene().getStylesheets().isEmpty()) {
-                stage.getScene().getStylesheets().clear();
-            }
-            stage.getScene().getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
-        } else {
-            if (!stage.getScene().getStylesheets().isEmpty()) {
-                stage.getScene().getStylesheets().clear();
-            }
-            stage.getScene().getStylesheets().add(getClass().getResource("/themes/menu_light.css").toExternalForm());
+        if (menuScene != null) {
+            menuScene.getStylesheets().clear();
+            String cssPath = theme.equals("Sombre")
+                    ? "/themes/menu.css"
+                    : "/themes/menu_light.css";
+            menuScene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
         }
 
         if (volume != musicManager.getVolume()) {
@@ -104,12 +83,6 @@ public class GameMenuView {
         }
     }
 
-    /**
-     * Generates input fields for the specified number of players and AI.
-     *
-     * @param playerCountField The text field containing the number of players.
-     * @param aiCountField     The text field containing the number of AI players.
-     */
     private void generatePlayerFields(TextField playerCountField, TextField aiCountField) {
         playerInputs.getChildren().clear();
         nameFields.clear();
@@ -125,39 +98,30 @@ public class GameMenuView {
             }
         } catch (NumberFormatException e) {
             Label errorLabel = new Label("Veuillez entrer un nombre valide de joueurs et d'IA (total max 8).");
-            errorLabel.setTextFill(Color.RED);
+            errorLabel.setTextFill(Color.web("#ef4444"));
+            errorLabel.setStyle("-fx-font-size: 14px;");
             playerInputs.getChildren().add(errorLabel);
             return;
         }
 
-        // Ajouter les champs pour les joueurs humains
+        // Human player fields
         GridPane playerGrid = new GridPane();
         playerGrid.setHgap(20);
-        playerGrid.setVgap(10);
-        int columns = switch (numPlayers) {
-            case 1 -> 1;
-            case 2 -> 2;
-            case 3 -> 3;
-            case 4 -> 2;
-            case 5 -> 3;
-            case 6 -> 3;
-            case 7 -> 4;
-            default -> 4;
-        };
+        playerGrid.setVgap(12);
+        int columns = Math.min(numPlayers, numPlayers <= 3 ? numPlayers : (numPlayers <= 6 ? 3 : 4));
 
         for (int i = 1; i <= numPlayers; i++) {
             TextField nameField = new TextField("Joueur " + i);
-            nameField.setPrefWidth(200);
-            nameField.setMaxWidth(200);
-            styleTextField(nameField);
+            nameField.setPrefWidth(180);
+            nameField.setMaxWidth(180);
+            nameField.getStyleClass().add("text-field");
             nameFields.add(nameField);
 
             Label lab = new Label("Joueur " + i + " :");
-            lab.setTextFill(Color.WHITE);
-            lab.setStyle("-fx-font-size: 16px;");
-            lab.setEffect(new DropShadow(5, Color.BLACK));
+            lab.setTextFill(Color.web("#cbd5e1"));
+            lab.setStyle("-fx-font-size: 15px;");
 
-            HBox playerBox = new HBox(10, lab, nameField);
+            HBox playerBox = new HBox(8, lab, nameField);
             playerBox.setAlignment(Pos.CENTER);
 
             int row = (i - 1) / columns;
@@ -168,47 +132,32 @@ public class GameMenuView {
         playerGrid.setAlignment(Pos.CENTER);
         playerInputs.getChildren().add(playerGrid);
 
-        
-
-        // Ajouter les champs pour les IA
+        // AI fields
         if (numAI > 0) {
             GridPane aiGrid = new GridPane();
             aiGrid.setHgap(20);
-            aiGrid.setVgap(10);
-
-            columns = switch (numAI) {
-                case 1 -> 1;
-                case 2 -> 2;
-                case 3 -> 3;
-                case 4 -> 2;
-                case 5 -> 3;
-                case 6 -> 3;
-                case 7 -> 4;
-                default -> 4;
-            };
+            aiGrid.setVgap(12);
+            int aiColumns = Math.min(numAI, numAI <= 3 ? numAI : (numAI <= 6 ? 3 : 4));
 
             for (int i = 1; i <= numAI; i++) {
-                ComboBox<Player.Difficulty> difficultyBox = new ComboBox<>();
-                difficultyBox.getItems().addAll(Player.Difficulty.values());
-                difficultyBox.setValue(Player.Difficulty.MEDIUM);
+                ComboBox<Difficulty> difficultyBox = new ComboBox<>();
+                difficultyBox.getItems().addAll(Difficulty.values());
+                difficultyBox.setValue(Difficulty.MEDIUM);
                 difficultyBox.setPrefWidth(150);
                 difficultyBox.setMaxWidth(150);
-                difficultyBox.setPrefHeight(40);
-                difficultyBox.setMaxHeight(40);
-                styleComboBox(difficultyBox);
+                difficultyBox.setPrefHeight(36);
+                difficultyBox.getStyleClass().add("combo-box");
                 difficultyBoxes.add(difficultyBox);
 
                 Label lab = new Label("IA " + i + " :");
-                lab.setTextFill(Color.WHITE);
-                lab.setStyle("-fx-font-size: 16px;");
-                lab.setEffect(new DropShadow(5, Color.BLACK));
-                
+                lab.setTextFill(Color.web("#cbd5e1"));
+                lab.setStyle("-fx-font-size: 15px;");
 
-                HBox aiBox = new HBox(10, lab, difficultyBox);
+                HBox aiBox = new HBox(8, lab, difficultyBox);
                 aiBox.setAlignment(Pos.CENTER);
 
-                int row = (i - 1) / columns;
-                int col = (i - 1) % columns;
+                int row = (i - 1) / aiColumns;
+                int col = (i - 1) % aiColumns;
                 aiGrid.add(aiBox, col, row);
             }
             aiGrid.setAlignment(Pos.CENTER);
@@ -216,43 +165,57 @@ public class GameMenuView {
         }
     }
 
-    /**
-     * Sets up the main menu with all its components.
-     */
     private void setupMenu() {
-        VBox menuContainer = new VBox(20);
-        menuContainer.setPadding(new Insets(30));
-        menuContainer.setAlignment(Pos.CENTER);
-        menuContainer.setStyle("-fx-background-color: #34495e; -fx-padding: 40px; -fx-border-radius: 15px;");
+        // Background layer with floating card decorations
+        Pane backgroundLayer = new Pane();
+        backgroundLayer.setMouseTransparent(true);
+        backgroundLayer.setPickOnBounds(false);
+        createFloatingCards(backgroundLayer);
 
-        Label title = new Label("Bienvenu dans Skyjo !");
+        // Content layer
+        VBox menuContainer = new VBox(22);
+        menuContainer.setPadding(new Insets(40, 40, 20, 40));
+        menuContainer.setAlignment(Pos.CENTER);
+
+        Label title = new Label("SKYJO");
         title.getStyleClass().add("skyjo-title");
-        title.setTextFill(Color.WHITE);
-        title.setEffect(new DropShadow(5, Color.BLACK));
+
+        // Configuration panel with glass effect
+        VBox configPanel = new VBox(12);
+        configPanel.getStyleClass().add("glass-panel");
+        configPanel.setAlignment(Pos.CENTER);
+        configPanel.setMaxWidth(480);
+
+        Label configLabel = new Label("CONFIGURATION");
+        configLabel.getStyleClass().add("section-label");
 
         Label playerCountLabel = new Label("Nombre de joueurs humains :");
-        playerCountLabel.setTextFill(Color.WHITE);
         playerCountLabel.getStyleClass().add("number-of-players-label");
 
         TextField playerCountField = new TextField("2");
-        playerCountField.setPrefWidth(50);
+        playerCountField.setPrefWidth(60);
         playerCountField.setMaxWidth(200);
+        playerCountField.getStyleClass().add("text-field");
 
         Label aiCountLabel = new Label("Nombre d'IA :");
-        aiCountLabel.setTextFill(Color.WHITE);
         aiCountLabel.getStyleClass().add("number-of-players-label");
 
         TextField aiCountField = new TextField("1");
-        aiCountField.setPrefWidth(50);
+        aiCountField.setPrefWidth(60);
         aiCountField.setMaxWidth(200);
+        aiCountField.getStyleClass().add("text-field");
 
-        Button generateFieldsButton = createStyledButton("Générer", "button-secondary");
+        Button generateFieldsButton = createStyledButton("Generer", "button-secondary");
         generateFieldsButton.setOnAction(e -> {
             hasPressOnGenerateFieldsButton = true;
             generatePlayerFields(playerCountField, aiCountField);
         });
 
-        Button startButton = createStyledButton("Start", "button-primary");
+        configPanel.getChildren().addAll(configLabel, playerCountLabel, playerCountField,
+                aiCountLabel, aiCountField, generateFieldsButton);
+
+        // Action buttons
+        Button startButton = createStyledButton("Jouer", "button-primary");
         startButton.setOnAction(e -> {
             if (hasPressOnGenerateFieldsButton) {
                 startGame();
@@ -265,34 +228,74 @@ public class GameMenuView {
         Button quitButton = createStyledButton("Quitter", "button-danger");
         quitButton.setOnAction(e -> stage.close());
 
-        // Agencement du menu
-        HBox buttonBox = new HBox(15, generateFieldsButton, startButton);
-        buttonBox.setAlignment(Pos.CENTER);
+        HBox actionButtons = new HBox(12, startButton, optionsButton, quitButton);
+        actionButtons.setAlignment(Pos.CENTER);
 
-        VBox optionsBox = new VBox(15, optionsButton, quitButton);
-        optionsBox.setAlignment(Pos.CENTER);
-        optionsBox.setPadding(new Insets(20));
+        // Footer
+        Label footer = new Label("Skyjo  \u00b7  Jeu de cartes  \u00b7  v1.0");
+        footer.getStyleClass().add("footer-label");
 
-        menuContainer.getChildren().addAll(title, playerCountLabel, playerCountField, aiCountLabel, aiCountField,
-                buttonBox, playerInputs, optionsBox);
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // Scene
-        if (OptionsManager.getTheme().equals("Sombre")) {
-            Scene scene = new Scene(menuContainer, 700, 500);
-            scene.getStylesheets().add(getClass().getResource("/themes/menu.css").toExternalForm());
-            stage.setScene(scene);
-        } else {
-            Scene scene = new Scene(menuContainer, 700, 500);
-            scene.getStylesheets().add(getClass().getResource("/themes/menu_light.css").toExternalForm());
-            stage.setScene(scene);
+        menuContainer.getChildren().addAll(title, configPanel, playerInputs, actionButtons, spacer, footer);
+
+        // Layered root
+        StackPane root = new StackPane(backgroundLayer, menuContainer);
+
+        String cssPath = OptionsManager.getTheme().equals("Sombre")
+                ? "/themes/menu.css"
+                : "/themes/menu_light.css";
+        this.menuScene = new Scene(root, 700, 500);
+        menuScene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+        stage.setScene(menuScene);
+    }
+
+    /** Creates floating card-shaped decorations in the background. */
+    private void createFloatingCards(Pane layer) {
+        Random rng = new Random();
+        boolean isDark = OptionsManager.getTheme().equals("Sombre");
+
+        for (int i = 0; i < 12; i++) {
+            Rectangle card = new Rectangle(35 + rng.nextInt(25), 50 + rng.nextInt(30));
+            card.setArcWidth(8);
+            card.setArcHeight(8);
+            card.setFill(isDark
+                    ? Color.web("#818cf8", 0.03 + rng.nextDouble() * 0.04)
+                    : Color.web("#6366f1", 0.04 + rng.nextDouble() * 0.05));
+            card.setStroke(isDark
+                    ? Color.web("#818cf8", 0.06)
+                    : Color.web("#6366f1", 0.07));
+            card.setStrokeWidth(1);
+
+            card.setLayoutX(rng.nextDouble() * 1200);
+            card.setLayoutY(rng.nextDouble() * 800);
+            card.setRotate(rng.nextDouble() * 360);
+
+            layer.getChildren().add(card);
+
+            TranslateTransition tt = new TranslateTransition(
+                    Duration.seconds(14 + rng.nextDouble() * 16), card);
+            tt.setFromY(0);
+            tt.setToY(-25 - rng.nextDouble() * 50);
+            tt.setFromX(0);
+            tt.setToX(-15 + rng.nextDouble() * 30);
+            tt.setAutoReverse(true);
+            tt.setCycleCount(TranslateTransition.INDEFINITE);
+            tt.setInterpolator(Interpolator.EASE_BOTH);
+            tt.play();
+
+            RotateTransition rt = new RotateTransition(
+                    Duration.seconds(22 + rng.nextDouble() * 20), card);
+            rt.setByAngle(-12 + rng.nextDouble() * 24);
+            rt.setAutoReverse(true);
+            rt.setCycleCount(RotateTransition.INDEFINITE);
+            rt.setInterpolator(Interpolator.EASE_BOTH);
+            rt.play();
         }
     }
 
-    /**
-     * Starts the game with the configured players.
-     */
     private void startGame() {
-
         musicManager.stop();
         List<Player> players = new ArrayList<>();
         for (TextField nameField : nameFields) {
@@ -300,10 +303,8 @@ public class GameMenuView {
         }
 
         for (int i = 0; i < difficultyBoxes.size(); i++) {
-            ComboBox<Player.Difficulty> difficultyBox = difficultyBoxes.get(i);
-            difficultyBox.setMaxSize(150, 40);
-            difficultyBox.setMinSize(150, 40);
-            Player.Difficulty difficulty = difficultyBox.getValue();
+            ComboBox<Difficulty> difficultyBox = difficultyBoxes.get(i);
+            Difficulty difficulty = difficultyBox.getValue();
             players.add(new AIPlayer(idplayer++, "IA " + (i + 1), difficulty));
         }
 
@@ -318,62 +319,26 @@ public class GameMenuView {
     }
 
     /**
-     * Opens the options menu.
+     * Opens options menu, passing 'this' so the player list is preserved on return.
      */
     private void openOptionsMenu() {
-        OptionsView optionsView = new OptionsView(stage, musicManager);
+        OptionsView optionsView = new OptionsView(stage, musicManager, this);
         stage.setScene(optionsView.getScene());
         stage.setFullScreen(true);
-
         optionsView.show();
-
-        stage.setOnCloseRequest(event -> applySavedOptions());
     }
 
-    /**
-     * Creates a styled button with the specified text.
-     *
-     * @param text The text to display on the button.
-     * @return The styled button.
-     */
     private Button createStyledButton(String text, String styleClass) {
         Button button = new Button(text);
         button.getStyleClass().addAll("button", styleClass);
-        button.setPrefSize(200, 40);
+        button.setPrefSize(180, 40);
         return button;
     }
 
-    /**
-     * Applies a style to the specified text field.
-     *
-     * @param textField The text field to style.
-     */
-    private void styleTextField(TextField textField) {
-        textField.setPrefWidth(200);
-        textField.getStyleClass().add("text-field");
-    }
-
-    /**
-     * Applies a style to the specified combo box.
-     *
-     * @param comboBox The combo box to style.
-     */
-    private void styleComboBox(ComboBox<Player.Difficulty> comboBox) {
-        comboBox.getStyleClass().add("combo-box");
-    }
-
-    /**
-     * Gets the scene associated with this view.
-     *
-     * @return The scene.
-     */
     public Scene getScene() {
-        return stage.getScene();
+        return menuScene;
     }
 
-    /**
-     * Displays the game menu.
-     */
     public void show() {
         stage.show();
     }
