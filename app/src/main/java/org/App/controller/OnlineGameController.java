@@ -17,6 +17,7 @@ import org.App.network.NetworkManager;
 import org.App.network.NetworkPlayerState;
 import org.App.network.Protocol;
 import org.App.view.components.CardView;
+import org.App.view.components.GameActionListener;
 import org.App.view.screens.GameViewInterface;
 
 import javafx.animation.PauseTransition;
@@ -37,7 +38,7 @@ import javafx.util.Duration;
  * @author Mathéo Piget
  * @version 1.1
  */
-public class OnlineGameController implements NetworkEventListener {
+public class OnlineGameController implements NetworkEventListener, GameActionListener {
     private GameViewInterface view;
     private int playerId;
     private boolean isMyTurn = false;
@@ -63,9 +64,10 @@ public class OnlineGameController implements NetworkEventListener {
         this.playerNames = new HashMap<>();
         
         System.out.println("OnlineGameController initialisé avec l'ID de joueur: " + playerId);
-        
-        // Register this controller as the network event listener
+
+        // Register this controller as the network event listener and view action listener
         NetworkManager.getInstance().getClient().setListener(this);
+        CardView.setGlobalListener(this);
 
         // Initial UI setup while waiting for server state
         Platform.runLater(() -> {
@@ -468,44 +470,6 @@ public class OnlineGameController implements NetworkEventListener {
     }
     
     /**
-     * Handles the end of the game.
-     * Displays final scores and returns to the main menu.
-     * 
-     * @param winnerName The name of the winning player.
-     * @param scores A map of player names to scores.
-     */
-    public void handleGameEnd(String winnerName, Map<String, Integer> scores) {
-        gameEnded = true;
-        
-        Platform.runLater(() -> {
-            // Build results message
-            StringBuilder results = new StringBuilder("Partie terminée !\n");
-            results.append("Gagnant : ").append(winnerName).append("\n\n");
-            results.append("Scores finaux :\n");
-            
-            for (Map.Entry<String, Integer> entry : scores.entrySet()) {
-                results.append(entry.getKey()).append(": ").append(entry.getValue()).append(" points\n");
-            }
-            
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, 
-                results.toString(), 
-                ButtonType.OK);
-            alert.setTitle("Fin de partie");
-            alert.setHeaderText("Résultats");
-            
-            alert.showAndWait();
-            
-            // Delay a bit before returning to menu
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e -> {
-                NetworkManager.getInstance().disconnect();
-                App.getINSTANCE().restart();
-            });
-            delay.play();
-        });
-    }
-    
-    /**
      * Handles when a player leaves the game.
      * 
      * @param playerName The name of the player who left.
@@ -637,8 +601,24 @@ public class OnlineGameController implements NetworkEventListener {
      * Retourne au menu principal.
      */
     private void returnToMainMenu() {
-        // Return to the main menu
         NetworkManager.getInstance().disconnect();
         App.getINSTANCE().restart();
+    }
+
+    // ==================== GameActionListener ====================
+
+    @Override
+    public void onCardClicked(CardView cardView) {
+        handleCardClick(cardView);
+    }
+
+    @Override
+    public void onPickClicked() {
+        handlePickClick();
+    }
+
+    @Override
+    public void onDiscardClicked() {
+        handleDiscardClick();
     }
 }

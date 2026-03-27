@@ -9,6 +9,7 @@ import org.App.model.game.SkyjoGame;
 import org.App.model.player.AIPlayer;
 import org.App.model.player.Player;
 import org.App.view.components.CardView;
+import org.App.view.components.GameActionListener;
 import org.App.view.screens.GameViewInterface;
 import org.App.view.utils.OptionsManager;
 
@@ -23,8 +24,7 @@ import javafx.util.Duration;
  * Game controller with smooth card following, turn announcements,
  * phase indicators, and polished UX.
  */
-public final class GameController {
-    private static GameController instance;
+public final class GameController implements GameActionListener {
     private final SkyjoGame game;
     private final GameViewInterface view;
     private CardView pickedCardView;
@@ -40,11 +40,7 @@ public final class GameController {
     public GameController(GameViewInterface view, List<Player> players) {
         this.view = view;
         this.game = new SkyjoGame(players);
-        instance = this;
-    }
-
-    public static GameController getInstance() {
-        return instance;
+        CardView.setGlobalListener(this);
     }
 
     public void startGame() {
@@ -258,6 +254,10 @@ public final class GameController {
             view.showToast("Dernier tour !");
         }
 
+        if (game.isFinalRound()) {
+            game.decrementFinalRoundTurns();
+        }
+
         if (!justEnteredFinalRound && game.isGameOver()) {
             concludeGame();
         } else {
@@ -352,5 +352,22 @@ public final class GameController {
             delay.setOnFinished(event -> animateCardFlipsSequentially(cardViews, onFinished));
             delay.play();
         });
+    }
+
+    // ==================== GameActionListener ====================
+
+    @Override
+    public void onCardClicked(CardView cardView) {
+        handleCardClick(cardView);
+    }
+
+    @Override
+    public void onPickClicked() {
+        handlePickClick();
+    }
+
+    @Override
+    public void onDiscardClicked() {
+        handleDiscardClick();
     }
 }

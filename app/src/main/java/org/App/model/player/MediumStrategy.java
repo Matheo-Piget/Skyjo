@@ -32,9 +32,18 @@ public final class MediumStrategy implements AIStrategy {
         } else {
             pickedCard = game.pickCard();
             if (pickedCard != null) {
-                int highestIndex = findHighestValueCardIndex(player);
                 pickedCard = pickedCard.retourner();
-                game.exchangeOrRevealCard(player, pickedCard, highestIndex);
+                int highestIndex = findHighestValueCardIndex(player);
+                if (highestIndex != -1 && pickedCard.valeur().getValue() < player.getCartes().get(highestIndex).valeur().getValue()) {
+                    game.exchangeOrRevealCard(player, pickedCard, highestIndex);
+                } else {
+                    // Card is not beneficial — discard and reveal a hidden card
+                    game.addToDiscard(pickedCard);
+                    int hiddenIndex = findHiddenCardIndex(player.getCartes());
+                    if (hiddenIndex != -1) {
+                        player.getCartes().set(hiddenIndex, player.getCartes().get(hiddenIndex).retourner());
+                    }
+                }
             }
         }
     }

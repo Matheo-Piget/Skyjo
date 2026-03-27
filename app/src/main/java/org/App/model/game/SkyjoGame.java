@@ -3,13 +3,12 @@ package org.App.model.game;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.App.model.player.Player;
 
@@ -26,10 +25,17 @@ import org.App.model.player.Player;
  * @see Card
  *
  * @author Mathéo Piget
- * @version 2.0
+ * @version 3.0
  */
 public final class SkyjoGame implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    /** Number of cards dealt to each player at the start. */
+    private static final int CARDS_PER_PLAYER = 12;
+    /** Number of rows in a player's grid. */
+    private static final int ROWS = 3;
+    /** Cumulative score threshold that ends the game. */
+    private static final int SCORE_LIMIT = 100;
 
     private int startingPlayerIndex = 0;
     private final List<Player> players;
@@ -44,6 +50,7 @@ public final class SkyjoGame implements Serializable {
     private boolean hasPickedFromDiscard;
     private Player firstPlayerToRevealAllCards;
     private boolean isFinalRound = false;
+    private int finalRoundTurnsRemaining = 0;
 
     /**
      * Constructs a new SkyjoGame with no players.
@@ -66,67 +73,24 @@ public final class SkyjoGame implements Serializable {
         this.discard = new ArrayList<>();
     }
 
-    // ─── Getters / Setters ───────────────────────────────────────────────
+    // ─── Getters ─────────────────────────────────────────────────────────
 
-    public int getStartingPlayerIndex() {
-        return startingPlayerIndex;
-    }
+    public int getStartingPlayerIndex() { return startingPlayerIndex; }
+    public Card getPickedCard()         { return pickedCard; }
+    public boolean hasDiscard()         { return hasDiscard; }
+    public boolean isFinalRound()       { return isFinalRound; }
+    public int getCountReveal()         { return countReveal; }
+    public List<Player> getPlayers()    { return players; }
+    public Player getActualPlayer()     { return players.get(indexActualPlayer); }
 
-    public void setIndexActualPlayer(int indexActualPlayer) {
-        this.indexActualPlayer = indexActualPlayer;
-    }
+    /** Returns the number of cards remaining in the draw pile. O(1). */
+    public int getPickSize() { return pick.size(); }
 
-    public Card getPickedCard() {
-        return pickedCard;
-    }
+    /** Returns an unmodifiable view of the draw pile — no defensive copy. */
+    public List<Card> getPick() { return Collections.unmodifiableList(pick); }
 
-    public void setPickedCard(Card pickedCard) {
-        this.pickedCard = pickedCard;
-    }
-
-    public boolean hasDiscard() {
-        return hasDiscard;
-    }
-
-    public void setHasDiscard(boolean hasDiscard) {
-        this.hasDiscard = hasDiscard;
-    }
-
-    public boolean isFinalRound() {
-        return isFinalRound;
-    }
-
-    public void setFinalRound(boolean isFinalRound) {
-        this.isFinalRound = isFinalRound;
-    }
-
-    public int getCountReveal() {
-        return countReveal;
-    }
-
-    public void incrementCountReveal() {
-        this.countReveal++;
-    }
-
-    public void resetCountReveal() {
-        this.countReveal = 0;
-    }
-
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public List<Card> getPick() {
-        return List.copyOf(pick);
-    }
-
-    public List<Card> getDiscard() {
-        return List.copyOf(discard);
-    }
-
-    public Player getActualPlayer() {
-        return players.get(indexActualPlayer);
-    }
+    /** Returns an unmodifiable view of the discard pile. */
+    public List<Card> getDiscard() { return Collections.unmodifiableList(discard); }
 
     /**
      * Gets the top card of the discard pile.
@@ -134,30 +98,52 @@ public final class SkyjoGame implements Serializable {
      * @return The top card of the discard pile, or null if the pile is empty.
      */
     public Card getTopDiscard() {
-        return discard.isEmpty() ? null : discard.get(discard.size() - 1);
+        return discard.isEmpty() ? null : discard.getLast();
     }
+
+    // ─── State mutators (used by controllers / server) ───────────────────
+
+    public void setIndexActualPlayer(int indexActualPlayer) {
+        this.indexActualPlayer = indexActualPlayer;
+    }
+
+    public void setPickedCard(Card pickedCard) {
+        this.pickedCard = pickedCard;
+    }
+
+    public void setHasDiscard(boolean hasDiscard) {
+        this.hasDiscard = hasDiscard;
+    }
+
+    public void setFinalRound(boolean isFinalRound) {
+        this.isFinalRound = isFinalRound;
+    }
+
+    public void incrementCountReveal() { this.countReveal++; }
+
+    public void resetCountReveal() { this.countReveal = 0; }
 
     // ─── Deck management ────────────────────────────────────────────────
 
     /**
      * Creates and shuffles the deck of cards for the game.
-     * IDs are generated locally per game session (no global static counter).
+     * Uses streams for concise card generation.
      *
      * @return A shuffled list of {@link Card} instances representing the deck.
      */
     private List<Card> createPick() {
-        List<Card> cards = new ArrayList<>();
-        int id = 0;
-        for (CardValue value : CardValue.values()) {
-            int count = switch (value) {
-                case ZERO -> 15;
-                case MOINS_DEUX -> 5;
-                default -> 10;
-            };
-            for (int i = 0; i < count; i++) {
-                cards.add(new Card(value, false, id++));
-            }
-        }
+        final int[] idHolder = {0};
+        final List<Card> cards = java.util.Arrays.stream(CardValue.values())
+                .flatMap(value -> {
+                    final int count = switch (value) {
+                        case ZERO -> 15;
+                        case MOINS_DEUX -> 5;
+                        default -> 10;
+                    };
+                    return IntStream.range(0, count)
+                            .mapToObj(i -> new Card(value, false, idHolder[0]++));
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(cards);
         return cards;
     }
@@ -170,11 +156,11 @@ public final class SkyjoGame implements Serializable {
      */
     public Card pickCard() {
         hasPickedFromDiscard = false;
-        return pick.isEmpty() ? null : pick.remove(pick.size() - 1);
+        return pick.isEmpty() ? null : pick.removeLast();
     }
 
     /**
-     * Picks a card from the discard pile.
+     * Picks a card from the discard pile (always returned face-up).
      *
      * @return The picked card, or null if the discard pile is empty.
      */
@@ -182,9 +168,9 @@ public final class SkyjoGame implements Serializable {
         if (discard.isEmpty()) {
             return null;
         }
-        Card topCard = discard.remove(discard.size() - 1);
+        final Card topCard = discard.removeLast();
         hasPickedFromDiscard = true;
-        return topCard.retourner();
+        return topCard.faceVisible() ? topCard : topCard.retourner();
     }
 
     /**
@@ -202,35 +188,31 @@ public final class SkyjoGame implements Serializable {
      * keeping one card face-up as the new discard top.
      */
     public void pickEmpty() {
-        if (pick.isEmpty() && !discard.isEmpty()) {
-            List<Card> newPick = new ArrayList<>(discard);
-            Collections.shuffle(newPick);
-            pick = newPick;
-            discard.clear();
+        if (!pick.isEmpty() || discard.isEmpty()) {
+            return;
+        }
+        pick = new ArrayList<>(discard);
+        Collections.shuffle(pick);
+        discard.clear();
 
-            if (!pick.isEmpty()) {
-                Card firstCard = pick.remove(pick.size() - 1);
-                discard.add(firstCard.faceVisible() ? firstCard : firstCard.retourner());
-            }
+        if (!pick.isEmpty()) {
+            final Card firstCard = pick.removeLast();
+            discard.add(firstCard.faceVisible() ? firstCard : firstCard.retourner());
         }
     }
 
     // ─── Turn management ────────────────────────────────────────────────
 
-    /**
-     * Moves to the next player in the game.
-     */
+    /** Moves to the next player in the game. */
     public void nextPlayer() {
         indexActualPlayer = (indexActualPlayer + 1) % players.size();
     }
 
-    // ─── Final round detection (Command-Query Separation) ───────────────
+    // ─── Final round detection ──────────────────────────────────────────
 
     /**
      * Checks whether any player has revealed all their cards.
      * Pure query — no side effects.
-     *
-     * @return true if at least one player has all cards face-up.
      */
     private boolean hasAnyPlayerRevealedAllCards() {
         return players.stream().anyMatch(
@@ -239,13 +221,14 @@ public final class SkyjoGame implements Serializable {
 
     /**
      * Command: checks if the final round should start and triggers it.
-     * Call this after each turn, before checking {@link #isGameOver()}.
+     * Every other player gets exactly one more turn after the trigger.
      *
      * @return true if the final round was <em>just</em> triggered by this call.
      */
     public boolean checkAndEnterFinalRound() {
         if (!isFinalRound && hasAnyPlayerRevealedAllCards()) {
             isFinalRound = true;
+            finalRoundTurnsRemaining = players.size() - 1;
             if (firstPlayerToRevealAllCards == null) {
                 firstPlayerToRevealAllCards = players.stream()
                         .filter(p -> p.getCartes().stream().allMatch(Card::faceVisible))
@@ -257,30 +240,31 @@ public final class SkyjoGame implements Serializable {
         return false;
     }
 
+    /** Decrements the final round counter. Call after each turn in the final round. */
+    public void decrementFinalRoundTurns() {
+        if (isFinalRound && finalRoundTurnsRemaining > 0) {
+            finalRoundTurnsRemaining--;
+        }
+    }
+
     /**
-     * Pure query: checks if the game is over.
-     * The game ends when the final round is active and we've reached the last player.
-     *
-     * @return true if the game is over.
+     * Pure query: the game is over when the final round is active
+     * and all remaining turns are spent.
      */
     public boolean isGameOver() {
-        return isFinalRound && indexActualPlayer == players.size() - 1;
+        return isFinalRound && finalRoundTurnsRemaining <= 0;
     }
 
     // ─── Card actions ───────────────────────────────────────────────────
 
-    /**
-     * Reveals all cards for all players (called at end of round).
-     */
+    /** Reveals all cards for all players (called at end of round). */
     public void revealAllCards() {
-        for (Player player : players) {
-            List<Card> cartes = player.getCartes();
-            for (int i = 0; i < cartes.size(); i++) {
-                if (!cartes.get(i).faceVisible()) {
-                    cartes.set(i, cartes.get(i).retourner());
-                }
-            }
-        }
+        players.forEach(player -> {
+            final List<Card> cartes = player.getCartes();
+            IntStream.range(0, cartes.size())
+                    .filter(i -> !cartes.get(i).faceVisible())
+                    .forEach(i -> cartes.set(i, cartes.get(i).retourner()));
+        });
     }
 
     /**
@@ -299,13 +283,9 @@ public final class SkyjoGame implements Serializable {
         if (cardIndex < 0 || cardIndex >= player.getCartes().size()) {
             throw new InvalidMoveException("Invalid card index: " + cardIndex);
         }
-        if (hasPickedFromDiscard) {
-            Card oldCard = player.getCartes().set(cardIndex, newCard.retourner());
-            addToDiscard(oldCard);
-        } else {
-            Card oldCard = player.getCartes().set(cardIndex, newCard);
-            addToDiscard(oldCard);
-        }
+        final Card placed = hasPickedFromDiscard ? newCard.retourner() : newCard;
+        final Card oldCard = player.getCartes().set(cardIndex, placed);
+        addToDiscard(oldCard);
     }
 
     /**
@@ -328,50 +308,52 @@ public final class SkyjoGame implements Serializable {
      * and have the same value.
      */
     public void checkColumns() {
-        Player player = players.get(indexActualPlayer);
-        List<Card> cartes = player.getCartes();
-        int columns = cartes.size() / 3;
-        int rows = 3;
+        final Player player = players.get(indexActualPlayer);
+        final List<Card> cartes = player.getCartes();
+        final int columns = cartes.size() / ROWS;
 
-        for (int col = 0; col < columns; col++) {
-            CardValue firstValue = null;
-            boolean allSame = true;
-            List<Integer> indexes = new ArrayList<>();
+        for (int col = columns - 1; col >= 0; col--) {
+            final int c = col;
+            final List<Integer> indexes = IntStream.range(0, ROWS)
+                    .map(row -> row * columns + c)
+                    .filter(idx -> idx < cartes.size())
+                    .boxed()
+                    .collect(Collectors.toList());
 
-            for (int row = 0; row < rows; row++) {
-                int index = row * columns + col;
-                if (index >= cartes.size()) {
-                    allSame = false;
-                    break;
-                }
+            if (indexes.size() != ROWS) continue;
 
-                Card card = cartes.get(index);
-                if (!card.faceVisible()) {
-                    allSame = false;
-                    break;
-                }
+            final boolean allVisible = indexes.stream().allMatch(i -> cartes.get(i).faceVisible());
+            if (!allVisible) continue;
 
-                if (firstValue == null) {
-                    firstValue = card.valeur();
-                } else if (!firstValue.equals(card.valeur())) {
-                    allSame = false;
-                    break;
-                }
+            final CardValue firstValue = cartes.get(indexes.getFirst()).valeur();
+            final boolean allSame = indexes.stream()
+                    .allMatch(i -> cartes.get(i).valeur() == firstValue);
 
-                indexes.add(index);
-            }
-
-            if (allSame && firstValue != null) {
-                for (int i = indexes.size() - 1; i >= 0; i--) {
-                    int index = indexes.get(i);
-                    addToDiscard(cartes.get(index));
-                    cartes.remove(index);
-                }
+            if (allSame) {
+                // Remove in reverse order to preserve indices
+                indexes.stream()
+                        .sorted(Collections.reverseOrder())
+                        .forEach(idx -> {
+                            addToDiscard(cartes.get(idx));
+                            cartes.remove((int) idx);
+                        });
             }
         }
     }
 
     // ─── Scoring ────────────────────────────────────────────────────────
+
+    /**
+     * Computes the score for a single player's hand.
+     *
+     * @param player The player whose hand to score.
+     * @return The sum of all card values.
+     */
+    public int computeHandScore(Player player) {
+        return player.getCartes().stream()
+                .mapToInt(c -> c.valeur().getValue())
+                .sum();
+    }
 
     /**
      * Gets the ranking of players based on round scores + cumulative.
@@ -381,14 +363,14 @@ public final class SkyjoGame implements Serializable {
      * @return A sorted map of players to their total scores (ascending).
      */
     public Map<Player, Integer> getRanking() {
-        Map<Player, Integer> ranking = new java.util.HashMap<>();
-        players.forEach(player -> ranking.put(player,
-                player.getCartes().stream().mapToInt(c -> c.valeur().getValue()).sum()
-                        + player.getCumulativeScore()));
+        final Map<Player, Integer> ranking = players.stream()
+                .collect(Collectors.toMap(
+                        p -> p,
+                        p -> computeHandScore(p) + p.getCumulativeScore()));
 
         if (firstPlayerToRevealAllCards != null) {
-            int minScore = Collections.min(ranking.values());
-            int firstPlayerScore = ranking.get(firstPlayerToRevealAllCards);
+            final int minScore = ranking.values().stream().mapToInt(Integer::intValue).min().orElse(0);
+            final int firstPlayerScore = ranking.get(firstPlayerToRevealAllCards);
             if (firstPlayerScore != minScore) {
                 ranking.put(firstPlayerToRevealAllCards, firstPlayerScore * 2);
             }
@@ -403,27 +385,21 @@ public final class SkyjoGame implements Serializable {
      * @return A sorted map of players to their cumulative scores (ascending).
      */
     public Map<Player, Integer> getFinalRanking() {
-        Map<Player, Integer> ranking = new java.util.HashMap<>();
-        players.forEach(player -> ranking.put(player, player.getCumulativeScore()));
-        return sortedRanking(ranking);
+        return sortedRanking(players.stream()
+                .collect(Collectors.toMap(p -> p, Player::getCumulativeScore)));
     }
 
     /**
-     * Checks if any player has reached 100 cumulative points (game-ending condition).
-     *
-     * @return true if any player has &gt;= 100 cumulative points.
+     * Checks if any player has reached the score limit (game-ending condition).
      */
     public boolean hasPlayerReached100Points() {
-        return players.stream().anyMatch(player -> player.getCumulativeScore() >= 100);
+        return players.stream().anyMatch(p -> p.getCumulativeScore() >= SCORE_LIMIT);
     }
 
-    /**
-     * Sorts a ranking map by value in ascending order.
-     */
+    /** Sorts a ranking map by value in ascending order. */
     private Map<Player, Integer> sortedRanking(Map<Player, Integer> ranking) {
-        return ranking.entrySet()
-                .stream()
-                .sorted(Map.Entry.<Player, Integer>comparingByValue())
+        return ranking.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -435,11 +411,12 @@ public final class SkyjoGame implements Serializable {
 
     /**
      * Starts (or restarts) the game by creating a new deck, distributing
-     * 12 cards to each player, and placing one card face-up in the discard.
+     * cards to each player, and placing one card face-up in the discard.
      */
     public void startGame() {
         firstPlayerToRevealAllCards = null;
         isFinalRound = false;
+        finalRoundTurnsRemaining = 0;
 
         pick.clear();
         discard.clear();
@@ -447,13 +424,12 @@ public final class SkyjoGame implements Serializable {
 
         pick = createPick();
         players.forEach(player -> {
-            int size = pick.size();
-            player.getCartes().addAll(pick.subList(size - 12, size));
-            pick.subList(size - 12, size).clear();
+            final int size = pick.size();
+            player.getCartes().addAll(pick.subList(size - CARDS_PER_PLAYER, size));
+            pick.subList(size - CARDS_PER_PLAYER, size).clear();
         });
         if (!pick.isEmpty()) {
-            Card firstCard = pick.remove(pick.size() - 1).retourner();
-            discard.add(firstCard);
+            discard.add(pick.removeLast().retourner());
         }
     }
 
@@ -462,22 +438,23 @@ public final class SkyjoGame implements Serializable {
      * (the player with the highest total of their two revealed cards).
      */
     public void revealInitialCards() {
-        int highestTotal = -1;
+        int highestTotal = Integer.MIN_VALUE;
 
         for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            int total = 0;
-            Set<Integer> revealedIndices = new HashSet<>();
+            final Player player = players.get(i);
+            final int cardCount = player.getCartes().size();
 
-            while (revealedIndices.size() < 2) {
-                int rand = random.nextInt(player.getCartes().size());
-                if (revealedIndices.add(rand)) {
-                    Card card = player.getCartes().get(rand);
-                    player.getCartes().set(rand, card.retourner());
-                    total += card.valeur().getValue();
-                }
-            }
+            // Pick 2 distinct random indices
+            final int idx1 = random.nextInt(cardCount);
+            int idx2 = random.nextInt(cardCount - 1);
+            if (idx2 >= idx1) idx2++;
 
+            final Card c1 = player.getCartes().get(idx1);
+            final Card c2 = player.getCartes().get(idx2);
+            player.getCartes().set(idx1, c1.retourner());
+            player.getCartes().set(idx2, c2.retourner());
+
+            final int total = c1.valeur().getValue() + c2.valeur().getValue();
             if (total > highestTotal) {
                 highestTotal = total;
                 startingPlayerIndex = i;

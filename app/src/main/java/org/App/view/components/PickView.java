@@ -1,10 +1,5 @@
 package org.App.view.components;
 
-import org.App.App;
-import org.App.controller.GameController;
-import org.App.controller.OnlineGameController;
-import org.App.network.NetworkManager;
-
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
@@ -18,6 +13,7 @@ import javafx.util.Duration;
 
 /**
  * Represents the draw pile in the game.
+ * Decoupled from controllers — delegates clicks to the global {@link GameActionListener}.
  */
 public class PickView extends StackPane {
 
@@ -29,7 +25,6 @@ public class PickView extends StackPane {
         cardBackground.setArcWidth(12);
         cardBackground.setArcHeight(12);
 
-        // Stacked card effect - second card behind
         Rectangle bgCard = new Rectangle(50, 72);
         bgCard.setFill(Color.web("#293548"));
         bgCard.setStroke(Color.web("#3d4f63"));
@@ -69,18 +64,13 @@ public class PickView extends StackPane {
 
         setAlignment(Pos.CENTER);
         getChildren().addAll(bgCard, cardBackground, cardCount, label);
-        setOnMouseClicked(event -> handleClick());
-    }
 
-    private void handleClick() {
-        if (App.getINSTANCE().isOnlineGame) {
-            OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
-            if (controller != null) {
-                controller.handlePickClick();
+        setOnMouseClicked(event -> {
+            GameActionListener listener = CardView.globalListener;
+            if (listener != null) {
+                listener.onPickClicked();
             }
-        } else {
-            GameController.getInstance().handlePickClick();
-        }
+        });
     }
 
     public void addCard(CardView cardView) {

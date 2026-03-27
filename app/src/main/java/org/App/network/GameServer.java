@@ -288,12 +288,9 @@ public class GameServer {
             game.setPickedCard(null);
             game.setHasDiscard(true);
 
-            // Broadcast updated state
+            // Broadcast updated state — player must now reveal a card before turn ends
             broadcastGameState();
-
-            // Move to next player's turn
-            game.nextPlayer();
-            broadcast(Protocol.formatMessage(Protocol.PLAYER_TURN, game.getActualPlayer().getId()));
+            // Do NOT advance to next player: the client must send a REVEAL message next
         } catch (Exception e) {
             sender.sendMessage(Protocol.formatMessage(Protocol.ERROR, -1, "Error discarding card: " + e.getMessage()));
         }
@@ -328,10 +325,14 @@ public class GameServer {
             
             // Broadcast the updated game state to all clients
             broadcastGameState();
-            
+
             // Check columns and final round
             game.checkColumns();
             game.checkAndEnterFinalRound();
+
+            if (game.isFinalRound()) {
+                game.decrementFinalRoundTurns();
+            }
 
             // Check if the game is finished after this move
             if (game.isGameOver()) {
@@ -387,6 +388,10 @@ public class GameServer {
             // Check columns and final round
             game.checkColumns();
             game.checkAndEnterFinalRound();
+
+            if (game.isFinalRound()) {
+                game.decrementFinalRoundTurns();
+            }
 
             // Check if the game is finished after this move
             if (game.isGameOver()) {

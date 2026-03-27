@@ -25,7 +25,6 @@ public final class EasyStrategy implements AIStrategy {
         if (pickFromDiscard && game.getTopDiscard() != null) {
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
-                pickedCard = pickedCard.retourner();
                 int cardIndex = findBestCardToReplace(player.getCartes(), pickedCard);
                 if (cardIndex != -1) {
                     game.exchangeOrRevealCard(player, pickedCard, cardIndex);

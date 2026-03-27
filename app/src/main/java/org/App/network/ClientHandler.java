@@ -52,7 +52,7 @@ public class ClientHandler implements Runnable {
     }
 
     public int getId() {
-        return server.getClientId(this);
+        return id;
     }
 
     public void setId(int id) {

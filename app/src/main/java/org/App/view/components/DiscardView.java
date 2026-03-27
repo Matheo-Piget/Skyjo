@@ -1,10 +1,6 @@
 package org.App.view.components;
 
-import org.App.App;
-import org.App.controller.GameController;
-import org.App.controller.OnlineGameController;
 import org.App.model.game.Card;
-import org.App.network.NetworkManager;
 
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
@@ -17,6 +13,7 @@ import javafx.util.Duration;
 
 /**
  * Represents the discard pile view in the Skyjo game.
+ * Decoupled from controllers — delegates clicks to the global {@link GameActionListener}.
  */
 public class DiscardView extends StackPane {
     private Card topCard;
@@ -52,7 +49,13 @@ public class DiscardView extends StackPane {
             st.play();
         });
 
-        setOnMouseClicked(event -> handleClick(event));
+        setOnMouseClicked(event -> {
+            GameActionListener listener = CardView.globalListener;
+            if (listener != null) {
+                listener.onDiscardClicked();
+            }
+            event.consume();
+        });
     }
 
     public void setTopCard(Card topCard) {
@@ -71,17 +74,5 @@ public class DiscardView extends StackPane {
 
     public void addCard(CardView cardView) {
         this.getChildren().add(cardView);
-    }
-
-    private void handleClick(javafx.scene.input.MouseEvent event) {
-        if (App.getINSTANCE().isOnlineGame) {
-            OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
-            if (controller != null) {
-                controller.handleDiscardClick();
-            }
-        } else {
-            GameController.getInstance().handleDiscardClick();
-        }
-        event.consume();
     }
 }

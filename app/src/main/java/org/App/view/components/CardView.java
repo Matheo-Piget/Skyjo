@@ -1,10 +1,6 @@
 package org.App.view.components;
 
-import org.App.App;
-import org.App.controller.GameController;
-import org.App.controller.OnlineGameController;
 import org.App.model.game.Card;
-import org.App.network.NetworkManager;
 import org.App.view.utils.OptionsManager;
 import org.App.view.utils.SoundManager;
 
@@ -24,8 +20,11 @@ import javafx.util.Duration;
 
 /**
  * Represents the view of a card in the Skyjo game.
+ * Decoupled from controllers — delegates clicks to an injected {@link GameActionListener}.
  */
 public class CardView extends StackPane {
+    static GameActionListener globalListener;
+
     private final int playerId;
     private final int cardId;
     private Card value;
@@ -33,6 +32,14 @@ public class CardView extends StackPane {
     private final Rectangle cardBackground = new Rectangle(50, 72);
     private final Text frontText = new Text();
     private final Text backText = new Text("?");
+
+    /**
+     * Sets the global action listener for all card views.
+     * Called once when the controller initialises the game view.
+     */
+    public static void setGlobalListener(GameActionListener listener) {
+        globalListener = listener;
+    }
 
     public CardView(Card value, int index, int playerId) {
         this.playerId = playerId;
@@ -47,7 +54,6 @@ public class CardView extends StackPane {
 
         updateCardAppearance();
 
-        // Hover animation + cursor
         setCursor(Cursor.HAND);
         setOnMouseEntered(event -> scaleUp());
         setOnMouseExited(event -> scaleDown());
@@ -58,7 +64,11 @@ public class CardView extends StackPane {
 
         backText.setVisible(true);
 
-        setOnMouseClicked(event -> handleClick());
+        setOnMouseClicked(event -> {
+            if (globalListener != null) {
+                globalListener.onCardClicked(this);
+            }
+        });
     }
 
     public int getPlayerId() {
@@ -82,7 +92,6 @@ public class CardView extends StackPane {
         cardBackground.setEffect(dropShadow);
 
         if (value.faceVisible()) {
-            // Face visible - colored by value range
             switch (value.valeur()) {
                 case MOINS_DEUX, MOINS_UN -> {
                     cardBackground.setFill(Color.web("#22c55e"));
@@ -106,18 +115,13 @@ public class CardView extends StackPane {
                 }
                 default -> throw new AssertionError();
             }
-            frontText.setText(String.valueOf((int) switch (value.valeur()) {
-                case MOINS_DEUX -> -2;
-                case MOINS_UN -> -1;
-                default -> value.valeur().getValue();
-            }));
+            frontText.setText(String.valueOf(value.valeur().getValue()));
             backText.setText("");
             backText.setVisible(false);
             frontText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
             frontText.setFill(Color.WHITE);
             frontText.setEffect(new DropShadow(2, 0, 1, Color.color(0, 0, 0, 0.3)));
         } else {
-            // Face cachee
             backText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
             cardBackground.setFill(Color.web("#1e293b"));
             cardBackground.setStroke(Color.web("#334155"));
@@ -171,21 +175,6 @@ public class CardView extends StackPane {
         st.setToY(1.0);
         st.setInterpolator(Interpolator.EASE_OUT);
         st.play();
-    }
-
-    private void handleClick() {
-        if (App.getINSTANCE().isOnlineGame) {
-            OnlineGameController controller = NetworkManager.getInstance().getOnlineController();
-            if (controller != null) {
-                controller.handleCardClick(this);
-            } else {
-                System.out.println("Online controller is null!");
-            }
-        } else if (GameController.getInstance() == null) {
-            System.out.println("GameController est null !");
-        } else {
-            GameController.getInstance().handleCardClick(this);
-        }
     }
 
     public Card getValue() {
