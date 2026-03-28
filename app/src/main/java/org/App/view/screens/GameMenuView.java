@@ -2,19 +2,15 @@ package org.App.view.screens;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.App.controller.GameController;
 import org.App.model.player.AIPlayer;
 import org.App.model.player.Difficulty;
 import org.App.model.player.HumanPlayer;
 import org.App.model.player.Player;
+import org.App.view.utils.FloatingCardsFactory;
 import org.App.view.utils.MusicManager;
 import org.App.view.utils.OptionsManager;
-
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
-import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,9 +26,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 /**
  * Main menu view for the Skyjo game.
@@ -170,7 +164,7 @@ public class GameMenuView {
         Pane backgroundLayer = new Pane();
         backgroundLayer.setMouseTransparent(true);
         backgroundLayer.setPickOnBounds(false);
-        createFloatingCards(backgroundLayer);
+        FloatingCardsFactory.create(backgroundLayer, 12, 1200, 800);
 
         // Content layer
         VBox menuContainer = new VBox(22);
@@ -249,50 +243,6 @@ public class GameMenuView {
         this.menuScene = new Scene(root, 700, 500);
         menuScene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
         stage.setScene(menuScene);
-    }
-
-    /** Creates floating card-shaped decorations in the background. */
-    private void createFloatingCards(Pane layer) {
-        Random rng = new Random();
-        boolean isDark = OptionsManager.getTheme().equals("Sombre");
-
-        for (int i = 0; i < 12; i++) {
-            Rectangle card = new Rectangle(35 + rng.nextInt(25), 50 + rng.nextInt(30));
-            card.setArcWidth(8);
-            card.setArcHeight(8);
-            card.setFill(isDark
-                    ? Color.web("#818cf8", 0.03 + rng.nextDouble() * 0.04)
-                    : Color.web("#6366f1", 0.04 + rng.nextDouble() * 0.05));
-            card.setStroke(isDark
-                    ? Color.web("#818cf8", 0.06)
-                    : Color.web("#6366f1", 0.07));
-            card.setStrokeWidth(1);
-
-            card.setLayoutX(rng.nextDouble() * 1200);
-            card.setLayoutY(rng.nextDouble() * 800);
-            card.setRotate(rng.nextDouble() * 360);
-
-            layer.getChildren().add(card);
-
-            TranslateTransition tt = new TranslateTransition(
-                    Duration.seconds(14 + rng.nextDouble() * 16), card);
-            tt.setFromY(0);
-            tt.setToY(-25 - rng.nextDouble() * 50);
-            tt.setFromX(0);
-            tt.setToX(-15 + rng.nextDouble() * 30);
-            tt.setAutoReverse(true);
-            tt.setCycleCount(TranslateTransition.INDEFINITE);
-            tt.setInterpolator(Interpolator.EASE_BOTH);
-            tt.play();
-
-            RotateTransition rt = new RotateTransition(
-                    Duration.seconds(22 + rng.nextDouble() * 20), card);
-            rt.setByAngle(-12 + rng.nextDouble() * 24);
-            rt.setAutoReverse(true);
-            rt.setCycleCount(RotateTransition.INDEFINITE);
-            rt.setInterpolator(Interpolator.EASE_BOTH);
-            rt.play();
-        }
     }
 
     private void startGame() {

@@ -18,7 +18,7 @@ public class ClientHandler implements Runnable {
         this.name = name;
         this.socket = socket;
         this.server = server;
-        this.id = server.getClientId(this);
+        this.id = -1; // Assigned later by server via setId()
         try {
             out = new PrintWriter(socket.getOutputStream(), true);
             in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));

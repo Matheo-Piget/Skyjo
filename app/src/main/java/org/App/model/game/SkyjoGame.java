@@ -283,7 +283,7 @@ public final class SkyjoGame implements Serializable {
         if (cardIndex < 0 || cardIndex >= player.getCartes().size()) {
             throw new InvalidMoveException("Invalid card index: " + cardIndex);
         }
-        final Card placed = hasPickedFromDiscard ? newCard.retourner() : newCard;
+        final Card placed = newCard.faceVisible() ? newCard : newCard.retourner();
         final Card oldCard = player.getCartes().set(cardIndex, placed);
         addToDiscard(oldCard);
     }

@@ -22,7 +22,6 @@ public final class HardStrategy implements AIStrategy {
         if (topDiscard != null && isCardBeneficial(topDiscard)) {
             pickedCard = game.pickDiscard();
             if (pickedCard != null) {
-                pickedCard = pickedCard.retourner();
                 int cardIndex = findBestCardToReplace(player.getCartes(), pickedCard);
                 if (cardIndex != -1) {
                     game.exchangeOrRevealCard(player, pickedCard, cardIndex);

@@ -134,7 +134,6 @@ public final class GameController implements GameActionListener {
             Card pickedCard = game.pickDiscard();
             game.setPickedCard(pickedCard);
             if (pickedCard != null) {
-                pickedCard = pickedCard.retourner();
                 startHoldingCard(pickedCard);
                 updatePhaseHint();
             } else {
@@ -369,5 +368,10 @@ public final class GameController implements GameActionListener {
     @Override
     public void onDiscardClicked() {
         handleDiscardClick();
+    }
+
+    @Override
+    public void onNextRoundRequested() {
+        restartRoundWithDelay(0.3);
     }
 }

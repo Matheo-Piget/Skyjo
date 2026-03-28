@@ -41,6 +41,10 @@ public class CardView extends StackPane {
         globalListener = listener;
     }
 
+    public static GameActionListener getGlobalListener() {
+        return globalListener;
+    }
+
     public CardView(Card value, int index, int playerId) {
         this.playerId = playerId;
         this.value = value;

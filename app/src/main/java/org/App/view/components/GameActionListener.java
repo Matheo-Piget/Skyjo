@@ -15,4 +15,7 @@ public interface GameActionListener {
 
     /** Called when the player clicks the discard pile. */
     void onDiscardClicked();
+
+    /** Called when the player clicks "next round" after the ranking screen. */
+    default void onNextRoundRequested() {}
 }

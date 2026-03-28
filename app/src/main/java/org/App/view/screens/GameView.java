@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.App.App;
-import org.App.controller.GameController;
 import org.App.model.game.Card;
 import org.App.model.player.Player;
 import org.App.view.components.BoardView;
@@ -587,7 +586,11 @@ public class GameView implements GameViewInterface {
 
         Button nextButton = new Button("Manche suivante");
         nextButton.getStyleClass().add("button");
-        nextButton.setOnAction(event -> GameController.getInstance().restartRoundWithDelay(0.3));
+        nextButton.setOnAction(event -> {
+            if (CardView.getGlobalListener() != null) {
+                CardView.getGlobalListener().onNextRoundRequested();
+            }
+        });
 
         VBox buttonBox = new VBox(nextButton);
         buttonBox.setAlignment(Pos.CENTER);
